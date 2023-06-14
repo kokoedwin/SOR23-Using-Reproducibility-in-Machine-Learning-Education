@@ -1,45 +1,31 @@
 ::: {.cell .markdown}
-# Reproducibility: Cutout
+# Cutout data augmentation
 
-### Original Paper: Improved Regularization of Convolutional Neural Networks with Cutout
+In this notebook, we will reproduce the results of the paper
 
-### Original Code: <https://github.com/uoguelph-mlrg/Cutout> {#original-code-httpsgithubcomuoguelph-mlrgcutout}
+> DeVries, T. and Taylor, G.W., 2017. Improved regularization of convolutional neural networks with Cutout. arXiv preprint [arXiv:1708.04552](https://arxiv.org/abs/1708.04552). 
+
+We will use the author's implementation of their technique, from [https://github.com/uoguelph-mlrg/Cutout](https://github.com/uoguelph-mlrg/Cutout), which is licensed under an Educational Community License version 2.0.
+
 :::
 
-::: {.cell .markdown }
 
-# 1. Introduction 
-
-This Jupyter notebook is designed to illustrate the implementation and
-usage of the CutOut data augmentation technique in deep learning,
-specifically in the context of Convolutional Neural Networks (CNNs).
-
-### CutOut: An Overview
-
-CutOut is a regularization and data augmentation technique for
-convolutional neural networks (CNNs). It involves randomly masking out
-square regions of input during training. This helps to improve the
-robustness and overall performance of CNNs by encouraging the network to
-better utilize the full context of the image, rather than relying on the
-presence of a small set of specific visual features.
-
-CutOut is computationally efficient as it can be applied during data
-loading in parallel with the main training task. It can be used in
-conjunction with existing forms of data augmentation and other
-regularizers to further improve model performance.
-
-The technique has been evaluated with state-of-the-art architectures on
-popular image recognition datasets such as CIFAR-10, CIFAR-100, and
-SVHN, often achieving state-of-the-art or near state-of-the-art results.
-:::
 
 ::: {.cell .markdown}
-# 2. Setting Up the Environment 
+
+## Learning outcomes
+
+After working through this notebook, you should be able to:
+
+* describe how Cutout works as a regularization technique,
+* enumerate specific claims (both quantitative claims, qualitative claims, and claims about the underlying mechanism behind a result) from the Cutout paper,
+* execute experiments (following the given procedure) to try and validate each claim about Cutout data augmentation,
+* evaluate whether your own result matches quantitative claims in the Cutout paper (i.e. whether it is within the confidence intervals for each reported numeric result),
+* evaluate whether your own result validates qualitative claims in the Cutout paper,
+* evaluate whether your own results support the author's claim about the underlying mechanism behind the result.
+
 :::
 
-::: {.cell .markdown}
-## Import Library
-:::
 
 ::: {.cell .code}
 ``` python
@@ -68,32 +54,58 @@ import os
 :::
 
 
-
-
-
 ::: {.cell .code}
 ``` python
+# note: This notebook has been developed and tested for pytorch 
 print(torch. __version__)
 ```
 :::
 
-::: {.cell .code id="D9nl5D7QC8Kg"}
-``` python
-if not os.path.exists('/content/checkpoints'):
-    os.makedirs('/content/checkpoints')
-```
+
+
+::: {.cell .markdown }
+
+## Cutout as a regularization technique
+
+This Jupyter notebook is designed to illustrate the implementation and
+usage of the Cutout data augmentation technique in deep learning,
+specifically in the context of Convolutional Neural Networks (CNNs).
+
 :::
 
-::: {.cell .markdown id="kTJayODE4tqA"}
-# 3. Data Preprocessing {#3-data-preprocessing}
+::: {.cell .markdown }
+
+
+Cutout is a regularization and data augmentation technique for
+convolutional neural networks (CNNs). It involves randomly masking out
+square regions of input during training. This helps to improve the
+robustness and overall performance of CNNs by encouraging the network to
+better utilize the full context of the image, rather than relying on the
+presence of a small set of specific visual features.
+
+Cutout is computationally efficient as it can be applied during data
+loading in parallel with the main training task. It can be used in
+conjunction with existing forms of data augmentation and other
+regularizers to further improve model performance.
+
+The technique has been evaluated with state-of-the-art architectures on
+popular image recognition datasets such as CIFAR-10, CIFAR-100, and
+SVHN, often achieving state-of-the-art or near state-of-the-art results.
 :::
 
-::: {.cell .markdown id="wePTccm-5Jfh"}
-## Cutout Code
+
+::: {.cell .markdown}
+In the following cells, we will see how Cutout works when applied to a sample image.
+
+<!-- To do: explain the code with reference to section 3.2. Implementation Details -->
+
 :::
+
+
 
 ::: {.cell .code id="8hBvsq8A8WPD"}
 ``` python
+# to do: link to the file in the original repo that this comes from
 class Cutout(object):
     """Randomly mask out one or more patches from an image.
 
@@ -136,15 +148,33 @@ class Cutout(object):
 ```
 :::
 
-::: {.cell .markdown id="G6qClZBC5PWp"}
-## Image without Cutout
+
+::: {.cell .markdown}
+
+To see how it works, in the following cell, you will upload an image of your choice to this workspace:
+
+<!-- to do - add instructions for uploading image on Colab, or on Chameleon -->
+
 :::
 
-::: {.cell .code colab="{\"base_uri\":\"https://localhost:8080/\",\"height\":527}" id="dxxPDv3HM-Ud" outputId="20a7d49f-7f40-48b0-fd3f-4200fd39bbb4"}
-``` python
+
+
+::: {.cell .code}
+```python
+# to do - update so user specifies image name and path themself
 # Load an image
 img = Image.open('/content/sample.png')
+```
+:::
 
+
+::: {.cell .markdown}
+Then, the following cell will display your image directly, without any data augmentation:
+:::
+
+
+::: {.cell .code }
+``` python
 # Convert the image to a PyTorch tensor
 img_tensor = transforms.ToTensor()(img)
 
@@ -155,31 +185,94 @@ plt.show()
 ```
 :::
 
-::: {.cell .markdown id="2blWk9iB5VZJ"}
-## Image with Cutout
+::: {.cell .markdown}
+and the next cell will display your image with Cutout applied:
 :::
 
-::: {.cell .code colab="{\"base_uri\":\"https://localhost:8080/\",\"height\":527}" id="3NOKi5DGNCpc" outputId="f4710560-963f-4a50-ffd7-3242f364d542"}
+
+::: {.cell .code}
 ``` python
 # Create a Cutout object
-cutout = Cutout(n_holes=1, length=300)
+Cutout = Cutout(n_holes=1, length=300)
 
 # Apply Cutout to the image
-img_tensor_cutout = cutout(img_tensor)
+img_tensor_Cutout = Cutout(img_tensor)
 
 # Convert the tensor back to an image for visualization
-img_cutout = transforms.ToPILImage()(img_tensor_cutout)
+img_Cutout = transforms.ToPILImage()(img_tensor_Cutout)
 
-# Display the image with cutout applied
+# Display the image with Cutout applied
 plt.figure(figsize=(6,6))
-plt.imshow(img_tensor_cutout.permute(1, 2, 0))
+plt.imshow(img_tensor_Cutout.permute(1, 2, 0))
 plt.show()
 ```
 :::
 
-::: {.cell .markdown id="HLiZirvA5dfE"}
-## Implement Cutout on CIFAR10 Dataset
+
+::: {.cell .markdown}
+
+Things to try:
+
+* You can re-run the cell above several times to see how the occlusion is randomly placed in a different position each time.
+* You can try changing the `length` parameter in the cell above, and re-running, to see how the size of the occlusion can change.
+* You can try changing the `n_holes` parameter in the cell above, and re-running, to see how the number of occlusions can change.
+
 :::
+
+
+::: {.cell .markdown}
+
+Cutout was introduced as an alternative to two closely related techniques:
+
+* Data Augmentation for Images
+* Dropout in Convolutional Neural Networks
+
+<!-- to do - expand on these -->
+
+:::
+
+
+::: {.cell .code}
+```python
+# to do - show the same image with "standard" data augmentation techniques
+# discussed in the related work section of the paper
+```
+:::
+
+
+
+
+::: {.cell .markdown}
+## Identifying claims from the Cutout paper
+
+To reproduce the results from the original Cutout paper, we will first need to identify the specific, falsifiable claims in that paper, by reading it very carefully. Then, we will design experiments to validate each claim. 
+
+These claims may be quantitative (i.e. describe a specific numeric result), qualitative (i.e. describe a general characteristic of the result), or they may relate to the mechanism behind a result (i.e. describe *why* a particular result occurs).
+
+<!-- to do - go through the paper, quote little snippets and explain each claim and organize them -->
+:::
+
+
+::: {.cell .markdown}
+## Execute experiments to validate quantitative and qualitative claims
+
+:::
+
+
+
+::: {.cell .markdown id="HLiZirvA5dfE"}
+### Implement Cutout on CIFAR10 Dataset
+:::
+
+
+::: {.cell .code id="D9nl5D7QC8Kg"}
+``` python
+if not os.path.exists('/content/checkpoints'):
+    os.makedirs('/content/checkpoints')
+```
+:::
+
+
 
 ::: {.cell .code id="FiuWkXnrQrs9"}
 ``` python
@@ -224,17 +317,17 @@ imshow(torchvision.utils.make_grid(images))
 ::: {.cell .code colab="{\"base_uri\":\"https://localhost:8080/\",\"height\":193}" id="mWDUpa-KSDta" outputId="a22fee56-b6eb-4e04-c066-ebbab49d0d4c"}
 ``` python
 # Apply Cutout and show images after
-cutout_images = torch.stack([Cutout(n_holes=1, length=16)(img) for img in images])
-imshow(torchvision.utils.make_grid(cutout_images))
+Cutout_images = torch.stack([Cutout(n_holes=1, length=16)(img) for img in images])
+imshow(torchvision.utils.make_grid(Cutout_images))
 ```
 :::
 
 ::: {.cell .markdown id="cyqBjZTW4tyV"}
-# 4. Methods and Implementation {#4-methods-and-implementation}
+### 4. Methods and Implementation {#4-methods-and-implementation}
 :::
 
 ::: {.cell .markdown id="iMV_N3Es5lkG"}
-## ResNet Code
+### ResNet Code
 :::
 
 ::: {.cell .code id="DvC8ZTlGTlxR"}
@@ -360,7 +453,7 @@ def test_resnet():
 :::
 
 ::: {.cell .markdown id="vHqVn5WX5onk"}
-## WideResNet Code
+### WideResNet Code
 :::
 
 ::: {.cell .code id="yVyKVrpCTwJG"}
@@ -487,14 +580,14 @@ class CSVLogger():
 :::
 
 ::: {.cell .markdown id="53JsJu4b4t1l"}
-# 5. Model Training and Evaluation {#5-model-training-and-evaluation}
+### 5. Model Training and Evaluation {#5-model-training-and-evaluation}
 :::
 
 ::: {.cell .code id="zKiNzV9teviL"}
 ``` python
-# run train.py --dataset cifar10 --model resnet18 --data_augmentation --cutout --length 16
-# run train.py --dataset cifar100 --model resnet18 --data_augmentation --cutout --length 8
-# run train.py --dataset svhn --model wideresnet --learning_rate 0.01 --epochs 160 --cutout --length 20
+# run train.py --dataset cifar10 --model resnet18 --data_augmentation --Cutout --length 16
+# run train.py --dataset cifar100 --model resnet18 --data_augmentation --Cutout --length 8
+# run train.py --dataset svhn --model wideresnet --learning_rate 0.01 --epochs 160 --Cutout --length 20
 
 '''
 import torch
@@ -508,7 +601,7 @@ from torchvision import datasets, transforms
 '''
 
 #from util.misc import CSVLogger
-#from util.cutout import Cutout
+#from util.Cutout import Cutout
 
 #from model.resnet import ResNet18
 #from model.wide_resnet import WideResNet
@@ -529,8 +622,8 @@ parser.add_argument('--learning_rate', type=float, default=0.1,
                     help='learning rate')
 parser.add_argument('--data_augmentation', action='store_true', default=False,
                     help='augment data by flipping and cropping')
-parser.add_argument('--cutout', action='store_true', default=False,
-                    help='apply cutout')
+parser.add_argument('--Cutout', action='store_true', default=False,
+                    help='apply Cutout')
 parser.add_argument('--n_holes', type=int, default=1,
                     help='number of holes to cut out from image')
 parser.add_argument('--length', type=int, default=16,
@@ -570,7 +663,7 @@ def main(args):
       train_transform.transforms.append(transforms.RandomHorizontalFlip())
   train_transform.transforms.append(transforms.ToTensor())
   train_transform.transforms.append(normalize)
-  if args.cutout:
+  if args.Cutout:
       train_transform.transforms.append(Cutout(n_holes=args.n_holes, length=args.length))
 
 
@@ -735,7 +828,7 @@ class Args:
     epochs = 200
     learning_rate = 0.1
     data_augmentation = False
-    cutout = False
+    Cutout = False
     n_holes = 1
     length = 16
     no_cuda = False
@@ -751,34 +844,18 @@ main(args)
 ```
 :::
 
-::: {.cell .markdown id="XHVRxUro4t4b"}
-# 6. Results and Analysis {#6-results-and-analysis}
+::: {.cell .markdown}
+## Evaluate your results for qualitative and quantitative claims
 :::
 
-::: {.cell .code id="W5JJ1ZeT57gD"}
-``` python
-```
+
+
+::: {.cell .markdown}
+## Execute experiments to validate the suggested mechanism
+
 :::
 
-::: {.cell .markdown id="vofk1uIX4t7Y"}
-# 7. Interactive Elements {#7-interactive-elements}
+::: {.cell .markdown}
+## Evaluate your results for validating the suggested mechanism
 :::
 
-::: {.cell .markdown id="NPKYdKrx5EHo"}
-# 8. Conclusion {#8-conclusion}
-:::
-
-::: {.cell .code id="2HK7vaSgEIs0"}
-``` python
-```
-:::
-
-::: {.cell .code id="_ROvEGMCEUuF"}
-``` python
-```
-:::
-
-::: {.cell .code id="yAgc1-3fFANK"}
-``` python
-```
-:::
