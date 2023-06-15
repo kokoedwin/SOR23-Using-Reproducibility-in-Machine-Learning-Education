@@ -98,14 +98,43 @@ SVHN, often achieving state-of-the-art or near state-of-the-art results.
 In the following cells, we will see how Cutout works when applied to a sample image.
 
 <!-- To do: explain the code with reference to section 3.2. Implementation Details -->
+In the code provided above, we see a Python class named Cutout defined. This class is designed to apply the Cutout data augmentation technique to an image. Below is an explanation of the class and its methods:
 
+- The Cutout class is initialized with two parameters:
+
+    - `n_holes`: the number of patches to cut out of each image.
+    - `length`: the length (in pixels) of each square patch.
+- The `__call__` method implements the Cutout technique. This method takes as input a tensor `img` representing an image, and returns the same image with `n_holes` number of patches of dimension `length` x `length` cut out of it.
+
+Here's a step-by-step explanation of what's happening inside the `__call__` method:
+
+1. The method first retrieves the height h and width w of the input image.
+
+2. A mask is then initialized as a 2D numpy array of ones with the same dimensions as the input image.
+
+3. The method then enters a loop which runs for n_holes iterations. In each iteration:
+
+    - A pair of coordinates y and x are randomly selected within the height and width of the image.
+
+    - The method then calculates the coordinates of a square patch around the (y, x) coordinate. The patch has a length of length pixels, and the method ensures that the patch doesn't fall outside the image by using the np.clip function.
+
+    - The corresponding area in the mask is set to zero.
+
+4. The mask is then converted to a PyTorch tensor and expanded to the same number of channels as the input image.
+
+5. Finally, the method applies the mask to the input image, effectively setting the pixels in the masked regions to zero, and returns the result.
+
+Remember to import necessary libraries like numpy (np) and PyTorch (torch) before running this class definition. The class Cutout can then be used as part of your data augmentation pipeline when training your models.
+
+The Cutout code we are using comes from this specific file in the original GitHub repository: [https://github.com/uoguelph-mlrg/Cutout/blob/master/util/cutout.py].
 :::
 
 
 
-::: {.cell .code id="8hBvsq8A8WPD"}
+::: {.cell .code}
 ``` python
 # to do: link to the file in the original repo that this comes from
+# Source Code from https://github.com/uoguelph-mlrg/Cutout/blob/master/util/cutout.py
 class Cutout(object):
     """Randomly mask out one or more patches from an image.
 
@@ -154,15 +183,24 @@ class Cutout(object):
 To see how it works, in the following cell, you will upload an image of your choice to this workspace:
 
 <!-- to do - add instructions for uploading image on Colab, or on Chameleon -->
+To see how Cutout works, let's upload an image and apply Cutout to it. Follow these steps to upload an image in this Google Colab notebook:
 
+1. Click on the folder icon in the left sidebar to open the 'Files' tab.
+2. Click the 'Upload to session storage' button (the icon looks like a file with an up arrow).
+3. Select the image file from your local machine that you want to upload.
+4. Wait for the upload to finish. The uploaded file should now appear in the 'Files' tab.
+After the image is uploaded, we can use Python code to load it into our notebook and apply the Cutout augmentation
+
+If you are using Chameleon, here are the steps:
+<!-- to do - add instructions for uploading image on Chameleon -->
 :::
 
 
 
 ::: {.cell .code}
 ```python
-# to do - update so user specifies image name and path themself
-# Load an image
+# TODO: Replace 'sample.png' with the filename of your own image. 
+# If your image is inside a directory, include the directory's name in the path.
 img = Image.open('/content/sample.png')
 ```
 :::
@@ -220,12 +258,38 @@ Things to try:
 :::
 
 
+::: {.cell .code}
+``` python
+ #TODO: Set the number of patches ("holes") to cut out of the image.
+n_holes = 
+
+#TODO: Set the size (length of a side) of each patch.
+length = 
+
+
+# Create a Cutout object
+Cutout = Cutout(n_holes, length)
+
+# Apply Cutout to the image
+img_tensor_Cutout = Cutout(img_tensor)
+
+# Convert the tensor back to an image for visualization
+img_Cutout = transforms.ToPILImage()(img_tensor_Cutout)
+
+# Display the image with Cutout applied
+plt.figure(figsize=(6,6))
+plt.imshow(img_tensor_Cutout.permute(1, 2, 0))
+plt.show()
+```
+:::
+
+
 ::: {.cell .markdown}
 
 Cutout was introduced as an alternative to two closely related techniques:
 
-* Data Augmentation for Images
-* Dropout in Convolutional Neural Networks
+* Data Augmentation for Images:  Data augmentation is a strategy used to increase the diversity of the data available for training models, without actually collecting new data. For image data, this could include operations like rotation, scaling, cropping, flipping, and adding noise. The goal is to make the model more robust by allowing it to see more variations of the data.
+* Dropout in Convolutional Neural Networks: Dropout is a regularization technique for reducing overfitting in neural networks. During training, some number of layer outputs are randomly ignored or "dropped out". This has the effect of making the layer look-like and be treated-like a layer with a different number of nodes and connectivity to the prior layer. In effect, dropout simulates ensembling a large number of neural networks with different architectures, which makes the model more robust.
 
 <!-- to do - expand on these -->
 
@@ -236,6 +300,28 @@ Cutout was introduced as an alternative to two closely related techniques:
 ```python
 # to do - show the same image with "standard" data augmentation techniques
 # discussed in the related work section of the paper
+
+# Import necessary libraries
+from torchvision.transforms import RandomHorizontalFlip, RandomCrop, ColorJitter
+
+# Define standard data augmentation techniques
+transforms = transforms.Compose([
+    RandomHorizontalFlip(),
+    RandomCrop(size=(28, 28), padding=4),  # assuming input image is size 28x28
+    ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+])
+
+# Apply transformations to the image
+augmented_img = transforms(img)
+
+# Display the original and augmented image
+fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+ax[0].imshow(img)
+ax[0].set_title('Original Image')
+ax[1].imshow(augmented_img)
+ax[1].set_title('Augmented Image')
+plt.show()
+
 ```
 :::
 
@@ -260,12 +346,12 @@ These claims may be quantitative (i.e. describe a specific numeric result), qual
 
 
 
-::: {.cell .markdown id="HLiZirvA5dfE"}
+::: {.cell .markdown}
 ### Implement Cutout on CIFAR10 Dataset
 :::
 
 
-::: {.cell .code id="D9nl5D7QC8Kg"}
+::: {.cell .code}
 ``` python
 if not os.path.exists('/content/checkpoints'):
     os.makedirs('/content/checkpoints')
@@ -274,7 +360,7 @@ if not os.path.exists('/content/checkpoints'):
 
 
 
-::: {.cell .code id="FiuWkXnrQrs9"}
+::: {.cell .code}
 ``` python
 # Define your transformations
 transform = transforms.Compose([
@@ -292,7 +378,7 @@ def imshow(img):
 ```
 :::
 
-::: {.cell .code colab="{\"base_uri\":\"https://localhost:8080/\"}" id="Z1WfijBcRzTd" outputId="29122b6a-cacf-44cd-f009-98f4c6ccbac1"}
+::: {.cell .code}
 ``` python
 # Load the CIFAR-10 dataset with transformations applied
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
@@ -303,7 +389,7 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=4, shuffle=False, n
 ```
 :::
 
-::: {.cell .code colab="{\"base_uri\":\"https://localhost:8080/\",\"height\":193}" id="gWt7F2tEQrvq" outputId="3f422d0a-aa37-4bb5-87fa-e3c9110ea8a9"}
+::: {.cell .code}
 ``` python
 # Get some random training images
 dataiter = iter(trainloader)
@@ -314,7 +400,7 @@ imshow(torchvision.utils.make_grid(images))
 ```
 :::
 
-::: {.cell .code colab="{\"base_uri\":\"https://localhost:8080/\",\"height\":193}" id="mWDUpa-KSDta" outputId="a22fee56-b6eb-4e04-c066-ebbab49d0d4c"}
+::: {.cell .code}
 ``` python
 # Apply Cutout and show images after
 Cutout_images = torch.stack([Cutout(n_holes=1, length=16)(img) for img in images])
@@ -322,15 +408,15 @@ imshow(torchvision.utils.make_grid(Cutout_images))
 ```
 :::
 
-::: {.cell .markdown id="cyqBjZTW4tyV"}
+::: {.cell .markdown}
 ### 4. Methods and Implementation {#4-methods-and-implementation}
 :::
 
-::: {.cell .markdown id="iMV_N3Es5lkG"}
+::: {.cell .markdown}
 ### ResNet Code
 :::
 
-::: {.cell .code id="DvC8ZTlGTlxR"}
+::: {.cell .code}
 ``` python
 # ResNet
 
@@ -452,11 +538,11 @@ def test_resnet():
 ```
 :::
 
-::: {.cell .markdown id="vHqVn5WX5onk"}
+::: {.cell .markdown}
 ### WideResNet Code
 :::
 
-::: {.cell .code id="yVyKVrpCTwJG"}
+::: {.cell .code}
 ``` python
 # WideResNet
 
@@ -551,7 +637,7 @@ class WideResNet(nn.Module):
 ```
 :::
 
-::: {.cell .code id="XGFkPhB9ncnB"}
+::: {.cell .code}
 ``` python
 class CSVLogger():
     def __init__(self, args, fieldnames, filename='log.csv'):
@@ -579,11 +665,11 @@ class CSVLogger():
 ```
 :::
 
-::: {.cell .markdown id="53JsJu4b4t1l"}
+::: {.cell .markdown}
 ### 5. Model Training and Evaluation {#5-model-training-and-evaluation}
 :::
 
-::: {.cell .code id="zKiNzV9teviL"}
+::: {.cell .code}
 ``` python
 # run train.py --dataset cifar10 --model resnet18 --data_augmentation --Cutout --length 16
 # run train.py --dataset cifar100 --model resnet18 --data_augmentation --Cutout --length 8
@@ -819,7 +905,7 @@ def main(args):
 ```
 :::
 
-::: {.cell .code id="LSqFDwY2kXe7"}
+::: {.cell .code}
 ``` python
 class Args:
     dataset = 'cifar10'
@@ -838,7 +924,7 @@ args = Args()
 ```
 :::
 
-::: {.cell .code colab="{\"base_uri\":\"https://localhost:8080/\"}" id="XPoNYqgJk3Bl" outputId="5587dc4a-609d-446a-ba21-42a49371e970"}
+::: {.cell .code}
 ``` python
 main(args)
 ```
