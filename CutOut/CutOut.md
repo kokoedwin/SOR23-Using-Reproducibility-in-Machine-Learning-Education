@@ -17,12 +17,12 @@ We will use the author's implementation of their technique, from [https://github
 
 After working through this notebook, you should be able to:
 
-* describe how Cutout works as a regularization technique,
-* enumerate specific claims (both quantitative claims, qualitative claims, and claims about the underlying mechanism behind a result) from the Cutout paper,
-* execute experiments (following the given procedure) to try and validate each claim about Cutout data augmentation,
-* evaluate whether your own result matches quantitative claims in the Cutout paper (i.e. whether it is within the confidence intervals for each reported numeric result),
-* evaluate whether your own result validates qualitative claims in the Cutout paper,
-* evaluate whether your own results support the author's claim about the underlying mechanism behind the result.
+* Describe how Cutout works as a regularization technique,
+* Enumerate specific claims (both quantitative claims, qualitative claims, and claims about the underlying mechanism behind a result) from the Cutout paper,
+* Execute experiments (following the given procedure) to try and validate each claim about Cutout data augmentation,
+* Evaluate whether your own result matches quantitative claims in the Cutout paper (i.e. whether it is within the confidence intervals for each reported numeric result),
+* Evaluate whether your own result validates qualitative claims in the Cutout paper,
+* Evaluate whether your own results support the author's claim about the underlying mechanism behind the result.
 
 :::
 
@@ -193,6 +193,10 @@ After the image is uploaded, we can use Python code to load it into our notebook
 
 If you are using Chameleon, here are the steps:
 <!-- to do - add instructions for uploading image on Chameleon -->
+1. Click on the upload icon in the left sidebar.
+2. Select the image file from your local machine that you want to upload.
+3. Wait for the upload to finish. The uploaded file should now appear in the 'Files' tab.
+After the image is uploaded, we can use Python code to load it into our notebook and apply the Cutout augmentation to the image.
 :::
 
 
@@ -289,13 +293,17 @@ plt.show()
 Cutout was introduced as an alternative to two closely related techniques:
 
 * Data Augmentation for Images:  Data augmentation is a strategy used to increase the diversity of the data available for training models, without actually collecting new data. For image data, this could include operations like rotation, scaling, cropping, flipping, and adding noise. The goal is to make the model more robust by allowing it to see more variations of the data.
+
 * Dropout in Convolutional Neural Networks: Dropout is a regularization technique for reducing overfitting in neural networks. During training, some number of layer outputs are randomly ignored or "dropped out". This has the effect of making the layer look-like and be treated-like a layer with a different number of nodes and connectivity to the prior layer. In effect, dropout simulates ensembling a large number of neural networks with different architectures, which makes the model more robust.
 
 <!-- to do - expand on these -->
 
 :::
 
+::: {.cell .markdown}
+In the following code snippet, we demonstrate some "standard" data augmentation techniques commonly used in image preprocessing. These techniques include random horizontal flipping, random cropping, and color jittering (random variation in brightness, contrast, saturation, and hue). The augmented image is then displayed alongside the original image for comparison.
 
+:::
 ::: {.cell .code}
 ```python
 # to do - show the same image with "standard" data augmentation techniques
@@ -336,6 +344,48 @@ To reproduce the results from the original Cutout paper, we will first need to i
 These claims may be quantitative (i.e. describe a specific numeric result), qualitative (i.e. describe a general characteristic of the result), or they may relate to the mechanism behind a result (i.e. describe *why* a particular result occurs).
 
 <!-- to do - go through the paper, quote little snippets and explain each claim and organize them -->
+
+### Qualitative Claims
+- 'We aimed to remove maximally activated
+features in order to encourage the network to consider less
+prominent features.' 
+
+### Quantitative Claims
+#### ResNet18
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) 
+
+| **Network** | **CIFAR-10** | **CIFAR-100** |
+| ----------- | ------------ | ------------- |
+| ResNet18    | 4.72         | 22.46         |
+| ResNet18 + cutout | 3.99   | 21.96         |  
+
+
+#### WideResNet
+
+WideResNet model implementation from https://github.com/xternalz/WideResNet-pytorch  
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs)  
+
+| **Network** | **CIFAR-10** | **CIFAR-100** | **SVHN** |
+| ----------- | ------------ | ------------- | -------- |
+| WideResNet  | 3.87         | 18.8          | 1.60     |
+| WideResNet + cutout | 3.08 | 18.41         | **1.30** |
+
+
+#### Shake-shake Regularization Network
+
+Shake-shake regularization model implementation from https://github.com/xgastaldi/shake-shake
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 3 runs)  
+
+| **Network** | **CIFAR-10** | **CIFAR-100** |
+| ----------- | ------------ | ------------- |
+| Shake-shake | 2.86         | 15.58         |
+| Shake-shake + cutout | 2.56 | 15.20 |
+
+
+
 :::
 
 
@@ -419,6 +469,8 @@ imshow(torchvision.utils.make_grid(Cutout_images))
 ::: {.cell .code}
 ``` python
 # ResNet
+
+# From https://github.com/uoguelph-mlrg/Cutout/blob/master/model/resnet.py
 
 '''ResNet18/34/50/101/152 in Pytorch.'''
 import torch
@@ -546,7 +598,7 @@ def test_resnet():
 ``` python
 # WideResNet
 
-# From https://github.com/xternalz/WideResNet-pytorch
+# From https://github.com/uoguelph-mlrg/Cutout/blob/master/model/wide_resnet.py
 
 import math
 import torch
@@ -943,5 +995,6 @@ main(args)
 
 ::: {.cell .markdown}
 ## Evaluate your results for validating the suggested mechanism
+### Implementing GradCam
 :::
 
