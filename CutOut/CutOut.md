@@ -346,9 +346,14 @@ These claims may be quantitative (i.e. describe a specific numeric result), qual
 <!-- to do - go through the paper, quote little snippets and explain each claim and organize them -->
 
 ### Qualitative Claims
-- 'We aimed to remove maximally activated
-features in order to encourage the network to consider less
-prominent features.' 
+
+The authors of the Grad-CAM paper are discussing the intention behind their approach. When they say "We aimed to remove maximally activated features in order to encourage the network to consider less prominent features", they are referring to the process of directing the neural network's attention towards features that it might not normally focus on.
+
+When a convolutional neural network (CNN) processes an image, it learns to recognize certain features that are most useful for making correct predictions. These "useful" features are often referred to as "maximally activated" because the network's activation functions output high values for these features. This means that these features are given a lot of importance when the network is making a decision.
+
+However, just because these features are the most prominent, doesn't mean they are the only important ones. There can be other, less prominent features that are also useful for the task. By removing the maximally activated features, the authors are attempting to force the network to pay more attention to these less prominent features. This could potentially lead to a more robust model, as it won't be overly reliant on a small set of features.
+
+So in essence, this claim is about trying to increase the diversity of the features that the network considers important, with the goal of improving the model's ability to generalize from the training data to unseen data.
 
 ### Quantitative Claims
 #### ResNet18
@@ -403,8 +408,17 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 3 
 
 ::: {.cell .code}
 ``` python
+# Create file names 'checkpoints' to save the weight of the models
+
+#If you use Jupyter Notebook
 if not os.path.exists('/content/checkpoints'):
     os.makedirs('/content/checkpoints')
+
+#If you use Chameleon
+'''
+if not os.path.exists('/checkpoints'):
+    os.makedirs('/checkpoints')
+'''
 ```
 :::
 
@@ -469,14 +483,12 @@ imshow(torchvision.utils.make_grid(Cutout_images))
 ::: {.cell .code}
 ``` python
 # ResNet
-
 # From https://github.com/uoguelph-mlrg/Cutout/blob/master/model/resnet.py
 
 '''ResNet18/34/50/101/152 in Pytorch.'''
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 from torch.autograd import Variable
 
 
@@ -560,6 +572,8 @@ class ResNet(nn.Module):
     out = self.layer2(out)
     out = self.layer3(out)
     out = self.layer4(out)
+    out = self.layer4(out) # We'll need this output for Grad-CAM
+    self.activations = out  # Save the activations
     out = F.avg_pool2d(out, 4)
     out = out.view(out.size(0), -1)
     out = self.linear(out)
@@ -688,9 +702,12 @@ class WideResNet(nn.Module):
         return out
 ```
 :::
-
+::: {.cell .markdown}
+The `CSVLogger` class logs training progress to a CSV file, with each row representing an epoch and columns representing metrics such as training and testing accuracy. 
+::: 
 ::: {.cell .code}
 ``` python
+# From: https://github.com/uoguelph-mlrg/Cutout/blob/master/util/misc.py
 class CSVLogger():
     def __init__(self, args, fieldnames, filename='log.csv'):
 
@@ -723,11 +740,7 @@ class CSVLogger():
 
 ::: {.cell .code}
 ``` python
-# run train.py --dataset cifar10 --model resnet18 --data_augmentation --Cutout --length 16
-# run train.py --dataset cifar100 --model resnet18 --data_augmentation --Cutout --length 8
-# run train.py --dataset svhn --model wideresnet --learning_rate 0.01 --epochs 160 --Cutout --length 20
 
-'''
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -736,43 +749,7 @@ from torch.optim.lr_scheduler import MultiStepLR
 
 from torchvision.utils import make_grid
 from torchvision import datasets, transforms
-'''
 
-#from util.misc import CSVLogger
-#from util.Cutout import Cutout
-
-#from model.resnet import ResNet18
-#from model.wide_resnet import WideResNet
-'''
-model_options = ['resnet18', 'wideresnet']
-dataset_options = ['cifar10', 'cifar100', 'svhn']
-
-parser = argparse.ArgumentParser(description='CNN')
-parser.add_argument('--dataset', '-d', default='cifar10',
-                    choices=dataset_options)
-parser.add_argument('--model', '-a', default='resnet18',
-                    choices=model_options)
-parser.add_argument('--batch_size', type=int, default=128,
-                    help='input batch size for training (default: 128)')
-parser.add_argument('--epochs', type=int, default=200,
-                    help='number of epochs to train (default: 20)')
-parser.add_argument('--learning_rate', type=float, default=0.1,
-                    help='learning rate')
-parser.add_argument('--data_augmentation', action='store_true', default=False,
-                    help='augment data by flipping and cropping')
-parser.add_argument('--Cutout', action='store_true', default=False,
-                    help='apply Cutout')
-parser.add_argument('--n_holes', type=int, default=1,
-                    help='number of holes to cut out from image')
-parser.add_argument('--length', type=int, default=16,
-                    help='length of the holes')
-parser.add_argument('--no-cuda', action='store_true', default=False,
-                    help='enables CUDA training')
-parser.add_argument('--seed', type=int, default=0,
-                    help='random seed (default: 1)')
-
-args = parser.parse_args()
-'''
 
 def main(args):
   args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -781,7 +758,7 @@ def main(args):
 
   torch.manual_seed(args.seed)
   if args.cuda:
-      torch.cuda.manual_seed(args.seed)
+      torch.cuda.manual_seed(args.seed) 
 
   test_id = args.dataset + '_' + args.model
 
@@ -946,8 +923,8 @@ def main(args):
       test_acc = test(test_loader)
       tqdm.write('test_acc: %.3f' % (test_acc))
 
-      scheduler.step(epoch)  # Use this line for PyTorch <1.4
-      # scheduler.step()     # Use this line for PyTorch >=1.4
+      #scheduler.step(epoch)  # Use this line for PyTorch <1.4
+       scheduler.step()     # Use this line for PyTorch >=1.4
 
       row = {'epoch': str(epoch), 'train_acc': str(accuracy), 'test_acc': str(test_acc)}
       csv_logger.writerow(row)
@@ -960,8 +937,8 @@ def main(args):
 ::: {.cell .code}
 ``` python
 class Args:
-    dataset = 'cifar10'
-    model = 'resnet18'
+    dataset = 'cifar10' #dataset_options = ['cifar10', 'cifar100', 'svhn']
+    model = 'resnet18' # model_options = ['resnet18', 'wideresnet']
     batch_size = 128
     epochs = 200
     learning_rate = 0.1
@@ -969,8 +946,9 @@ class Args:
     Cutout = False
     n_holes = 1
     length = 16
-    no_cuda = False
-    seed = 0
+    no_cuda = False #False means use Cuda GPU
+    seed = 1 #Default from the source code
+
 
 args = Args()
 ```
@@ -978,23 +956,179 @@ args = Args()
 
 ::: {.cell .code}
 ``` python
-main(args)
+num_runs = 5
+
+
+for i in range(num_runs):
+    print("Experiment -"+str(i)+" out of "+str(num_ruunns))
+    main(args)
+    
+
 ```
 :::
 
 ::: {.cell .markdown}
 ## Evaluate your results for qualitative and quantitative claims
 :::
+#### ResNet18
 
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) 
+
+| **Network** | **CIFAR-10** | **CIFAR-100** |
+| ----------- | ------------ | ------------- |
+| ResNet18    | 4.72         | 22.46         |
+| ResNet18 + cutout | 3.99   | 21.96         |  
+
+
+#### WideResNet
+
+WideResNet model implementation from https://github.com/xternalz/WideResNet-pytorch  
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs)  
+
+| **Network** | **CIFAR-10** | **CIFAR-100** | **SVHN** |
+| ----------- | ------------ | ------------- | -------- |
+| WideResNet  | 3.87         | 18.8          | 1.60     |
+| WideResNet + cutout | 3.08 | 18.41         | **1.30** |
+
+
+#### Shake-shake Regularization Network
+
+Shake-shake regularization model implementation from https://github.com/xgastaldi/shake-shake
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 3 runs)  
+
+| **Network** | **CIFAR-10** | **CIFAR-100** |
+| ----------- | ------------ | ------------- |
+| Shake-shake | 2.86         | 15.58         |
+| Shake-shake + cutout | 2.56 | 15.20 |
 
 
 ::: {.cell .markdown}
 ## Execute experiments to validate the suggested mechanism
-
+### Implementing GradCam
 :::
+
+::: {.cell .code}
+``` python
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+
+def overlay_heatmap_on_image(image, heatmap, alpha=0.5):
+    # Resize the heatmap to match the size of the image
+    heatmap = cv2.resize(heatmap, (image.shape[1], image.shape[0]))
+
+    # Convert the heatmap to RGB format
+    heatmap = np.uint8(255 * heatmap)
+
+    # Apply the heatmap to the image
+    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+
+    # Overlay the heatmap on the image with the specified alpha
+    superimposed_img = heatmap * alpha + image
+
+    # Return the superimposed image
+    return superimposed_img
+```
+:::
+
+### Implementing GradCam
+:::
+
+::: {.cell .code}
+``` python
+from torchvision.utils import make_grid
+import torch.nn.functional as F
+import cv2
+
+def gradcam(model, image, class_idx):
+    # Zero out existing gradients
+    model.zero_grad()
+
+    # Forward pass
+    output = model(image.unsqueeze(0))
+
+    # Calculate the gradients of the target class score w.r.t. input image
+    output[0, class_idx].backward()
+
+    # Apply global average pooling to the gradients
+    pooled_gradients = F.adaptive_avg_pool2d(model.gradient, 1)
+
+    # Multiply the feature maps by the pooled gradients
+    for i in range(model.gradient.shape[1]):
+        model.gradient[:, i, :, :] *= pooled_gradients[0, i]
+
+    # Average the channel-wise multiplied feature maps along the channel dimension
+    gradcam_heatmap = torch.mean(model.gradient, dim=1).squeeze().detach().cpu().numpy()
+
+    # Apply ReLU to the heatmap
+    gradcam_heatmap = np.maximum(gradcam_heatmap, 0)
+
+    # Normalize the heatmap
+    gradcam_heatmap = gradcam_heatmap / np.max(gradcam_heatmap)
+
+    # Resize the heatmap to match the original image
+    gradcam_heatmap = cv2.resize(gradcam_heatmap, (image.shape[1], image.shape[2]))
+
+    return gradcam_heatmap
+```
+:::
+ 
+ 
 
 ::: {.cell .markdown}
 ## Evaluate your results for validating the suggested mechanism
 ### Implementing GradCam
+
 :::
 
+::: {.cell .code}
+``` python
+# Load the model
+model = ResNet18(num_classes=10)  # Initialize model architecture
+model.load_state_dict(torch.load('checkpoints/cifar10_resnet18.pt'))
+model.eval()  # Set the model to evaluation mode
+```
+:::
+
+::: {.cell .code}
+``` python
+# Get a batch of training data
+dataiter = iter(trainloader)
+images, labels = next(dataiter)
+
+# Now you have a batch of 4 images and their corresponding labels.
+# You can use one of these images for the Grad-CAM visualization.
+# For example, let's use the first image in the batch:
+
+image = images[0]
+#print(image.max())
+label = labels[0]
+print(label.item())
+
+# Now you can use the 'image' in your Grad-CAM function.
+gradcam_heatmap = gradcam(model, image, label.item())
+superimposed_img = overlay_heatmap_on_image(image.permute(1, 2, 0).detach().cpu().numpy(), gradcam_heatmap)
+
+
+# create figure
+fig = plt.figure(figsize=(10, 7))
+
+# Adds a subplot at the 1st position
+fig.add_subplot(1, 2, 1)  # 1 row, 2 columns, 1st subplot
+  
+# showing image
+plt.imshow(image.T)
+plt.axis('off')
+plt.title("Ori Image")
+  
+# Adds a subplot at the 2nd position
+fig.add_subplot(1, 2, 2)  # 1 row, 2 columns, 2nd subplot
+  
+# showing image
+plt.imshow(superimposed_img)
+plt.axis('off')
+plt.title("GradCam")
+
+:::
