@@ -193,6 +193,7 @@ After the image is uploaded, we can use Python code to load it into our notebook
 
 If you are using Chameleon, here are the steps:
 <!-- to do - add instructions for uploading image on Chameleon -->
+
 1. Click on the upload icon in the left sidebar.
 2. Select the image file from your local machine that you want to upload.
 3. Wait for the upload to finish. The uploaded file should now appear in the 'Files' tab.
@@ -345,46 +346,45 @@ These claims may be quantitative (i.e. describe a specific numeric result), qual
 
 <!-- to do - go through the paper, quote little snippets and explain each claim and organize them -->
 
-### Qualitative Claims
+### Claims
 
-The authors of the Grad-CAM paper are discussing the intention behind their approach. When they say "We aimed to remove maximally activated features in order to encourage the network to consider less prominent features", they are referring to the process of directing the neural network's attention towards features that it might not normally focus on.
-
-When a convolutional neural network (CNN) processes an image, it learns to recognize certain features that are most useful for making correct predictions. These "useful" features are often referred to as "maximally activated" because the network's activation functions output high values for these features. This means that these features are given a lot of importance when the network is making a decision.
-
-However, just because these features are the most prominent, doesn't mean they are the only important ones. There can be other, less prominent features that are also useful for the task. By removing the maximally activated features, the authors are attempting to force the network to pay more attention to these less prominent features. This could potentially lead to a more robust model, as it won't be overly reliant on a small set of features.
-
-So in essence, this claim is about trying to increase the diversity of the features that the network considers important, with the goal of improving the model's ability to generalize from the training data to unseen data.
+1. Cutout aimed to remove maximally activated features in order to encourage the network to consider less prominent features
+2. This technique improves the robustness and overall performance of convolutional neural networks.
+3. Cutout can be used in conjunction with existing forms of data augmentation and other regularizers to further improve model performance.
 
 ### Quantitative Claims
 #### ResNet18
 
-Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) 
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) and “+” indicates standard data augmentation (mirror
++ crop)
 
-| **Network** | **CIFAR-10** | **CIFAR-100** |
-| ----------- | ------------ | ------------- |
-| ResNet18    | 4.72         | 22.46         |
-| ResNet18 + cutout | 3.99   | 21.96         |  
+| **Network** | **CIFAR-10** | **CIFAR-10+** | **CIFAR-100** | **CIFAR-100+** |
+| ----------- | ------------ | ------------- | ------------ | ------------- |
+| ResNet18    | 10.63         | 4.72        | 36.68         | 22.46         |
+| ResNet18 + cutout | 9.31   | 3.99         | 34.98         | 21.96        |  
 
 
 #### WideResNet
 
 WideResNet model implementation from https://github.com/xternalz/WideResNet-pytorch  
 
-Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs)  
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) and “+” indicates standard data augmentation (mirror
++ crop)  
 
-| **Network** | **CIFAR-10** | **CIFAR-100** | **SVHN** |
-| ----------- | ------------ | ------------- | -------- |
-| WideResNet  | 3.87         | 18.8          | 1.60     |
-| WideResNet + cutout | 3.08 | 18.41         | **1.30** |
+| **Network** | **CIFAR-10** | **CIFAR-10+** |**CIFAR-100** | **CIFAR-100+** | **SVHN** |
+| ----------- | ------------ | ------------- | ------------ | ------------- | -------- |
+| WideResNet  | 6.97         | 3.87         |26.06 | 18.8 | 1.60     |
+| WideResNet + cutout | 5.54 | 3.08        |23.94 |  18.41 | **1.30** |
 
 
 #### Shake-shake Regularization Network
 
 Shake-shake regularization model implementation from https://github.com/xgastaldi/shake-shake
 
-Test error (%, flip/translation augmentation, mean/std normalization, mean of 3 runs)  
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 3 runs) and “+” indicates standard data augmentation (mirror
++ crop)
 
-| **Network** | **CIFAR-10** | **CIFAR-100** |
+| **Network** | **CIFAR-10+** | **CIFAR-100+** |
 | ----------- | ------------ | ------------- |
 | Shake-shake | 2.86         | 15.58         |
 | Shake-shake + cutout | 2.56 | 15.20 |
@@ -738,9 +738,11 @@ class CSVLogger():
 ### 5. Model Training and Evaluation {#5-model-training-and-evaluation}
 :::
 
+::: {.cell .markdown}
+#### 5.1. Import the model
+:::
 ::: {.cell .code}
 ``` python
-
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -749,190 +751,263 @@ from torch.optim.lr_scheduler import MultiStepLR
 
 from torchvision.utils import make_grid
 from torchvision import datasets, transforms
+```
+:::
+
+::: {.cell .markdown}
+#### 5.2. Check Cuda availability
+:::
+::: {.cell .code}
+``` python
+args.cuda = not args.no_cuda and torch.cuda.is_available()
+cudnn.benchmark = True  # Should make training should go faster for large models
+
+torch.manual_seed(args.seed)
+if args.cuda:
+    torch.cuda.manual_seed(args.seed)
+```
+:::
+
+::: {.cell .markdown}
+#### 5.3. Image Processing
+:::
+::: {.cell .code}
+``` python
+#test_id will be the used for the name of the file of weight of the model and also the result
+test_id = args.dataset + '_' + args.model
+
+# Image Preprocessing
+if args.dataset == 'svhn':
+    normalize = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]],
+                                     std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
+else:
+    normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]],
+                                     std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+
+train_transform = transforms.Compose([])
+if args.data_augmentation:
+    train_transform.transforms.append(transforms.RandomCrop(32, padding=4))
+    train_transform.transforms.append(transforms.RandomHorizontalFlip())
+train_transform.transforms.append(transforms.ToTensor())
+train_transform.transforms.append(normalize)
+if args.cutout:
+    train_transform.transforms.append(Cutout(n_holes=args.n_holes, length=args.length))
 
 
-def main(args):
-  args.cuda = not args.no_cuda and torch.cuda.is_available()
-  cudnn.benchmark = True  # Should make training should go faster for large models
+test_transform = transforms.Compose([
+    transforms.ToTensor(),
+    normalize])
+```
+:::
 
 
-  torch.manual_seed(args.seed)
-  if args.cuda:
-      torch.cuda.manual_seed(args.seed) 
+::: {.cell .markdown}
+#### 5.4. Import the dataset
+:::
 
-  test_id = args.dataset + '_' + args.model
+::: {.cell .code}
+``` python
+if args.dataset == 'cifar10':
+    num_classes = 10
+    train_dataset = datasets.CIFAR10(root='data/',
+                                     train=True,
+                                     transform=train_transform,
+                                     download=True)
 
-  print(args)
-
-  # Image Preprocessing
-  if args.dataset == 'svhn':
-      normalize = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]],
-                                      std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
-  else:
-      normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]],
-                                      std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
-
-  train_transform = transforms.Compose([])
-  if args.data_augmentation:
-      train_transform.transforms.append(transforms.RandomCrop(32, padding=4))
-      train_transform.transforms.append(transforms.RandomHorizontalFlip())
-  train_transform.transforms.append(transforms.ToTensor())
-  train_transform.transforms.append(normalize)
-  if args.Cutout:
-      train_transform.transforms.append(Cutout(n_holes=args.n_holes, length=args.length))
-
-
-  test_transform = transforms.Compose([
-      transforms.ToTensor(),
-      normalize])
-
-  if args.dataset == 'cifar10':
-      num_classes = 10
-      train_dataset = datasets.CIFAR10(root='data/',
+    test_dataset = datasets.CIFAR10(root='data/',
+                                    train=False,
+                                    transform=test_transform,
+                                    download=True)
+elif args.dataset == 'cifar100':
+    num_classes = 100
+    train_dataset = datasets.CIFAR100(root='data/',
                                       train=True,
                                       transform=train_transform,
                                       download=True)
 
-      test_dataset = datasets.CIFAR10(root='data/',
-                                      train=False,
-                                      transform=test_transform,
-                                      download=True)
-  elif args.dataset == 'cifar100':
-      num_classes = 100
-      train_dataset = datasets.CIFAR100(root='data/',
-                                        train=True,
-                                        transform=train_transform,
-                                        download=True)
-
-      test_dataset = datasets.CIFAR100(root='data/',
-                                      train=False,
-                                      transform=test_transform,
-                                      download=True)
-  elif args.dataset == 'svhn':
-      num_classes = 10
-      train_dataset = datasets.SVHN(root='data/',
-                                    split='train',
-                                    transform=train_transform,
-                                    download=True)
-
-      extra_dataset = datasets.SVHN(root='data/',
-                                    split='extra',
-                                    transform=train_transform,
-                                    download=True)
-
-      # Combine both training splits (https://arxiv.org/pdf/1605.07146.pdf)
-      data = np.concatenate([train_dataset.data, extra_dataset.data], axis=0)
-      labels = np.concatenate([train_dataset.labels, extra_dataset.labels], axis=0)
-      train_dataset.data = data
-      train_dataset.labels = labels
-
-      test_dataset = datasets.SVHN(root='data/',
-                                  split='test',
-                                  transform=test_transform,
+    test_dataset = datasets.CIFAR100(root='data/',
+                                     train=False,
+                                     transform=test_transform,
+                                     download=True)
+elif args.dataset == 'svhn':
+    num_classes = 10
+    train_dataset = datasets.SVHN(root='data/',
+                                  split='train',
+                                  transform=train_transform,
                                   download=True)
 
-  # Data Loader (Input Pipeline)
-  train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                            batch_size=args.batch_size,
-                                            shuffle=True,
-                                            pin_memory=True,
-                                            num_workers=2)
+    extra_dataset = datasets.SVHN(root='data/',
+                                  split='extra',
+                                  transform=train_transform,
+                                  download=True)
 
-  test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
-                                            batch_size=args.batch_size,
-                                            shuffle=False,
-                                            pin_memory=True,
-                                            num_workers=2)
+    # Combine both training splits (https://arxiv.org/pdf/1605.07146.pdf)
+    data = np.concatenate([train_dataset.data, extra_dataset.data], axis=0)
+    labels = np.concatenate([train_dataset.labels, extra_dataset.labels], axis=0)
+    train_dataset.data = data
+    train_dataset.labels = labels
 
-  if args.model == 'resnet18':
-      cnn = ResNet18(num_classes=num_classes)
-  elif args.model == 'wideresnet':
-      if args.dataset == 'svhn':
-          cnn = WideResNet(depth=16, num_classes=num_classes, widen_factor=8,
-                          dropRate=0.4)
-      else:
-          cnn = WideResNet(depth=28, num_classes=num_classes, widen_factor=10,
-                          dropRate=0.3)
-
-  cnn = cnn.cuda()
-  criterion = nn.CrossEntropyLoss().cuda()
-  cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=args.learning_rate,
-                                  momentum=0.9, nesterov=True, weight_decay=5e-4)
-
-  if args.dataset == 'svhn':
-      scheduler = MultiStepLR(cnn_optimizer, milestones=[80, 120], gamma=0.1)
-  else:
-      scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
-
-  filename = 'logs/' + test_id + '.csv'
-  csv_logger = CSVLogger(args=args, fieldnames=['epoch', 'train_acc', 'test_acc'], filename=filename)
-
-
-  def test(loader):
-      cnn.eval()    # Change model to 'eval' mode (BN uses moving mean/var).
-      correct = 0.
-      total = 0.
-      for images, labels in loader:
-          images = images.cuda()
-          labels = labels.cuda()
-
-          with torch.no_grad():
-              pred = cnn(images)
-
-          pred = torch.max(pred.data, 1)[1]
-          total += labels.size(0)
-          correct += (pred == labels).sum().item()
-
-      val_acc = correct / total
-      cnn.train()
-      return val_acc
-
-
-  for epoch in range(args.epochs):
-
-      xentropy_loss_avg = 0.
-      correct = 0.
-      total = 0.
-
-      progress_bar = tqdm(train_loader)
-      for i, (images, labels) in enumerate(progress_bar):
-          progress_bar.set_description('Epoch ' + str(epoch))
-
-          images = images.cuda()
-          labels = labels.cuda()
-
-          cnn.zero_grad()
-          pred = cnn(images)
-
-          xentropy_loss = criterion(pred, labels)
-          xentropy_loss.backward()
-          cnn_optimizer.step()
-
-          xentropy_loss_avg += xentropy_loss.item()
-
-          # Calculate running average of accuracy
-          pred = torch.max(pred.data, 1)[1]
-          total += labels.size(0)
-          correct += (pred == labels.data).sum().item()
-          accuracy = correct / total
-
-          progress_bar.set_postfix(
-              xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
-              acc='%.3f' % accuracy)
-
-      test_acc = test(test_loader)
-      tqdm.write('test_acc: %.3f' % (test_acc))
-
-      #scheduler.step(epoch)  # Use this line for PyTorch <1.4
-       scheduler.step()     # Use this line for PyTorch >=1.4
-
-      row = {'epoch': str(epoch), 'train_acc': str(accuracy), 'test_acc': str(test_acc)}
-      csv_logger.writerow(row)
-
-  torch.save(cnn.state_dict(), 'checkpoints/' + test_id + '.pt')
-  csv_logger.close()
+    test_dataset = datasets.SVHN(root='data/',
+                                 split='test',
+                                 transform=test_transform,
+                                 download=True)
 ```
 :::
+
+
+::: {.cell .markdown}
+#### 5.5. Create Dataset as Dataloader
+:::
+
+::: {.cell .code}
+``` python
+# Data Loader (Input Pipeline)
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
+                                           batch_size=args.batch_size,
+                                           shuffle=True,
+                                           pin_memory=True,
+                                           num_workers=2)
+
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
+                                          batch_size=args.batch_size,
+                                          shuffle=False,
+                                          pin_memory=True,
+                                          num_workers=2)
+```
+:::
+
+
+::: {.cell .markdown}
+#### 5.6. Define the model
+:::
+
+::: {.cell .code}
+``` python
+if args.model == 'resnet18':
+    cnn = ResNet18(num_classes=num_classes)
+elif args.model == 'wideresnet':
+    if args.dataset == 'svhn':
+        cnn = WideResNet(depth=16, num_classes=num_classes, widen_factor=8,
+                         dropRate=0.4)
+    else:
+        cnn = WideResNet(depth=28, num_classes=num_classes, widen_factor=10,
+                         dropRate=0.3)
+
+cnn = cnn.cuda()
+criterion = nn.CrossEntropyLoss().cuda()
+cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=args.learning_rate,
+                                momentum=0.9, nesterov=True, weight_decay=5e-4)
+
+if args.dataset == 'svhn':
+    scheduler = MultiStepLR(cnn_optimizer, milestones=[80, 120], gamma=0.1)
+else:
+    scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
+
+filename = 'logs/' + test_id + '.csv'
+csv_logger = CSVLogger(args=args, fieldnames=['epoch', 'train_acc', 'test_acc'], filename=filename)
+```
+:::
+
+
+
+::: {.cell .markdown}
+#### 5.7. Test function
+:::
+
+::: {.cell .code}
+``` python
+def test(loader):
+    cnn.eval()    # Change model to 'eval' mode (BN uses moving mean/var).
+    correct = 0.
+    total = 0.
+    for images, labels in loader:
+        images = images.cuda()
+        labels = labels.cuda()
+
+        with torch.no_grad():
+            pred = cnn(images)
+
+        pred = torch.max(pred.data, 1)[1]
+        total += labels.size(0)
+        correct += (pred == labels).sum().item()
+
+    val_acc = correct / total
+    cnn.train()
+    return val_acc
+```
+:::
+
+
+
+::: {.cell .code}
+``` python
+for epoch in range(args.epochs):
+
+    xentropy_loss_avg = 0.
+    correct = 0.
+    total = 0.
+
+    progress_bar = tqdm(train_loader)
+    for i, (images, labels) in enumerate(progress_bar):
+        progress_bar.set_description('Epoch ' + str(epoch))
+
+        images = images.cuda()
+        labels = labels.cuda()
+
+        cnn.zero_grad()
+        pred = cnn(images)
+
+        xentropy_loss = criterion(pred, labels)
+        xentropy_loss.backward()
+        cnn_optimizer.step()
+
+        xentropy_loss_avg += xentropy_loss.item()
+
+        # Calculate running average of accuracy
+        pred = torch.max(pred.data, 1)[1]
+        total += labels.size(0)
+        correct += (pred == labels.data).sum().item()
+        accuracy = correct / total
+
+        progress_bar.set_postfix(
+            xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
+            acc='%.3f' % accuracy)
+
+    test_acc = test(test_loader)
+    tqdm.write('test_acc: %.3f' % (test_acc))
+
+    #scheduler.step(epoch)  # Use this line for PyTorch <1.4
+    scheduler.step()     # Use this line for PyTorch >=1.4
+
+    row = {'epoch': str(epoch), 'train_acc': str(accuracy), 'test_acc': str(test_acc)}
+    csv_logger.writerow(row)
+
+torch.save(cnn.state_dict(), 'checkpoints/' + test_id + '.pt')
+csv_logger.close()
+```
+:::
+
+
+
+::: {.cell .code}
+``` python
+```
+:::
+
+
+
+::: {.cell .code}
+``` python
+```
+:::
+
+
+
+::: {.cell .code}
+``` python
+```
+:::
+
 
 ::: {.cell .code}
 ``` python
@@ -964,6 +1039,7 @@ for i in range(num_runs):
     main(args)
     
 
+
 ```
 :::
 
@@ -972,14 +1048,16 @@ for i in range(num_runs):
 :::
 #### ResNet18
 
-Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) 
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) and “+” indicates standard data augmentation (mirror
++ crop)
 
-| **Network** | **CIFAR-10** | **CIFAR-100** |
-| ----------- | ------------ | ------------- |
-| ResNet18    | 4.72         | 22.46         |
-| ResNet18 + cutout | 3.99   | 21.96         |  
+| **Network** | **CIFAR-10** | **CIFAR-10+** | **CIFAR-100** | **CIFAR-100+** |
+| ----------- | ------------ | ------------- | ------------ | ------------- |
+| ResNet18    | 14.04         |   5.72     | 40.13         | 24.36         |
+| ResNet18 + cutout | -   | 4.86         | -         | 23.9        |  
 
 
+<!-- to do - fINISH THIS-->
 #### WideResNet
 
 WideResNet model implementation from https://github.com/xternalz/WideResNet-pytorch  
