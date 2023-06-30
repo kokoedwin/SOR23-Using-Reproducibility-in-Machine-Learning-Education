@@ -1048,13 +1048,13 @@ for i in range(num_runs):
 :::
 #### ResNet18
 
-Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) and “+” indicates standard data augmentation (mirror
+Test error from our own experiments (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) and “+” indicates standard data augmentation (mirror
 + crop)
 
 | **Network** | **CIFAR-10** | **CIFAR-10+** | **CIFAR-100** | **CIFAR-100+** |
 | ----------- | ------------ | ------------- | ------------ | ------------- |
 | ResNet18    | 14.04         |   5.72     | 40.13         | 24.36         |
-| ResNet18 + cutout | -   | 4.86         | -         | 23.9        |  
+| ResNet18 + cutout | 10.98   | 4.86         | 36.5        | 23.9        |  
 
 
 <!-- to do - fINISH THIS-->
