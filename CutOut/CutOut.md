@@ -759,12 +759,12 @@ from torchvision import datasets, transforms
 :::
 ::: {.cell .code}
 ``` python
-args.cuda = not args.no_cuda and torch.cuda.is_available()
+cuda = torch.cuda.is_available()
 cudnn.benchmark = True  # Should make training should go faster for large models
 
-torch.manual_seed(args.seed)
-if args.cuda:
-    torch.cuda.manual_seed(args.seed)
+seed = 1
+torch.manual_seed(seed)
+
 ```
 :::
 
@@ -774,10 +774,10 @@ if args.cuda:
 ::: {.cell .code}
 ``` python
 #test_id will be the used for the name of the file of weight of the model and also the result
-test_id = args.dataset + '_' + args.model
+test_id = dataset + '_' + model
 
 # Image Preprocessing
-if args.dataset == 'svhn':
+if dataset == 'svhn':
     normalize = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]],
                                      std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
 else:
@@ -785,13 +785,17 @@ else:
                                      std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform = transforms.Compose([])
-if args.data_augmentation:
+data_augmentation = True
+cutout = True
+n_holes = 1
+length = 16
+if data_augmentation:
     train_transform.transforms.append(transforms.RandomCrop(32, padding=4))
     train_transform.transforms.append(transforms.RandomHorizontalFlip())
 train_transform.transforms.append(transforms.ToTensor())
 train_transform.transforms.append(normalize)
-if args.cutout:
-    train_transform.transforms.append(Cutout(n_holes=args.n_holes, length=args.length))
+if .cutout:
+    train_transform.transforms.append(Cutout(n_holes=n_holes, length=length))
 
 
 test_transform = transforms.Compose([
@@ -807,7 +811,9 @@ test_transform = transforms.Compose([
 
 ::: {.cell .code}
 ``` python
-if args.dataset == 'cifar10':
+dataset_options = ['cifar10', 'cifar100', 'svhn']
+dataset = dataset_options[0]
+if dataset == 'cifar10':
     num_classes = 10
     train_dataset = datasets.CIFAR10(root='data/',
                                      train=True,
@@ -818,7 +824,7 @@ if args.dataset == 'cifar10':
                                     train=False,
                                     transform=test_transform,
                                     download=True)
-elif args.dataset == 'cifar100':
+elif dataset == 'cifar100':
     num_classes = 100
     train_dataset = datasets.CIFAR100(root='data/',
                                       train=True,
@@ -829,7 +835,7 @@ elif args.dataset == 'cifar100':
                                      train=False,
                                      transform=test_transform,
                                      download=True)
-elif args.dataset == 'svhn':
+elif dataset == 'svhn':
     num_classes = 10
     train_dataset = datasets.SVHN(root='data/',
                                   split='train',
@@ -862,14 +868,15 @@ elif args.dataset == 'svhn':
 ::: {.cell .code}
 ``` python
 # Data Loader (Input Pipeline)
+batch_size = 128
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                           batch_size=args.batch_size,
+                                           batch_size=batch_size,
                                            shuffle=True,
                                            pin_memory=True,
                                            num_workers=2)
 
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
-                                          batch_size=args.batch_size,
+                                          batch_size=batch_size,
                                           shuffle=False,
                                           pin_memory=True,
                                           num_workers=2)
@@ -883,10 +890,12 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
 
 ::: {.cell .code}
 ``` python
-if args.model == 'resnet18':
+model_options = ['resnet18', 'wideresnet']
+model = model_options[0]
+if model == 'resnet18':
     cnn = ResNet18(num_classes=num_classes)
-elif args.model == 'wideresnet':
-    if args.dataset == 'svhn':
+elif model == 'wideresnet':
+    if dataset == 'svhn':
         cnn = WideResNet(depth=16, num_classes=num_classes, widen_factor=8,
                          dropRate=0.4)
     else:
@@ -894,11 +903,12 @@ elif args.model == 'wideresnet':
                          dropRate=0.3)
 
 cnn = cnn.cuda()
+learning_rate = 0.1
 criterion = nn.CrossEntropyLoss().cuda()
-cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=args.learning_rate,
+cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=learning_rate,
                                 momentum=0.9, nesterov=True, weight_decay=5e-4)
 
-if args.dataset == 'svhn':
+if dataset == 'svhn':
     scheduler = MultiStepLR(cnn_optimizer, milestones=[80, 120], gamma=0.1)
 else:
     scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
@@ -941,7 +951,8 @@ def test(loader):
 
 ::: {.cell .code}
 ``` python
-for epoch in range(args.epochs):
+epochs = 200
+for epoch in range(epochs):
 
     xentropy_loss_avg = 0.
     correct = 0.
@@ -1011,6 +1022,7 @@ csv_logger.close()
 
 ::: {.cell .code}
 ``` python
+'''
 class Args:
     dataset = 'cifar10' #dataset_options = ['cifar10', 'cifar100', 'svhn']
     model = 'resnet18' # model_options = ['resnet18', 'wideresnet']
@@ -1026,6 +1038,7 @@ class Args:
 
 
 args = Args()
+'''
 ```
 :::
 
