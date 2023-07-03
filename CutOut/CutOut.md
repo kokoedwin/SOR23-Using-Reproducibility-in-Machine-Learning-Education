@@ -26,6 +26,9 @@ After working through this notebook, you should be able to:
 
 :::
 
+::: {.cell .markdown}
+Note: for faster training, use Runtime > Change Runtime Type to run this notebook on a GPU.
+:::
 
 ::: {.cell .code}
 ``` python
@@ -405,6 +408,13 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 3 
 ### Implement Cutout on CIFAR10 Dataset
 :::
 
+::: {.cell .markdown}
+This code block is used for creating a directory named 'checkpoints'. This directory will be used to store the weights of our models, which are crucial for both preserving our progress during model training and for future use of the trained models.
+
+There are two versions of the directory path - one is for those who are running this code in a Jupyter Notebook environment, and the other (currently commented out) is for those who are using the Chameleon cloud computing platform.
+
+Creating such a directory and regularly saving model weights is a good practice in machine learning, as it ensures that you can resume your work from where you left off, should the training process be interrupted.
+:::
 
 ::: {.cell .code}
 ``` python
@@ -421,7 +431,6 @@ if not os.path.exists('/checkpoints'):
 '''
 ```
 :::
-
 
 
 ::: {.cell .code}
@@ -441,6 +450,11 @@ def imshow(img):
     plt.show()
 ```
 :::
+
+::: {.cell .markdown}
+Here, we're loading the CIFAR-10 dataset and setting up data loaders. Afterward, we'll display some images from the dataset both in their original form and with Cutout augmentation applied, so you can see the effect of this technique firsthand.
+:::
+
 
 ::: {.cell .code}
 ``` python
@@ -773,10 +787,10 @@ torch.manual_seed(seed)
 :::
 ::: {.cell .code}
 ``` python
-#test_id will be the used for the name of the file of weight of the model and also the result
-test_id = dataset + '_' + model
 
 # Image Preprocessing
+dataset_options = ['cifar10', 'cifar100', 'svhn']
+dataset = dataset_options[0]
 if dataset == 'svhn':
     normalize = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]],
                                      std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
@@ -805,14 +819,14 @@ test_transform = transforms.Compose([
 :::
 
 
+
 ::: {.cell .markdown}
 #### 5.4. Import the dataset
 :::
 
 ::: {.cell .code}
 ``` python
-dataset_options = ['cifar10', 'cifar100', 'svhn']
-dataset = dataset_options[0]
+
 if dataset == 'cifar10':
     num_classes = 10
     train_dataset = datasets.CIFAR10(root='data/',
@@ -888,10 +902,34 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
 #### 5.6. Define the model
 :::
 
+::: {.cell .markdown}
+This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. It allows for the selection of different models (ResNet18 or WideResNet) and adjusts settings based on the chosen dataset. It also initializes a logger to record training progress.
+:::
+
 ::: {.cell .code}
 ``` python
 model_options = ['resnet18', 'wideresnet']
-model = model_options[0]
+model = model_options[0] # Choose 0 for resnet18 or 1 for wideresnet
+```
+:::
+
+::: {.cell .code}
+``` python
+#test_id will be the used for the name of the file of weight of the model and also the result
+test_id = dataset + '_' + model
+
+if data_augmentation:
+    test_id = test_id + "_DA"
+
+if cutout:
+    test_id = test_id + "_CO"
+
+```
+:::
+
+::: {.cell .code}
+``` python
+
 if model == 'resnet18':
     cnn = ResNet18(num_classes=num_classes)
 elif model == 'wideresnet':
@@ -947,7 +985,9 @@ def test(loader):
 ```
 :::
 
-
+::: {.cell .markdown}
+This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved.
+:::
 
 ::: {.cell .code}
 ``` python
@@ -1079,8 +1119,8 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 
 
 | **Network** | **CIFAR-10** | **CIFAR-100** | **SVHN** |
 | ----------- | ------------ | ------------- | -------- |
-| WideResNet  | 3.87         | 18.8          | 1.60     |
-| WideResNet + cutout | 3.08 | 18.41         | **1.30** |
+| WideResNet  | -        | -          | -     |
+| WideResNet + cutout | - | -        | - |
 
 
 #### Shake-shake Regularization Network
@@ -1091,8 +1131,8 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 3 
 
 | **Network** | **CIFAR-10** | **CIFAR-100** |
 | ----------- | ------------ | ------------- |
-| Shake-shake | 2.86         | 15.58         |
-| Shake-shake + cutout | 2.56 | 15.20 |
+| Shake-shake | -        | -        |
+| Shake-shake + cutout | - | - |
 
 
 ::: {.cell .markdown}
