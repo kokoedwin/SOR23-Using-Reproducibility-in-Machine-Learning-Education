@@ -13,7 +13,7 @@ We will use the author's implementation of their technique, from [https://github
 
 ::: {.cell .markdown}
 
-## Learning outcomes
+## 1. Learning outcomes
 
 After working through this notebook, you should be able to:
 
@@ -68,7 +68,7 @@ print(torch. __version__)
 
 ::: {.cell .markdown }
 
-## Cutout as a regularization technique
+## 2. Cutout as a regularization technique
 
 This Jupyter notebook is designed to illustrate the implementation and
 usage of the Cutout data augmentation technique in deep learning,
@@ -341,7 +341,7 @@ plt.show()
 
 
 ::: {.cell .markdown}
-## Identifying claims from the Cutout paper
+## 3. Identifying claims from the Cutout paper
 
 To reproduce the results from the original Cutout paper, we will first need to identify the specific, falsifiable claims in that paper, by reading it very carefully. Then, we will design experiments to validate each claim. 
 
@@ -349,14 +349,14 @@ These claims may be quantitative (i.e. describe a specific numeric result), qual
 
 <!-- to do - go through the paper, quote little snippets and explain each claim and organize them -->
 
-### Claims
+### 3.1 Claims
 
 1. Cutout aimed to remove maximally activated features in order to encourage the network to consider less prominent features
 2. This technique improves the robustness and overall performance of convolutional neural networks.
 3. Cutout can be used in conjunction with existing forms of data augmentation and other regularizers to further improve model performance.
 
-### Quantitative Claims
-#### ResNet18
+### 3.2 Quantitative Claims
+#### 3.2.1 ResNet18
 
 Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) and “+” indicates standard data augmentation (mirror
 + crop)
@@ -367,7 +367,7 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 
 | ResNet18 + cutout | 9.31   | 3.99         | 34.98         | 21.96        |  
 
 
-#### WideResNet
+#### 3.2.2 WideResNet
 
 WideResNet model implementation from https://github.com/xternalz/WideResNet-pytorch  
 
@@ -380,7 +380,7 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 
 | WideResNet + cutout | 5.54 | 3.08        |23.94 |  18.41 | **1.30** |
 
 
-#### Shake-shake Regularization Network
+#### 3.3.3 Shake-shake Regularization Network
 
 Shake-shake regularization model implementation from https://github.com/xgastaldi/shake-shake
 
@@ -398,14 +398,14 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 3 
 
 
 ::: {.cell .markdown}
-## Execute experiments to validate quantitative and qualitative claims
+## 4. Execute experiments to validate quantitative and qualitative claims
 
 :::
 
 
 
 ::: {.cell .markdown}
-### Implement Cutout on CIFAR10 Dataset
+### 4.1 Implement Cutout on CIFAR10 Dataset
 :::
 
 ::: {.cell .markdown}
@@ -487,11 +487,11 @@ imshow(torchvision.utils.make_grid(Cutout_images))
 :::
 
 ::: {.cell .markdown}
-### 4. Methods and Implementation {#4-methods-and-implementation}
+### 4.2 Methods and Implementation {#4-methods-and-implementation}
 :::
 
 ::: {.cell .markdown}
-### ResNet Code
+### 4.2.1 ResNet Code
 :::
 
 ::: {.cell .code}
@@ -619,7 +619,7 @@ def test_resnet():
 :::
 
 ::: {.cell .markdown}
-### WideResNet Code
+### 4.2.2 WideResNet Code
 :::
 
 ::: {.cell .code}
@@ -716,7 +716,38 @@ class WideResNet(nn.Module):
         return out
 ```
 :::
+
 ::: {.cell .markdown}
+### 4.2.3 Model Evaluate Test Code
+This function evaluates the performance of the model on a given data loader (loader). It sets the model to evaluation mode (eval), calculates the accuracy on the dataset, and returns the validation accuracy. It then switches the model back to training mode (train) before returning the validation accuracy.
+:::
+
+::: {.cell .code}
+``` python
+def test(loader):
+    cnn.eval()    # Change model to 'eval' mode (BN uses moving mean/var).
+    correct = 0.
+    total = 0.
+    for images, labels in loader:
+        images = images.cuda()
+        labels = labels.cuda()
+
+        with torch.no_grad():
+            pred = cnn(images)
+
+        pred = torch.max(pred.data, 1)[1]
+        total += labels.size(0)
+        correct += (pred == labels).sum().item()
+
+    val_acc = correct / total
+    cnn.train()
+    return val_acc
+```
+:::
+
+::: {.cell .markdown}
+### 4.2.4 CSVLogger (Save the result to a CSV) Code
+
 The `CSVLogger` class logs training progress to a CSV file, with each row representing an epoch and columns representing metrics such as training and testing accuracy. 
 ::: 
 ::: {.cell .code}
@@ -748,16 +779,21 @@ class CSVLogger():
 ```
 :::
 
+
+
 ::: {.cell .markdown}
-### 5. Model Training and Evaluation {#5-model-training-and-evaluation}
+### 4.3 Model Training and Evaluation {#5-model-training-and-evaluation}
 :::
 
 ::: {.cell .markdown}
-##### 5.1. Experiment using ResNet with CIFAR-10 Dataset
+#### 4.3.1 Experiment using ResNet with CIFAR-10 Dataset Without Cutout vs With Cutout
 :::
 
 ::: {.cell .markdown}
-##### 5.1.1. Import the model
+##### 4.3.1.1. Training ResNet-18 in CF10 without Cutout
+:::
+::: {.cell .markdown}
+Import the library
 :::
 ::: {.cell .code}
 ``` python
@@ -773,7 +809,7 @@ from torchvision import datasets, transforms
 :::
 
 ::: {.cell .markdown}
-##### 5.1.2. Check Cuda availability annd seed
+Check Cuda GPU availability and set seed number
 :::
 ::: {.cell .code}
 ``` python
@@ -782,38 +818,24 @@ cudnn.benchmark = True  # Should make training should go faster for large models
 
 seed = 1
 torch.manual_seed(seed)
-
 ```
 :::
 
 ::: {.cell .markdown}
-##### 5.1.3. Image Processing
+Image Processing for CIFAR-10
 :::
 ::: {.cell .code}
 ``` python
 
 # Image Preprocessing
-dataset_options = ['cifar10', 'cifar100', 'svhn']
-dataset = dataset_options[0]
-if dataset == 'svhn':
-    normalize = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]],
-                                     std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
-else:
-    normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]],
-                                     std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+
+normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform = transforms.Compose([])
-data_augmentation = True
-cutout = True
-n_holes = 1
-length = 16
-if data_augmentation:
-    train_transform.transforms.append(transforms.RandomCrop(32, padding=4))
-    train_transform.transforms.append(transforms.RandomHorizontalFlip())
+
 train_transform.transforms.append(transforms.ToTensor())
 train_transform.transforms.append(normalize)
-if .cutout:
-    train_transform.transforms.append(Cutout(n_holes=n_holes, length=length))
+
 
 
 test_transform = transforms.Compose([
@@ -825,62 +847,26 @@ test_transform = transforms.Compose([
 
 
 ::: {.cell .markdown}
-#### 5.1.4. Import the dataset
+Import the dataset of CIFAR-10
 :::
 
 ::: {.cell .code}
 ``` python
-
-if dataset == 'cifar10':
-    num_classes = 10
-    train_dataset = datasets.CIFAR10(root='data/',
+train_dataset = datasets.CIFAR10(root='data/',
                                      train=True,
                                      transform=train_transform,
                                      download=True)
 
-    test_dataset = datasets.CIFAR10(root='data/',
+test_dataset = datasets.CIFAR10(root='data/',
                                     train=False,
                                     transform=test_transform,
                                     download=True)
-elif dataset == 'cifar100':
-    num_classes = 100
-    train_dataset = datasets.CIFAR100(root='data/',
-                                      train=True,
-                                      transform=train_transform,
-                                      download=True)
-
-    test_dataset = datasets.CIFAR100(root='data/',
-                                     train=False,
-                                     transform=test_transform,
-                                     download=True)
-elif dataset == 'svhn':
-    num_classes = 10
-    train_dataset = datasets.SVHN(root='data/',
-                                  split='train',
-                                  transform=train_transform,
-                                  download=True)
-
-    extra_dataset = datasets.SVHN(root='data/',
-                                  split='extra',
-                                  transform=train_transform,
-                                  download=True)
-
-    # Combine both training splits (https://arxiv.org/pdf/1605.07146.pdf)
-    data = np.concatenate([train_dataset.data, extra_dataset.data], axis=0)
-    labels = np.concatenate([train_dataset.labels, extra_dataset.labels], axis=0)
-    train_dataset.data = data
-    train_dataset.labels = labels
-
-    test_dataset = datasets.SVHN(root='data/',
-                                 split='test',
-                                 transform=test_transform,
-                                 download=True)
 ```
 :::
 
 
 ::: {.cell .markdown}
-#### 5.1.5. Create Dataset as Dataloader
+Create Dataset as Dataloader
 :::
 
 ::: {.cell .code}
@@ -903,59 +889,31 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
 
 
 ::: {.cell .markdown}
-#### 5.1.6. Define the model
+Define the model
 :::
 
 ::: {.cell .markdown}
-This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. It allows for the selection of different models (ResNet18 or WideResNet) and adjusts settings based on the chosen dataset. It also initializes a logger to record training progress.
+This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. 
 :::
+
 
 ::: {.cell .code}
 ``` python
-model_options = ['resnet18', 'wideresnet']
-model = model_options[0] # Choose 0 for resnet18 or 1 for wideresnet
-```
-:::
+#file_name will be the used for the name of the file of weight of the model and also the result
+file_name = "cifar10_resnet18"
 
-::: {.cell .code}
-``` python
-#test_id will be the used for the name of the file of weight of the model and also the result
-test_id = dataset + '_' + model
+num_classes = 10
+cnn = ResNet18(num_classes=num_classes)
 
-if data_augmentation:
-    test_id = test_id + "_DA"
-
-if cutout:
-    test_id = test_id + "_CO"
-
-```
-:::
-
-::: {.cell .code}
-``` python
-
-if model == 'resnet18':
-    cnn = ResNet18(num_classes=num_classes)
-elif model == 'wideresnet':
-    if dataset == 'svhn':
-        cnn = WideResNet(depth=16, num_classes=num_classes, widen_factor=8,
-                         dropRate=0.4)
-    else:
-        cnn = WideResNet(depth=28, num_classes=num_classes, widen_factor=10,
-                         dropRate=0.3)
 
 cnn = cnn.cuda()
 learning_rate = 0.1
 criterion = nn.CrossEntropyLoss().cuda()
 cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=learning_rate,
                                 momentum=0.9, nesterov=True, weight_decay=5e-4)
+scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
 
-if dataset == 'svhn':
-    scheduler = MultiStepLR(cnn_optimizer, milestones=[80, 120], gamma=0.1)
-else:
-    scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
-
-filename = 'logs/' + test_id + '.csv'
+filename = 'logs/' + file_name + '.csv'
 csv_logger = CSVLogger(args=args, fieldnames=['epoch', 'train_acc', 'test_acc'], filename=filename)
 ```
 :::
@@ -963,30 +921,7 @@ csv_logger = CSVLogger(args=args, fieldnames=['epoch', 'train_acc', 'test_acc'],
 
 
 ::: {.cell .markdown}
-#### 5.1.7. Test function
-:::
-
-::: {.cell .code}
-``` python
-def test(loader):
-    cnn.eval()    # Change model to 'eval' mode (BN uses moving mean/var).
-    correct = 0.
-    total = 0.
-    for images, labels in loader:
-        images = images.cuda()
-        labels = labels.cuda()
-
-        with torch.no_grad():
-            pred = cnn(images)
-
-        pred = torch.max(pred.data, 1)[1]
-        total += labels.size(0)
-        correct += (pred == labels).sum().item()
-
-    val_acc = correct / total
-    cnn.train()
-    return val_acc
-```
+Training ResNet-18 withuout Cutout
 :::
 
 ::: {.cell .markdown}
@@ -1037,18 +972,17 @@ for epoch in range(epochs):
     row = {'epoch': str(epoch), 'train_acc': str(accuracy), 'test_acc': str(test_acc)}
     csv_logger.writerow(row)
 
-torch.save(cnn.state_dict(), 'checkpoints/' + test_id + '.pt')
+torch.save(cnn.state_dict(), 'checkpoints/' + file_name + '.pt')
 csv_logger.close()
 ```
 :::
 
-sdsds
+sdsd
 ::: {.cell .markdown}
-##### 5.2. Experiment using WideResNet with CIFAR-100 Dataset
+##### 4.3.1.2. Training ResNet-18 in CF10 with Cutout
 :::
-
 ::: {.cell .markdown}
-##### 5.2.1. Import the model
+Import the library
 :::
 ::: {.cell .code}
 ``` python
@@ -1064,7 +998,7 @@ from torchvision import datasets, transforms
 :::
 
 ::: {.cell .markdown}
-##### 5.2.2. Check Cuda availability annd seed
+Check Cuda GPU availability and set seed number
 :::
 ::: {.cell .code}
 ``` python
@@ -1073,38 +1007,28 @@ cudnn.benchmark = True  # Should make training should go faster for large models
 
 seed = 1
 torch.manual_seed(seed)
-
 ```
 :::
 
 ::: {.cell .markdown}
-##### 5.2.3. Image Processing
+Image Processing for CIFAR-10
 :::
 ::: {.cell .code}
 ``` python
 
 # Image Preprocessing
-dataset_options = ['cifar10', 'cifar100', 'svhn']
-dataset = dataset_options[1] #Change the index to change the dataset that want to be used
-if dataset == 'svhn':
-    normalize = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]],
-                                     std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
-else:
-    normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]],
-                                     std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+
+normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform = transforms.Compose([])
-data_augmentation = True
-cutout = True
-n_holes = 1
-length = 16
-if data_augmentation:
-    train_transform.transforms.append(transforms.RandomCrop(32, padding=4))
-    train_transform.transforms.append(transforms.RandomHorizontalFlip())
+
 train_transform.transforms.append(transforms.ToTensor())
 train_transform.transforms.append(normalize)
-if .cutout:
-    train_transform.transforms.append(Cutout(n_holes=n_holes, length=length))
+
+#Add Cutout to the image transformer piepeline
+n_holes = 1
+length = 16
+train_transform.transforms.append(Cutout(n_holes=n_holes, length=length))
 
 
 test_transform = transforms.Compose([
@@ -1116,62 +1040,26 @@ test_transform = transforms.Compose([
 
 
 ::: {.cell .markdown}
-#### 5.2.4. Import the dataset
+Import the dataset of CIFAR-10
 :::
 
 ::: {.cell .code}
 ``` python
-
-if dataset == 'cifar10':
-    num_classes = 10
-    train_dataset = datasets.CIFAR10(root='data/',
+train_dataset = datasets.CIFAR10(root='data/',
                                      train=True,
                                      transform=train_transform,
                                      download=True)
 
-    test_dataset = datasets.CIFAR10(root='data/',
+test_dataset = datasets.CIFAR10(root='data/',
                                     train=False,
                                     transform=test_transform,
                                     download=True)
-elif dataset == 'cifar100':
-    num_classes = 100
-    train_dataset = datasets.CIFAR100(root='data/',
-                                      train=True,
-                                      transform=train_transform,
-                                      download=True)
-
-    test_dataset = datasets.CIFAR100(root='data/',
-                                     train=False,
-                                     transform=test_transform,
-                                     download=True)
-elif dataset == 'svhn':
-    num_classes = 10
-    train_dataset = datasets.SVHN(root='data/',
-                                  split='train',
-                                  transform=train_transform,
-                                  download=True)
-
-    extra_dataset = datasets.SVHN(root='data/',
-                                  split='extra',
-                                  transform=train_transform,
-                                  download=True)
-
-    # Combine both training splits (https://arxiv.org/pdf/1605.07146.pdf)
-    data = np.concatenate([train_dataset.data, extra_dataset.data], axis=0)
-    labels = np.concatenate([train_dataset.labels, extra_dataset.labels], axis=0)
-    train_dataset.data = data
-    train_dataset.labels = labels
-
-    test_dataset = datasets.SVHN(root='data/',
-                                 split='test',
-                                 transform=test_transform,
-                                 download=True)
 ```
 :::
 
 
 ::: {.cell .markdown}
-#### 5.1.5. Create Dataset as Dataloader
+Create Dataset as Dataloader
 :::
 
 ::: {.cell .code}
@@ -1194,59 +1082,31 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
 
 
 ::: {.cell .markdown}
-#### 5.2.6. Define the model
+Define the model
 :::
 
 ::: {.cell .markdown}
-This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. It allows for the selection of different models (ResNet18 or WideResNet) and adjusts settings based on the chosen dataset. It also initializes a logger to record training progress.
+This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. 
 :::
+
 
 ::: {.cell .code}
 ``` python
-model_options = ['resnet18', 'wideresnet']
-model = model_options[1] # Choose 0 for resnet18 or 1 for wideresnet
-```
-:::
+#file_name will be the used for the name of the file of weight of the model and also the result
+file_name = "cifar10_resnet18_Cutout"
 
-::: {.cell .code}
-``` python
-#test_id will be the used for the name of the file of weight of the model and also the result
-test_id = dataset + '_' + model
+num_classes = 10
+cnn = ResNet18(num_classes=num_classes)
 
-if data_augmentation:
-    test_id = test_id + "_DA"
-
-if cutout:
-    test_id = test_id + "_CO"
-
-```
-:::
-
-::: {.cell .code}
-``` python
-
-if model == 'resnet18':
-    cnn = ResNet18(num_classes=num_classes)
-elif model == 'wideresnet':
-    if dataset == 'svhn':
-        cnn = WideResNet(depth=16, num_classes=num_classes, widen_factor=8,
-                         dropRate=0.4)
-    else:
-        cnn = WideResNet(depth=28, num_classes=num_classes, widen_factor=10,
-                         dropRate=0.3)
 
 cnn = cnn.cuda()
 learning_rate = 0.1
 criterion = nn.CrossEntropyLoss().cuda()
 cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=learning_rate,
                                 momentum=0.9, nesterov=True, weight_decay=5e-4)
+scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
 
-if dataset == 'svhn':
-    scheduler = MultiStepLR(cnn_optimizer, milestones=[80, 120], gamma=0.1)
-else:
-    scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
-
-filename = 'logs/' + test_id + '.csv'
+filename = 'logs/' + file_name + '.csv'
 csv_logger = CSVLogger(args=args, fieldnames=['epoch', 'train_acc', 'test_acc'], filename=filename)
 ```
 :::
@@ -1254,30 +1114,7 @@ csv_logger = CSVLogger(args=args, fieldnames=['epoch', 'train_acc', 'test_acc'],
 
 
 ::: {.cell .markdown}
-#### 5.2.7. Test function
-:::
-
-::: {.cell .code}
-``` python
-def test(loader):
-    cnn.eval()    # Change model to 'eval' mode (BN uses moving mean/var).
-    correct = 0.
-    total = 0.
-    for images, labels in loader:
-        images = images.cuda()
-        labels = labels.cuda()
-
-        with torch.no_grad():
-            pred = cnn(images)
-
-        pred = torch.max(pred.data, 1)[1]
-        total += labels.size(0)
-        correct += (pred == labels).sum().item()
-
-    val_acc = correct / total
-    cnn.train()
-    return val_acc
-```
+Training ResNet-18 with Cutout
 :::
 
 ::: {.cell .markdown}
@@ -1328,14 +1165,27 @@ for epoch in range(epochs):
     row = {'epoch': str(epoch), 'train_acc': str(accuracy), 'test_acc': str(test_acc)}
     csv_logger.writerow(row)
 
-torch.save(cnn.state_dict(), 'checkpoints/' + test_id + '.pt')
+torch.save(cnn.state_dict(), 'checkpoints/' + file_name + '.pt')
 csv_logger.close()
 ```
 :::
 
+::: {.cell .markdown}
+##### 4.3.1.3. Compare the Result and match with the claims
+:::
+
+::: {.cell .markdown}
+##### 4.3.1.3.1. Compare the Quantitative Claims
+
+
+:::
 
 ::: {.cell .code}
 ``` python
+test_acc_without_cutout = test(test_loader_without_cutout)
+test_acc_with_cutout = test(test_loader_with_cutout)
+print("Result ResNet-18 without Cutout for Test Dataset" + str(1- test_acc_without_cutout ))
+print("Result ResNet-18 with Cutout for Test Dataset" + str(1- test_acc_without_cutout ))
 ```
 :::
 
@@ -1391,7 +1241,7 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 
 | **Network** | **CIFAR-10** | **CIFAR-10+** |**CIFAR-100** | **CIFAR-100+** | **SVHN** |
 | ----------- | ------------ | ------------- | ------------ | ------------- | -------- |
 | WideResNet  | 6.99        | 4.00         |- | - | -    |
-| WideResNet + cutout | 5.45 | 3.20        |- |  - | - |
+| WideResNet + cutout | 5.45 | 3.20        |- |  18.8 | - |
 
 #### Shake-shake Regularization Network
 
