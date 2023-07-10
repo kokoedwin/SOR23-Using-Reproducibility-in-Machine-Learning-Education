@@ -503,116 +503,118 @@ imshow(torchvision.utils.make_grid(Cutout_images))
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 from torch.autograd import Variable
 
-
 def conv3x3(in_planes, out_planes, stride=1):
-  return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
+    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
 
 
 class BasicBlock(nn.Module):
-  expansion = 1
+    expansion = 1
 
-  def __init__(self, in_planes, planes, stride=1):
-    super(BasicBlock, self).__init__()
-    self.conv1 = conv3x3(in_planes, planes, stride)
-    self.bn1 = nn.BatchNorm2d(planes)
-    self.conv2 = conv3x3(planes, planes)
-    self.bn2 = nn.BatchNorm2d(planes)
-    self.shortcut = nn.Sequential()
-    if stride != 1 or in_planes != self.expansion*planes:
-      self.shortcut = nn.Sequential(
+    def __init__(self, in_planes, planes, stride=1):
+        super(BasicBlock, self).__init__()
+        self.conv1 = conv3x3(in_planes, planes, stride)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = conv3x3(planes, planes)
+        self.bn2 = nn.BatchNorm2d(planes)
+
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_planes != self.expansion*planes:
+            self.shortcut = nn.Sequential(
                 nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(self.expansion*planes)
             )
 
-  def forward(self, x):
-    out = F.relu(self.bn1(self.conv1(x)))
-    out = self.bn2(self.conv2(out))
-    out += self.shortcut(x)
-    out = F.relu(out)
-    return out
+    def forward(self, x):
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.bn2(self.conv2(out))
+        out += self.shortcut(x)
+        out = F.relu(out)
+        return out
 
 
 class Bottleneck(nn.Module):
-  expansion = 4
+    expansion = 4
 
-  def __init__(self, in_planes, planes, stride=1):
-    super(Bottleneck, self).__init__()
-    self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False)
-    self.bn1 = nn.BatchNorm2d(planes)
-    self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
-    self.bn2 = nn.BatchNorm2d(planes)
-    self.conv3 = nn.Conv2d(planes, self.expansion*planes, kernel_size=1, bias=False)
-    self.bn3 = nn.BatchNorm2d(self.expansion*planes)
+    def __init__(self, in_planes, planes, stride=1):
+        super(Bottleneck, self).__init__()
+        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(planes)
+        self.conv3 = nn.Conv2d(planes, self.expansion*planes, kernel_size=1, bias=False)
+        self.bn3 = nn.BatchNorm2d(self.expansion*planes)
 
-    self.shortcut = nn.Sequential()
-    if stride != 1 or in_planes != self.expansion*planes:
-      self.shortcut = nn.Sequential(nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),nn.BatchNorm2d(self.expansion*planes))
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_planes != self.expansion*planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(self.expansion*planes)
+            )
 
-  def forward(self, x):
-    out = F.relu(self.bn1(self.conv1(x)))
-    out = F.relu(self.bn2(self.conv2(out)))
-    out = self.bn3(self.conv3(out))
-    out += self.shortcut(x)
-    out = F.relu(out)
-    return out
+    def forward(self, x):
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = F.relu(self.bn2(self.conv2(out)))
+        out = self.bn3(self.conv3(out))
+        out += self.shortcut(x)
+        out = F.relu(out)
+        return out
 
 
 class ResNet(nn.Module):
-  def __init__(self, block, num_blocks, num_classes=10):
-    super(ResNet, self).__init__()
-    self.in_planes = 64
+    def __init__(self, block, num_blocks, num_classes=10):
+        super(ResNet, self).__init__()
+        self.in_planes = 64
 
-    self.conv1 = conv3x3(3,64)
-    self.bn1 = nn.BatchNorm2d(64)
-    self.layer1 = self._make_layer(block, 64, num_blocks[0], stride=1)
-    self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
-    self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
-    self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
-    self.linear = nn.Linear(512*block.expansion, num_classes)
+        self.conv1 = conv3x3(3,64)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.layer1 = self._make_layer(block, 64, num_blocks[0], stride=1)
+        self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
+        self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
+        self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
+        self.linear = nn.Linear(512*block.expansion, num_classes)
 
-  def _make_layer(self, block, planes, num_blocks, stride):
-    strides = [stride] + [1]*(num_blocks-1)
-    layers = []
-    for stride in strides:
-      layers.append(block(self.in_planes, planes, stride))
-      self.in_planes = planes * block.expansion
-      return nn.Sequential(*layers)
+    def _make_layer(self, block, planes, num_blocks, stride):
+        strides = [stride] + [1]*(num_blocks-1)
+        layers = []
+        for stride in strides:
+            layers.append(block(self.in_planes, planes, stride))
+            self.in_planes = planes * block.expansion
+        return nn.Sequential(*layers)
 
-  def forward(self, x):
-    out = F.relu(self.bn1(self.conv1(x)))
-    out = self.layer1(out)
-    out = self.layer2(out)
-    out = self.layer3(out)
-    out = self.layer4(out)
-    out = self.layer4(out) # We'll need this output for Grad-CAM
-    self.activations = out  # Save the activations
-    out = F.avg_pool2d(out, 4)
-    out = out.view(out.size(0), -1)
-    out = self.linear(out)
-    return out
+    def forward(self, x):
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.layer1(out)
+        out = self.layer2(out)
+        out = self.layer3(out)
+        out = self.layer4(out)
+        out = F.avg_pool2d(out, 4)
+        out = out.view(out.size(0), -1)
+        out = self.linear(out)
+        return out
 
 
 def ResNet18(num_classes=10):
-  return ResNet(BasicBlock, [2,2,2,2], num_classes)
+    return ResNet(BasicBlock, [2,2,2,2], num_classes)
 
 def ResNet34(num_classes=10):
-  return ResNet(BasicBlock, [3,4,6,3], num_classes)
+    return ResNet(BasicBlock, [3,4,6,3], num_classes)
 
 def ResNet50(num_classes=10):
-  return ResNet(Bottleneck, [3,4,6,3], num_classes)
+    return ResNet(Bottleneck, [3,4,6,3], num_classes)
 
 def ResNet101(num_classes=10):
-  return ResNet(Bottleneck, [3,4,23,3], num_classes)
+    return ResNet(Bottleneck, [3,4,23,3], num_classes)
 
 def ResNet152(num_classes=10):
-  return ResNet(Bottleneck, [3,8,36,3], num_classes)
+    return ResNet(Bottleneck, [3,8,36,3], num_classes)
 
 def test_resnet():
-  net = ResNet50()
-  y = net(Variable(torch.randn(1,3,32,32)))
-  print(y.size())
+    net = ResNet50()
+    y = net(Variable(torch.randn(1,3,32,32)))
+    print(y.size())
 
 # test_resnet()
 ```
@@ -1189,30 +1191,163 @@ print("Result ResNet-18 with Cutout for Test Dataset" + str(1- test_acc_without_
 ```
 :::
 
+::: {.cell .markdown}
+##### 4.3.1.3.2. Compare the Qualitative Claims usinng Grad-CAM
 
 
-::: {.cell .code}
-``` python
-```
-:::
-
-
-
-::: {.cell .code}
-``` python
-```
-:::
-
-
-::: {.cell .code}
-``` python
-
-```
 :::
 
 ::: {.cell .code}
 ``` python
+class ResNet(nn.Module):
+    def __init__(self, block, num_blocks, num_classes=10):
+        super(ResNet, self).__init__()
+        self.in_planes = 64
 
+        self.conv1 = conv3x3(3,64)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.layer1 = self._make_layer(block, 64, num_blocks[0], stride=1)
+        self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
+        self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
+        self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
+        self.linear = nn.Linear(512*block.expansion, num_classes)
+
+        # Register hooks for Grad-CAM
+        self.gradients = None
+        self.activations = None
+        self.layer4.register_forward_hook(self._store_activations_hook)
+        self.layer4.register_backward_hook(self._store_gradients_hook)
+
+    def _store_activations_hook(self, module, input, output):
+        self.activations = output
+
+    def _store_gradients_hook(self, module, grad_input, grad_output):
+        self.gradients = grad_output[0]
+
+    def _make_layer(self, block, planes, num_blocks, stride):
+        strides = [stride] + [1]*(num_blocks-1)
+        layers = []
+        for stride in strides:
+            layers.append(block(self.in_planes, planes, stride))
+            self.in_planes = planes * block.expansion
+        return nn.Sequential(*layers)
+
+    def forward(self, x):
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.layer1(out)
+        out = self.layer2(out)
+        out = self.layer3(out)
+        out = self.layer4(out) 
+        out = F.avg_pool2d(out, 4)
+        out = out.view(out.size(0), -1)
+        out = self.linear(out)
+        return out
+
+```
+:::
+
+
+::: {.cell .code}
+``` python
+
+model = ResNet18(num_classes=10)
+model.load_state_dict(torch.load("checkpoints/cifar10_resnet18.pt"))
+model.eval()
+
+model_co = ResNet18(num_classes=10)
+model_co.load_state_dict(torch.load("checkpoints/cifar10_resnet18_Cutout.pt"))
+model_co.eval()
+```
+:::
+
+::: {.cell .markdown}
+You need to load your image, preprocess it and convert it into a PyTorch tensor. The preprocessing steps should be the same as the ones you used for training your model. This generally involves resizing the image, normalizing it and adding an extra dimension for the batch size. Let's say you have an image `image.jpg`:
+:::
+
+
+::: {.cell .code}
+``` python
+from PIL import Image
+from torchvision import transforms
+
+# Load the image
+image_path = "image.jpg"
+image = Image.open(image_path)
+
+# Define the transformations: resize, to tensor, normalize (replace the mean and std with values you used for training)
+preprocess = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+# Preprocess the image
+input_tensor = preprocess(image)
+input_tensor = input_tensor.unsqueeze(0)  # add batch dimension.  C,H,W => B,C,H,W
+
+```
+:::
+
+::: {.cell .markdown}
+Apply Grad-CAM
+:::
+
+::: {.cell .code}
+``` python
+# Forward pass
+model.zero_grad()
+output = model(input_tensor)
+
+# Get the index of the max log-probability
+target = output.argmax(1)
+output.max().backward()
+
+# Get the gradients and activations
+gradients = model.gradients.detach().cpu()
+activations = model.activations.detach().cpu()
+
+# Calculate the weights
+weights = gradients.mean(dim=(2, 3), keepdim=True)
+
+# Calculate the weighted sum of activations (Grad-CAM)
+cam = (weights * activations).sum(dim=1, keepdim=True)
+cam = F.relu(cam)  # apply ReLU to the heatmap
+cam = F.interpolate(cam, size=(32, 32), mode='bilinear', align_corners=False)
+cam = cam.squeeze().numpy()
+
+# Normalize the heatmap
+cam -= cam.min()
+cam /= cam.max()
+
+```
+:::
+::: {.cell .markdown}
+Visualize the image and the Grad-CAM heatmap
+:::
+
+
+::: {.cell .code}
+``` python
+import matplotlib.pyplot as plt
+import cv2
+
+# Load the original image
+img = cv2.imread(image_path)
+img = cv2.resize(img, (32, 32))
+img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+# Superimpose the heatmap onto the original image
+heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
+heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
+superimposed_img = heatmap * 0.4 + img
+
+# Display the original image and the Grad-CAM
+fig, ax = plt.subplots(nrows=1, ncols=2)
+ax[0].imshow(img)
+ax[0].set_title('Original Image')
+ax[1].imshow(superimposed_img / 255)
+ax[1].set_title('Grad-CAM')
+plt.show()
 
 ```
 :::
@@ -1240,7 +1375,7 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 
 
 | **Network** | **CIFAR-10** | **CIFAR-10+** |**CIFAR-100** | **CIFAR-100+** | **SVHN** |
 | ----------- | ------------ | ------------- | ------------ | ------------- | -------- |
-| WideResNet  | 6.99        | 4.00         |- | - | -    |
+| WideResNet  | 6.99        | 4.00         |18.9 | - | -    |
 | WideResNet + cutout | 5.45 | 3.20        |- |  18.8 | - |
 
 #### Shake-shake Regularization Network
