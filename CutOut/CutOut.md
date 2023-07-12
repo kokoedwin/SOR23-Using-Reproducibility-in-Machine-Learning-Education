@@ -1190,11 +1190,26 @@ print("Result ResNet-18 without Cutout for Test Dataset" + str(1- test_acc_witho
 print("Result ResNet-18 with Cutout for Test Dataset" + str(1- test_acc_without_cutout ))
 ```
 :::
+::: {.cell .markdown}
+
+| **Network** | **From Paper** | **Your Result** |
+| ----------- | ------------ |  ------------ | 
+| ResNet18    | 10.63         |   |
+| ResNet18 + cutout | 9.31   |    |
+
+:::
 
 ::: {.cell .markdown}
 ##### 4.3.1.3.2. Compare the Qualitative Claims usinng Grad-CAM
 
+###### What is Grad-CAM?
+Grad-CAM (Gradient-weighted Class Activation Mapping) is a technique that provides visual explanations for decisions made by Convolutional Neural Network (CNN) models. It uses the gradients of any target concept, flowing into the final convolutional layer to produce a coarse localization map highlighting the important regions in the image for predicting the concept.
 
+Grad-CAM is not limited to a specific architecture, it can be applied to a wide range of CNN models without any changes to their existing structure or requiring re-training. It's also class-discriminative, allowing it to effectively manage multi-label scenarios.
+
+By visualizing the model's focus areas with Grad-CAM, we can assess how effectively Cutout is encouraging the model to use a broader range of features. For example, if a model trained with Cutout still primarily focuses on a single region, that might suggest the Cutout squares are too small, or not numerous enough. Conversely, if the focus areas are well spread across the image, it would confirm that Cutout is indeed pushing the model to generalize better.
+
+If you want to understand more about Grad-CAM? Check this paper (https://arxiv.org/abs/1610.02391)
 :::
 
 ::: {.cell .code}
@@ -1261,7 +1276,138 @@ model_co.eval()
 :::
 
 ::: {.cell .markdown}
-You need to load your image, preprocess it and convert it into a PyTorch tensor. The preprocessing steps should be the same as the ones you used for training your model. This generally involves resizing the image, normalizing it and adding an extra dimension for the batch size. Let's say you have an image `image.jpg`:
+Let's try to see the result from the testloader of CIFAR-10 dataset
+:::
+
+::: {.cell .code}
+``` python
+import torchvision
+
+transform = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=True, num_workers=2)
+
+```
+:::
+
+::: {.cell .code}
+``` python
+cifar_classes = [
+    "Airplane", "Automobile", "Bird", "Cat", "Deer",
+    "Dog", "Frog", "Horse", "Ship", "Truck"
+]
+```
+:::
+
+::: {.cell .code}
+``` python
+# Get a batch from the testloader
+images, labels = next(iter(testloader))
+input_tensor = images  # As your batch_size is 1, you will have a single image here
+
+# Forward pass
+model.zero_grad()
+output = model(input_tensor)
+
+model_co.zero_grad()
+output_co = model_co(input_tensor)
+
+# Get the index of the max log-probability
+target = output.argmax(1)
+output.max().backward()
+
+target_co = output_co.argmax(1)
+output_co.max().backward()
+
+# Map the predicted class indices to the class labels
+predicted_class = cifar_classes[target.item()]
+predicted_class_co = cifar_classes[target_co.item()]
+
+
+# Get the gradients and activations
+gradients = model.gradients.detach().cpu()
+activations = model.activations.detach().cpu()
+
+gradients_co = model_co.gradients.detach().cpu()
+activations_co = model_co.activations.detach().cpu()
+
+
+# Calculate the weights
+weights = gradients.mean(dim=(2, 3), keepdim=True)
+
+weights_co = gradients_co.mean(dim=(2, 3), keepdim=True)
+
+# Calculate the weighted sum of activations (Grad-CAM)
+cam = (weights * activations).sum(dim=1, keepdim=True)
+cam = F.relu(cam)  # apply ReLU to the heatmap
+cam = F.interpolate(cam, size=(32, 32), mode='bilinear', align_corners=False)
+cam = cam.squeeze().numpy()
+
+cam_co = (weights_co * activations_co).sum(dim=1, keepdim=True)
+cam_co = F.relu(cam_co)  # apply ReLU to the heatmap
+cam_co = F.interpolate(cam_co, size=(32, 32), mode='bilinear', align_corners=False)
+cam_co = cam_co.squeeze().numpy()
+
+
+# Normalize the heatmap
+cam -= cam.min()
+cam /= cam.max()
+
+cam_co -= cam_co.min()
+cam_co /= cam_co.max()
+
+# Since the images from the dataloader are normalized, you have to denormalize them before plotting
+mean = torch.tensor([0.485, 0.456, 0.406])
+std = torch.tensor([0.229, 0.224, 0.225])
+img = images.squeeze().detach().cpu() * std[..., None, None] + mean[..., None, None]
+img = img.permute(1, 2, 0).numpy()
+
+# Superimpose the heatmap onto the original image
+heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
+heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
+superimposed_img = heatmap * 0.4 + img * 255
+
+heatmap_co = cv2.applyColorMap(np.uint8(255 * cam_co), cv2.COLORMAP_JET)
+heatmap_co = cv2.cvtColor(heatmap_co, cv2.COLOR_BGR2RGB)
+superimposed_img_co = heatmap_co * 0.4 + img * 255
+
+class_label = str(labels.item())
+
+# Display the original image and the Grad-CAM
+fig, ax = plt.subplots(nrows=1, ncols=3)
+
+ax[0].imshow(img)
+ax[0].set_title('Original Image (Class: ' + cifar_classes[int(class_label)] + ')')
+ax[0].axis('off')
+ax[1].imshow(superimposed_img / 255)
+ax[1].set_title('Grad-CAM: ' + predicted_class)
+ax[1].axis('off')
+ax[2].imshow(superimposed_img_co / 255)
+ax[2].set_title('Grad-CAM with Cutout:'+  predicted_class_co)
+ax[2].axis('off')
+plt.show()
+
+```
+:::
+
+::: {.cell .code}
+``` python
+
+```
+:::
+
+
+
+::: {.cell .markdown}
+Now you  can try to load your image, preprocess it and convert it into a PyTorch tensor. 
+Choose an image that is in the CIFAR-10 classes (airplanes, cars, birds, cats, deer, dogs, frogs, horses, ships, and trucks).
+The preprocessing steps should be the same as the ones you used for training your model. 
+Let's say you have an image `image.jpg`:
 :::
 
 
@@ -1309,7 +1455,7 @@ activations = model.activations.detach().cpu()
 # Calculate the weights
 weights = gradients.mean(dim=(2, 3), keepdim=True)
 
-# Calculate the weighted sum of activations (Grad-CAM)
+# Calculate the weighted sum of activations (Grad-CAM) 
 cam = (weights * activations).sum(dim=1, keepdim=True)
 cam = F.relu(cam)  # apply ReLU to the heatmap
 cam = F.interpolate(cam, size=(32, 32), mode='bilinear', align_corners=False)
@@ -1375,8 +1521,8 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 
 
 | **Network** | **CIFAR-10** | **CIFAR-10+** |**CIFAR-100** | **CIFAR-100+** | **SVHN** |
 | ----------- | ------------ | ------------- | ------------ | ------------- | -------- |
-| WideResNet  | 6.99        | 4.00         |18.9 | - | -    |
-| WideResNet + cutout | 5.45 | 3.20        |- |  18.8 | - |
+| WideResNet  | 6.99        | 4.00         |24.5 |18.9 | -    |
+| WideResNet + cutout | 5.45 | 3.20        |22.8 |  18.8 | - |
 
 #### Shake-shake Regularization Network
 
@@ -1391,130 +1537,37 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 3 
 
 
 ::: {.cell .markdown}
-## Execute experiments to validate the suggested mechanism
-### Implementing GradCam
+
 :::
 
 ::: {.cell .code}
 ``` python
-import cv2
-import matplotlib.pyplot as plt
-import numpy as np
-
-def overlay_heatmap_on_image(image, heatmap, alpha=0.5):
-    # Resize the heatmap to match the size of the image
-    heatmap = cv2.resize(heatmap, (image.shape[1], image.shape[0]))
-
-    # Convert the heatmap to RGB format
-    heatmap = np.uint8(255 * heatmap)
-
-    # Apply the heatmap to the image
-    heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
-
-    # Overlay the heatmap on the image with the specified alpha
-    superimposed_img = heatmap * alpha + image
-
-    # Return the superimposed image
-    return superimposed_img
 ```
 :::
 
-### Implementing GradCam
+
 :::
 
 ::: {.cell .code}
 ``` python
-from torchvision.utils import make_grid
-import torch.nn.functional as F
-import cv2
-
-def gradcam(model, image, class_idx):
-    # Zero out existing gradients
-    model.zero_grad()
-
-    # Forward pass
-    output = model(image.unsqueeze(0))
-
-    # Calculate the gradients of the target class score w.r.t. input image
-    output[0, class_idx].backward()
-
-    # Apply global average pooling to the gradients
-    pooled_gradients = F.adaptive_avg_pool2d(model.gradient, 1)
-
-    # Multiply the feature maps by the pooled gradients
-    for i in range(model.gradient.shape[1]):
-        model.gradient[:, i, :, :] *= pooled_gradients[0, i]
-
-    # Average the channel-wise multiplied feature maps along the channel dimension
-    gradcam_heatmap = torch.mean(model.gradient, dim=1).squeeze().detach().cpu().numpy()
-
-    # Apply ReLU to the heatmap
-    gradcam_heatmap = np.maximum(gradcam_heatmap, 0)
-
-    # Normalize the heatmap
-    gradcam_heatmap = gradcam_heatmap / np.max(gradcam_heatmap)
-
-    # Resize the heatmap to match the original image
-    gradcam_heatmap = cv2.resize(gradcam_heatmap, (image.shape[1], image.shape[2]))
-
-    return gradcam_heatmap
 ```
 :::
  
  
 
 ::: {.cell .markdown}
-## Evaluate your results for validating the suggested mechanism
-### Implementing GradCam
+
 
 :::
 
 ::: {.cell .code}
 ``` python
-# Load the model
-model = ResNet18(num_classes=10)  # Initialize model architecture
-model.load_state_dict(torch.load('checkpoints/cifar10_resnet18.pt'))
-model.eval()  # Set the model to evaluation mode
+
 ```
 :::
 
 ::: {.cell .code}
 ``` python
-# Get a batch of training data
-dataiter = iter(trainloader)
-images, labels = next(dataiter)
 
-# Now you have a batch of 4 images and their corresponding labels.
-# You can use one of these images for the Grad-CAM visualization.
-# For example, let's use the first image in the batch:
-
-image = images[0]
-#print(image.max())
-label = labels[0]
-print(label.item())
-
-# Now you can use the 'image' in your Grad-CAM function.
-gradcam_heatmap = gradcam(model, image, label.item())
-superimposed_img = overlay_heatmap_on_image(image.permute(1, 2, 0).detach().cpu().numpy(), gradcam_heatmap)
-
-
-# create figure
-fig = plt.figure(figsize=(10, 7))
-
-# Adds a subplot at the 1st position
-fig.add_subplot(1, 2, 1)  # 1 row, 2 columns, 1st subplot
-  
-# showing image
-plt.imshow(image.T)
-plt.axis('off')
-plt.title("Ori Image")
-  
-# Adds a subplot at the 2nd position
-fig.add_subplot(1, 2, 2)  # 1 row, 2 columns, 2nd subplot
-  
-# showing image
-plt.imshow(superimposed_img)
-plt.axis('off')
-plt.title("GradCam")
 ```
 :::
