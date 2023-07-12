@@ -1184,8 +1184,8 @@ csv_logger.close()
 
 ::: {.cell .code}
 ``` python
-test_acc_without_cutout = test(test_loader_without_cutout)
-test_acc_with_cutout = test(test_loader_with_cutout)
+test_acc_without_cutout = test(test_loader)
+test_acc_with_cutout = test(test_loader)
 print("Result ResNet-18 without Cutout for Test Dataset" + str(1- test_acc_without_cutout ))
 print("Result ResNet-18 with Cutout for Test Dataset" + str(1- test_acc_without_cutout ))
 ```
@@ -1444,26 +1444,45 @@ Apply Grad-CAM
 model.zero_grad()
 output = model(input_tensor)
 
+model_co.zero_grad()
+output_co = model_co(input_tensor)
+
 # Get the index of the max log-probability
 target = output.argmax(1)
 output.max().backward()
+
+target_co  = output_co .argmax(1)
+output_co .max().backward()
 
 # Get the gradients and activations
 gradients = model.gradients.detach().cpu()
 activations = model.activations.detach().cpu()
 
+gradients_co  = model_co.gradients.detach().cpu()
+activations_co  = model_co.activations.detach().cpu()
+
 # Calculate the weights
 weights = gradients.mean(dim=(2, 3), keepdim=True)
 
-# Calculate the weighted sum of activations (Grad-CAM) 
+weights_co = gradients_co.mean(dim=(2, 3), keepdim=True)
+
+# Calculate the weighted sum of activations (Grad-CAM)
 cam = (weights * activations).sum(dim=1, keepdim=True)
 cam = F.relu(cam)  # apply ReLU to the heatmap
 cam = F.interpolate(cam, size=(32, 32), mode='bilinear', align_corners=False)
 cam = cam.squeeze().numpy()
 
+cam_co = (weights_co * activations_co).sum(dim=1, keepdim=True)
+cam_co = F.relu(cam_co)  # apply ReLU to the heatmap
+cam_co = F.interpolate(cam_co, size=(32, 32), mode='bilinear', align_corners=False)
+cam_co = cam_co.squeeze().numpy()
+
 # Normalize the heatmap
 cam -= cam.min()
 cam /= cam.max()
+
+cam_co -= cam_co.min()
+cam_co /= cam_co.max()
 
 ```
 :::
@@ -1483,16 +1502,21 @@ img = cv2.resize(img, (32, 32))
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 # Superimpose the heatmap onto the original image
-heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
-heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
-superimposed_img = heatmap * 0.4 + img
+heatmap_co = cv2.applyColorMap(np.uint8(255 * cam_co), cv2.COLORMAP_JET)
+heatmap_co = cv2.cvtColor(heatmap_co, cv2.COLOR_BGR2RGB)
+superimposed_img_co = heatmap_co * 0.4 + img
 
 # Display the original image and the Grad-CAM
-fig, ax = plt.subplots(nrows=1, ncols=2)
+fig, ax = plt.subplots(nrows=1, ncols=3)
 ax[0].imshow(img)
 ax[0].set_title('Original Image')
+ax[0].axis("off")
 ax[1].imshow(superimposed_img / 255)
 ax[1].set_title('Grad-CAM')
+ax[1].axis("off")
+ax[2].imshow(superimposed_img_co / 255)
+ax[2].set_title('Grad-CAM with Cutout')
+ax[2].axis("off")
 plt.show()
 
 ```
