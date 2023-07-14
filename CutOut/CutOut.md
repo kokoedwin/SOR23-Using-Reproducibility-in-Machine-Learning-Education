@@ -210,6 +210,9 @@ After the image is uploaded, we can use Python code to load it into our notebook
 # TODO: Replace 'sample.png' with the filename of your own image. 
 # If your image is inside a directory, include the directory's name in the path.
 img = Image.open('/content/sample.png')
+
+# Resize the image to 100x100
+img = img.resize((100, 100))
 ```
 :::
 
@@ -239,7 +242,7 @@ and the next cell will display your image with Cutout applied:
 ::: {.cell .code}
 ``` python
 # Create a Cutout object
-cutout_obj = Cutout(n_holes=1, length=300)
+cutout_obj = Cutout(n_holes=1, length=50)
 
 # Apply Cutout to the image
 img_tensor_Cutout = cutout_obj(img_tensor)
