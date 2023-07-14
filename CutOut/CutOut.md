@@ -239,10 +239,10 @@ and the next cell will display your image with Cutout applied:
 ::: {.cell .code}
 ``` python
 # Create a Cutout object
-Cutout = Cutout(n_holes=1, length=300)
+cutout_obj = Cutout(n_holes=1, length=300)
 
 # Apply Cutout to the image
-img_tensor_Cutout = Cutout(img_tensor)
+img_tensor_Cutout = cutout_obj(img_tensor)
 
 # Convert the tensor back to an image for visualization
 img_Cutout = transforms.ToPILImage()(img_tensor_Cutout)
@@ -317,14 +317,14 @@ In the following code snippet, we demonstrate some "standard" data augmentation 
 from torchvision.transforms import RandomHorizontalFlip, RandomCrop, ColorJitter
 
 # Define standard data augmentation techniques
-transforms = transforms.Compose([
+transforms_data_augmentation = transforms.Compose([
     RandomHorizontalFlip(),
     RandomCrop(size=(28, 28), padding=4),  # assuming input image is size 28x28
     ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
 ])
 
 # Apply transformations to the image
-augmented_img = transforms(img)
+augmented_img = transforms_data_augmentation(img)
 
 # Display the original and augmented image
 fig, ax = plt.subplots(1, 2, figsize=(10, 5))
@@ -436,10 +436,9 @@ if not os.path.exists('/checkpoints'):
 ::: {.cell .code}
 ``` python
 # Define your transformations
-transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)) #,
-    #Cutout(n_holes=1, length=16)  # Cutout applied here
+transforms_image = transforms.Compose([
+    transforms._imageToTensor(),
+    transforms_image.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
 
 # Function to show an image
@@ -831,18 +830,18 @@ Image Processing for CIFAR-10
 
 # Image Preprocessing
 
-normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform = transforms.Compose([])
 
 train_transform.transforms.append(transforms.ToTensor())
-train_transform.transforms.append(normalize)
+train_transform.transforms.append(normalize_image)
 
 
 
 test_transform = transforms.Compose([
     transforms.ToTensor(),
-    normalize])
+    normalize_image])
 ```
 :::
 
@@ -1187,7 +1186,7 @@ csv_logger.close()
 test_acc_without_cutout = test(test_loader)
 test_acc_with_cutout = test(test_loader)
 print("Result ResNet-18 without Cutout for Test Dataset" + str(1- test_acc_without_cutout ))
-print("Result ResNet-18 with Cutout for Test Dataset" + str(1- test_acc_without_cutout ))
+print("Result ResNet-18 with Cutout for Test Dataset" + str(1- test_acc_with_cutout ))
 ```
 :::
 ::: {.cell .markdown}
@@ -1283,10 +1282,10 @@ Let's try to see the result from the testloader of CIFAR-10 dataset
 ``` python
 import torchvision
 
-transform = transforms.Compose([
-    transforms.Resize((32, 32)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+transform_dataset = transforms.Compose([
+    transforms_dataset.Resize((32, 32)),
+    transforms_dataset.ToTensor(),
+    transforms_dataset.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
 testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
