@@ -423,15 +423,12 @@ Creating such a directory and regularly saving model weights is a good practice 
 ``` python
 # Create file names 'checkpoints' to save the weight of the models
 
-#If you use Jupyter Notebook
-if not os.path.exists('/content/checkpoints'):
-    os.makedirs('/content/checkpoints')
-
-#If you use Chameleon
-'''
-if not os.path.exists('/checkpoints'):
-    os.makedirs('/checkpoints')
-'''
+if 'google.colab' in str(get_ipython()):
+    if not os.path.exists('/content/checkpoints'):
+        os.makedirs('/content/checkpoints')
+else:
+    if not os.path.exists('/checkpoints'):
+        os.makedirs('/checkpoints')
 ```
 :::
 
