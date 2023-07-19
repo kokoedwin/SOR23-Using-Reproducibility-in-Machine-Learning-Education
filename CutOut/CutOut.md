@@ -209,7 +209,7 @@ After the image is uploaded, we can use Python code to load it into our notebook
 ```python
 # TODO: Replace 'sample.png' with the filename of your own image. 
 # If your image is inside a directory, include the directory's name in the path.
-img = Image.open('/content/sample.png')
+img = Image.open('./sample.png')
 
 # Resize the image to 100x100
 img = img.resize((100, 100))
@@ -322,7 +322,7 @@ from torchvision.transforms import RandomHorizontalFlip, RandomCrop, ColorJitter
 # Define standard data augmentation techniques
 transforms_data_augmentation = transforms.Compose([
     RandomHorizontalFlip(),
-    RandomCrop(size=(28, 28), padding=4),  # assuming input image is size 28x28
+    RandomCrop(size=(100, 100), padding=4),  # assuming input image is size 100x100
     ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
 ])
 
@@ -442,13 +442,8 @@ Creating such a directory and regularly saving model weights is a good practice 
 ::: {.cell .code}
 ``` python
 # Create file names 'checkpoints' to save the weight of the models
-
-if 'google.colab' in str(get_ipython()):
-    if not os.path.exists('/content/checkpoints'):
-        os.makedirs('/content/checkpoints')
-else:
-    if not os.path.exists('/checkpoints'):
-        os.makedirs('/checkpoints')
+if not os.path.exists('./checkpoints'):
+    os.makedirs('./checkpoints')
 ```
 :::
 
@@ -457,8 +452,8 @@ else:
 ``` python
 # Define your transformations
 transforms_image = transforms.Compose([
-    transforms._imageToTensor(),
-    transforms_image.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
 
 # Function to show an image
@@ -986,7 +981,7 @@ csv_logger.close()
 ```
 :::
 
-sdsd
+
 ::: {.cell .markdown}
 ##### 4.3.1.2. Training ResNet-18 in CF10 with Cutout
 :::
@@ -1291,9 +1286,9 @@ Let's try to see the result from the testloader of CIFAR-10 dataset
 import torchvision
 
 transform_dataset = transforms.Compose([
-    transforms_dataset.Resize((32, 32)),
-    transforms_dataset.ToTensor(),
-    transforms_dataset.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    transforms.Resize((32, 32)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
 testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
