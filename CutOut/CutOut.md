@@ -42,6 +42,7 @@ import torch.backends.cudnn as cudnn
 from torch.optim.lr_scheduler import MultiStepLR
 from torchvision.utils import make_grid
 from torchvision import datasets, transforms
+import cv2
 
 
 import math
@@ -880,7 +881,7 @@ for epoch in range(epochs):
 torch.save(resnet18_cifar10.state_dict(), 'checkpoints/' + file_name + '.pt')
 
 
-final_test_acc_without_cutout = 1 - test(test_loader, resnet18_cifar10)
+final_test_acc_without_cutout = (1 - test(test_loader, resnet18_cifar10))*100
 print('Result ResNet-18 without Cutout for Test Dataset: %.3f' % (final_test_acc_without_cutout))
 ```
 :::
@@ -1064,13 +1065,11 @@ for epoch in range(epochs):
 
     test_acc = test(test_loader,resnet18_cifar10_cutout)
     tqdm.write('test_acc: %.3f' % (test_acc))
-
-    #scheduler.step(epoch)  # Use this line for PyTorch <1.4
-    scheduler.step()     # Use this line for PyTorch >=1.4
+    scheduler.step()     
 torch.save(resnet18_cifar10_cutout.state_dict(), 'checkpoints/' + file_name + '.pt')
 
 
-final_test_acc_with_cutout = 1 - test(test_loader,resnet18_cifar10_cutout)
+final_test_acc_with_cutout = (1 - test(test_loader,resnet18_cifar10_cutout))*100
 print('Result ResNet-18 with Cutout for Test Dataset: %.3f' % (final_test_acc_with_cutout))
 ```
 :::
@@ -1190,7 +1189,7 @@ transform_dataset = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
-testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_dataset)
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=True, num_workers=2)
 
 ```
@@ -1403,6 +1402,11 @@ img = cv2.resize(img, (32, 32))
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 # Superimpose the heatmap onto the original image
+heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
+heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
+superimposed_img = heatmap * 0.4 + img
+
+# Superimpose the heatmap onto the original image with cutout
 heatmap_co = cv2.applyColorMap(np.uint8(255 * cam_co), cv2.COLORMAP_JET)
 heatmap_co = cv2.cvtColor(heatmap_co, cv2.COLOR_BGR2RGB)
 superimposed_img_co = heatmap_co * 0.4 + img
