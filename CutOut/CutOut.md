@@ -426,15 +426,8 @@ These results again underline the effectiveness of cutout augmentation in improv
 :::
 
 
-
-::: {.cell .markdown}
-### 4.1 Implement Cutout on CIFAR10 Dataset
-:::
-
 ::: {.cell .markdown}
 This code block is used for creating a directory named 'checkpoints'. This directory will be used to store the weights of our models, which are crucial for both preserving our progress during model training and for future use of the trained models.
-
-There are two versions of the directory path - one is for those who are running this code in a Jupyter Notebook environment, and the other (currently commented out) is for those who are using the Chameleon cloud computing platform.
 
 Creating such a directory and regularly saving model weights is a good practice in machine learning, as it ensures that you can resume your work from where you left off, should the training process be interrupted.
 :::
@@ -448,64 +441,12 @@ if not os.path.exists('./checkpoints'):
 :::
 
 
-::: {.cell .code}
-``` python
-# Define your transformations
-transforms_image = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-])
-
-# Function to show an image
-def imshow(img):
-    img = img / 2 + 0.5  # unnormalize
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
-```
+::: {.cell .markdown}
+### 4.1 Methods and Implementation {#4-methods-and-implementation}
 :::
 
 ::: {.cell .markdown}
-Here, we're loading the CIFAR-10 dataset and setting up data loaders. Afterward, we'll display some images from the dataset both in their original form and with Cutout augmentation applied, so you can see the effect of this technique firsthand.
-:::
-
-
-::: {.cell .code}
-``` python
-# Load the CIFAR-10 dataset with transformations applied
-trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=4, shuffle=True, num_workers=2)
-
-testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
-testloader = torch.utils.data.DataLoader(testset, batch_size=4, shuffle=False, num_workers=2)
-```
-:::
-
-::: {.cell .code}
-``` python
-# Get some random training images
-dataiter = iter(trainloader)
-images, labels = next(dataiter)
-
-# Show images before Cutout
-imshow(torchvision.utils.make_grid(images))
-```
-:::
-
-::: {.cell .code}
-``` python
-# Apply Cutout and show images after
-Cutout_images = torch.stack([Cutout(n_holes=1, length=16)(img) for img in images])
-imshow(torchvision.utils.make_grid(Cutout_images))
-```
-:::
-
-::: {.cell .markdown}
-### 4.2 Methods and Implementation {#4-methods-and-implementation}
-:::
-
-::: {.cell .markdown}
-### 4.2.1 ResNet Code
+### 4.1.1 ResNet Code
 :::
 
 ::: {.cell .code}
@@ -623,7 +564,7 @@ def test_resnet():
 :::
 
 ::: {.cell .markdown}
-### 4.2.2 WideResNet Code
+### 4.1.2 WideResNet Code
 :::
 
 ::: {.cell .code}
@@ -722,13 +663,13 @@ class WideResNet(nn.Module):
 :::
 
 ::: {.cell .markdown}
-### 4.2.3 Model Evaluate Test Code
+### 4.1.3 Model Evaluate Test Code
 This function evaluates the performance of the model on a given data loader (loader). It sets the model to evaluation mode (eval), calculates the accuracy on the dataset, and returns the validation accuracy. It then switches the model back to training mode (train) before returning the validation accuracy.
 :::
 
 ::: {.cell .code}
 ``` python
-def test(loader):
+def test(loader, cnn):
     cnn.eval()    # Change model to 'eval' mode (BN uses moving mean/var).
     correct = 0.
     total = 0.
@@ -749,52 +690,17 @@ def test(loader):
 ```
 :::
 
-::: {.cell .markdown}
-### 4.2.4 CSVLogger (Save the result to a CSV) Code
-
-The `CSVLogger` class logs training progress to a CSV file, with each row representing an epoch and columns representing metrics such as training and testing accuracy. 
-::: 
-::: {.cell .code}
-``` python
-# From: https://github.com/uoguelph-mlrg/Cutout/blob/master/util/misc.py
-class CSVLogger():
-    def __init__(self, args, fieldnames, filename='log.csv'):
-
-        self.filename = filename
-        self.csv_file = open(filename, 'w')
-
-        # Write model configuration at top of csv
-        writer = csv.writer(self.csv_file)
-        for arg in vars(args):
-            writer.writerow([arg, getattr(args, arg)])
-        writer.writerow([''])
-
-        self.writer = csv.DictWriter(self.csv_file, fieldnames=fieldnames)
-        self.writer.writeheader()
-
-        self.csv_file.flush()
-
-    def writerow(self, row):
-        self.writer.writerow(row)
-        self.csv_file.flush()
-
-    def close(self):
-        self.csv_file.close()
-```
-:::
-
-
 
 ::: {.cell .markdown}
-### 4.3 Model Training and Evaluation {#5-model-training-and-evaluation}
+### 4.2 Model Training and Evaluation {#5-model-training-and-evaluation}
 :::
 
 ::: {.cell .markdown}
-#### 4.3.1 Experiment using ResNet with CIFAR-10 Dataset Without Cutout vs With Cutout
+#### 4.2.1 Experiment using ResNet with CIFAR-10 Dataset Without Cutout vs With Cutout
 :::
 
 ::: {.cell .markdown}
-##### 4.3.1.1. Training ResNet-18 in CF10 without Cutout
+##### 4.2.1.1. Training ResNet-18 in CF10 without Cutout
 :::
 ::: {.cell .markdown}
 Import the library
@@ -907,18 +813,15 @@ This code block sets up the machine learning model, loss function, optimizer, an
 file_name = "cifar10_resnet18"
 
 num_classes = 10
-cnn = ResNet18(num_classes=num_classes)
+resnet18_cifar10 = ResNet18(num_classes=num_classes)
 
 
-cnn = cnn.cuda()
+resnet18_cifar10 = resnet18_cifar10.cuda()
 learning_rate = 0.1
 criterion = nn.CrossEntropyLoss().cuda()
-cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=learning_rate,
+cnn_optimizer = torch.optim.SGD(resnet18_cifar10.parameters(), lr=learning_rate,
                                 momentum=0.9, nesterov=True, weight_decay=5e-4)
 scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
-
-filename = 'logs/' + file_name + '.csv'
-csv_logger = CSVLogger(args=args, fieldnames=['epoch', 'train_acc', 'test_acc'], filename=filename)
 ```
 :::
 
@@ -948,8 +851,8 @@ for epoch in range(epochs):
         images = images.cuda()
         labels = labels.cuda()
 
-        cnn.zero_grad()
-        pred = cnn(images)
+        resnet18_cifar10.zero_grad()
+        pred = resnet18_cifar10(images)
 
         xentropy_loss = criterion(pred, labels)
         xentropy_loss.backward()
@@ -967,23 +870,24 @@ for epoch in range(epochs):
             xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
             acc='%.3f' % accuracy)
 
-    test_acc = test(test_loader)
+    test_acc = test(test_loader, resnet18_cifar10)
     tqdm.write('test_acc: %.3f' % (test_acc))
 
     #scheduler.step(epoch)  # Use this line for PyTorch <1.4
     scheduler.step()     # Use this line for PyTorch >=1.4
 
-    row = {'epoch': str(epoch), 'train_acc': str(accuracy), 'test_acc': str(test_acc)}
-    csv_logger.writerow(row)
+    
+torch.save(resnet18_cifar10.state_dict(), 'checkpoints/' + file_name + '.pt')
 
-torch.save(cnn.state_dict(), 'checkpoints/' + file_name + '.pt')
-csv_logger.close()
+
+final_test_acc_without_cutout = 1 - test(test_loader, resnet18_cifar10)
+print('Result ResNet-18 without Cutout for Test Dataset: %.3f' % (final_test_acc_without_cutout))
 ```
 :::
 
 
 ::: {.cell .markdown}
-##### 4.3.1.2. Training ResNet-18 in CF10 with Cutout
+##### 4.2.1.2. Training ResNet-18 in CF10 with Cutout
 :::
 ::: {.cell .markdown}
 Import the library
@@ -1100,18 +1004,16 @@ This code block sets up the machine learning model, loss function, optimizer, an
 file_name = "cifar10_resnet18_Cutout"
 
 num_classes = 10
-cnn = ResNet18(num_classes=num_classes)
+resnet18_cifar10_cutout = ResNet18(num_classes=num_classes)
 
 
-cnn = cnn.cuda()
+resnet18_cifar10_cutout = resnet18_cifar10_cutout.cuda()
 learning_rate = 0.1
 criterion = nn.CrossEntropyLoss().cuda()
-cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=learning_rate,
+cnn_optimizer = torch.optim.SGD(resnet18_cifar10_cutout.parameters(), lr=learning_rate,
                                 momentum=0.9, nesterov=True, weight_decay=5e-4)
 scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
 
-filename = 'logs/' + file_name + '.csv'
-csv_logger = CSVLogger(args=args, fieldnames=['epoch', 'train_acc', 'test_acc'], filename=filename)
 ```
 :::
 
@@ -1141,8 +1043,8 @@ for epoch in range(epochs):
         images = images.cuda()
         labels = labels.cuda()
 
-        cnn.zero_grad()
-        pred = cnn(images)
+        resnet18_cifar10_cutout.zero_grad()
+        pred = resnet18_cifar10_cutout(images)
 
         xentropy_loss = criterion(pred, labels)
         xentropy_loss.backward()
@@ -1160,36 +1062,33 @@ for epoch in range(epochs):
             xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
             acc='%.3f' % accuracy)
 
-    test_acc = test(test_loader)
+    test_acc = test(test_loader,resnet18_cifar10_cutout)
     tqdm.write('test_acc: %.3f' % (test_acc))
 
     #scheduler.step(epoch)  # Use this line for PyTorch <1.4
     scheduler.step()     # Use this line for PyTorch >=1.4
+torch.save(resnet18_cifar10_cutout.state_dict(), 'checkpoints/' + file_name + '.pt')
 
-    row = {'epoch': str(epoch), 'train_acc': str(accuracy), 'test_acc': str(test_acc)}
-    csv_logger.writerow(row)
 
-torch.save(cnn.state_dict(), 'checkpoints/' + file_name + '.pt')
-csv_logger.close()
+final_test_acc_with_cutout = 1 - test(test_loader,resnet18_cifar10_cutout)
+print('Result ResNet-18 with Cutout for Test Dataset: %.3f' % (final_test_acc_with_cutout))
 ```
 :::
 
 ::: {.cell .markdown}
-##### 4.3.1.3. Compare the Result and match with the claims
+##### 4.2.1.3. Compare the Result and match with the claims
 :::
 
 ::: {.cell .markdown}
-##### 4.3.1.3.1. Compare the Quantitative Claims
+##### 4.2.1.3.1. Compare the Quantitative Claims
 
 
 :::
 
 ::: {.cell .code}
 ``` python
-test_acc_without_cutout = test(test_loader)
-test_acc_with_cutout = test(test_loader)
-print("Result ResNet-18 without Cutout for Test Dataset" + str(1- test_acc_without_cutout ))
-print("Result ResNet-18 with Cutout for Test Dataset" + str(1- test_acc_with_cutout ))
+print('Result ResNet-18 without Cutout for Test Dataset: %.3f' % (final_test_acc_without_cutout))
+print('Result ResNet-18 with Cutout for Test Dataset: %.3f' % (final_test_acc_with_cutout))
 ```
 :::
 ::: {.cell .markdown}
