@@ -1,11 +1,14 @@
-SOURCES := CutOut.md
-NBS := $(patsubst %.md,%.ipynb,$(SOURCES))
+# source with wildcard
+SOURCES := $(wildcard notebooks/*.md)
+NBS := $(patsubst notebooks/%.md, notebooks/%.ipynb, $(SOURCES))
 
-%.ipynb: %.md
-	pandoc --embed-resources --standalone --wrap=none  $^ -o $@
+# rule to run
+notebooks/%.ipynb: notebooks/%.md
+	pandoc --embed-resources --standalone --wrap=none  $< -o $@
+	pandoc --embed-resources --standalone --wrap=none  $(SOURCES) -o CutOut.ipynb
 
-
-all: $(NBS)
+all: $(NBS) CutOut.ipynb
 
 clean: 
-	rm -f *.ipynb
+	rm -f $(NBS) CutOut.ipynb
+
