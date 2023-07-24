@@ -41,6 +41,11 @@ SVHN, often achieving state-of-the-art or near state-of-the-art results.
 ```python
 # Import necessary libraries
 from torchvision.transforms import RandomHorizontalFlip, RandomCrop, ColorJitter
+import numpy as np
+import torch
+from PIL import Image
+from torchvision import transforms
+import matplotlib.pyplot as plt
 ```
 :::
 
