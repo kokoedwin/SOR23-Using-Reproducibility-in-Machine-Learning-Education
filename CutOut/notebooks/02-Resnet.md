@@ -241,16 +241,16 @@ Image Processing for CIFAR-10
 ``` python
 # Image Preprocessing
 
-normalize_image = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
-train_transform = transforms.Compose([])
+train_transform_cifar10 = transforms.Compose([])
 
-train_transform.transforms.append(transforms.ToTensor())
-train_transform.transforms.append(normalize_image)
+train_transform_cifar10.transforms.append(transforms.ToTensor())
+train_transform_cifar10.transforms.append(normalize_image_cifar10)
 
 
 
-test_transform = transforms.Compose([
+test_transform_cifar10 = transforms.Compose([
     transforms.ToTensor(),
     normalize_image])
 ```
@@ -262,14 +262,14 @@ Import the dataset of CIFAR-10
 
 ::: {.cell .code}
 ``` python
-train_dataset = datasets.CIFAR10(root='data/',
+train_dataset_cifar10 = datasets.CIFAR10(root='data/',
                                      train=True,
-                                     transform=train_transform,
+                                     transform=train_transform_cifar10,
                                      download=True)
 
-test_dataset = datasets.CIFAR10(root='data/',
+test_dataset_cifar10 = datasets.CIFAR10(root='data/',
                                     train=False,
-                                    transform=test_transform,
+                                    transform=test_transform_cifar10,
                                     download=True)
 ```
 :::
@@ -280,13 +280,13 @@ test_dataset = datasets.CIFAR10(root='data/',
 ``` python
 # Data Loader (Input Pipeline)
 batch_size = 128
-train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
+train_loader_cifar10 = torch.utils.data.DataLoader(dataset=train_dataset_cifar10,
                                            batch_size=batch_size,
                                            shuffle=True,
                                            pin_memory=True,
                                            num_workers=2)
 
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
+test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
                                           batch_size=batch_size,
                                           shuffle=False,
                                           pin_memory=True,
@@ -294,31 +294,39 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
 ```
 :::
 
-::: {.cell .markdown} Define the model :::
+::: {.cell .markdown} 
+Define the model 
+:::
 
-::: {.cell .markdown} This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. :::
+::: {.cell .markdown} 
+This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. 
+:::
 
 ::: {.cell .code}
 ``` python
 #file_name will be the used for the name of the file of weight of the model and also the result
-file_name = "cifar10_resnet18"
+file_name_resnet18_cifar10 = "resnet18_cifar10"
 
 num_classes = 10
 resnet18_cifar10 = ResNet18(num_classes=num_classes)
 
 
 resnet18_cifar10 = resnet18_cifar10.cuda()
-learning_rate = 0.1
-criterion = nn.CrossEntropyLoss().cuda()
-cnn_optimizer = torch.optim.SGD(resnet18_cifar10.parameters(), lr=learning_rate,
+learning_rate_resnet18_cifar10 = 0.1
+criterion_resnet18_cifar10 = nn.CrossEntropyLoss().cuda()
+cnn_optimizer_resnet18_cifar10 = torch.optim.SGD(resnet18_cifar10.parameters(), lr=learning_rate_resnet18_cifar10,
                                 momentum=0.9, nesterov=True, weight_decay=5e-4)
-scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
+scheduler_resnet18_cifar10 = MultiStepLR(cnn_optimizer_resnet18_cifar10, milestones=[60, 120, 160], gamma=0.2)
 ```
 :::
 
-::: {.cell .markdown} Training ResNet-18 withuout Cutout :::
+::: {.cell .markdown} 
+Training ResNet-18 withuout Cutout 
+:::
 
-::: {.cell .markdown} This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved. :::
+::: {.cell .markdown} 
+This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved. 
+:::
 
 ::: {.cell .code}
 ``` python
@@ -329,7 +337,7 @@ for epoch in range(epochs):
     correct = 0.
     total = 0.
 
-    progress_bar = tqdm(train_loader)
+    progress_bar = tqdm(train_loader_cifar10)
     for i, (images, labels) in enumerate(progress_bar):
         progress_bar.set_description('Epoch ' + str(epoch))
 
@@ -355,18 +363,18 @@ for epoch in range(epochs):
             xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
             acc='%.3f' % accuracy)
 
-    test_acc = test(test_loader, resnet18_cifar10)
-    tqdm.write('test_acc: %.3f' % (test_acc))
+    test_accr_cifar10 = test(test_loader_cifar10, resnet18_cifar10)
+    tqdm.write('test_acc: %.3f' % (test_accr_cifar10))
 
     #scheduler.step(epoch)  # Use this line for PyTorch <1.4
-    scheduler.step()     # Use this line for PyTorch >=1.4
+    scheduler_resnet18_cifar10.step()     # Use this line for PyTorch >=1.4
 
     
-torch.save(resnet18_cifar10.state_dict(), 'checkpoints/' + file_name + '.pt')
+torch.save(resnet18_cifar10.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10 + '.pt')
 
 
-final_test_acc_without_cutout = (1 - test(test_loader, resnet18_cifar10))*100
-print('Result ResNet-18 without Cutout for Test Dataset: %.3f' % (final_test_acc_without_cutout))
+final_test_acc_cifar10 = (1 - test(test_loader_cifar10, resnet18_cifar10))*100
+print('Result ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_cifar10))
 ``` 
 :::
 
@@ -375,22 +383,55 @@ print('Result ResNet-18 without Cutout for Test Dataset: %.3f' % (final_test_acc
 4.2.1.2. Training ResNet-18 in CF10 with Cutout
 ::: 
 
-::: {.cell .markdown} Import the library ::: 
+::: {.cell .markdown}
+Check Cuda GPU availability and set seed number 
+::: 
+
 ::: {.cell .code}
 ``` python
-import torch
-import torch.nn as nn
-from torch.autograd import Variable
-import torch.backends.cudnn as cudnn
-from torch.optim.lr_scheduler import MultiStepLR
+# to do: link to the file in the original repo that this comes from
+# Source Code from https://github.com/uoguelph-mlrg/Cutout/blob/master/util/cutout.py
+class Cutout(object):
+    """Randomly mask out one or more patches from an image.
 
-from torchvision.utils import make_grid
-from torchvision import datasets, transforms
-``` 
+    Args:
+        n_holes (int): Number of patches to cut out of each image.
+        length (int): The length (in pixels) of each square patch.
+    """
+    def __init__(self, n_holes, length):
+        self.n_holes = n_holes
+        self.length = length
+
+    def __call__(self, img):
+        """
+        Args:
+            img (Tensor): Tensor image of size (C, H, W).
+        Returns:
+            Tensor: Image with n_holes of dimension length x length cut out of it.
+        """
+        h = img.size(1)
+        w = img.size(2)
+
+        mask = np.ones((h, w), np.float32)
+
+        for n in range(self.n_holes):
+            y = np.random.randint(h)
+            x = np.random.randint(w)
+
+            y1 = np.clip(y - self.length // 2, 0, h)
+            y2 = np.clip(y + self.length // 2, 0, h)
+            x1 = np.clip(x - self.length // 2, 0, w)
+            x2 = np.clip(x + self.length // 2, 0, w)
+
+            mask[y1: y2, x1: x2] = 0.
+
+        mask = torch.from_numpy(mask)
+        mask = mask.expand_as(img)
+        img = img * mask
+
+        return img
+```
 :::
-
-
-::: {.cell .markdown} Check Cuda GPU availability and set seed number ::: 
 
 ::: {.cell .code}
 ``` python
@@ -408,20 +449,20 @@ torch.manual_seed(seed)
 ``` python
 # Image Preprocessing
 
-normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
-train_transform = transforms.Compose([])
+train_transform_cifar10_cutout = transforms.Compose([])
 
-train_transform.transforms.append(transforms.ToTensor())
-train_transform.transforms.append(normalize)
+train_transform_cifar10_cutout.transforms.append(transforms.ToTensor())
+train_transform_cifar10_cutout.transforms.append(normalize_image_cifar10)
 
 #Add Cutout to the image transformer piepeline
-n_holes = 1
-length = 16
-train_transform.transforms.append(Cutout(n_holes=n_holes, length=length))
+n_holes_cifar10 = 1
+length_cifar10 = 16
+train_transform_cifar10_cutout.transforms.append(Cutout(n_holes=n_holes_cifar10, length=length_cifar10))
 
 
-test_transform = transforms.Compose([
+test_transform_cifar10 = transforms.Compose([
     transforms.ToTensor(),
     normalize])
 ``` 
@@ -431,63 +472,73 @@ test_transform = transforms.Compose([
 
 ::: {.cell .code}
 ``` python
-train_dataset = datasets.CIFAR10(root='data/',
+train_dataset_cifar10_cutout = datasets.CIFAR10(root='data/',
                                      train=True,
-                                     transform=train_transform,
+                                     transform=train_transform_cifar10_cutout,
                                      download=True)
 
-test_dataset = datasets.CIFAR10(root='data/',
+test_dataset_cifar10 = datasets.CIFAR10(root='data/',
                                     train=False,
                                     transform=test_transform,
                                     download=True)
 ```
 :::
 
-::: {.cell .markdown} Create Dataset as Dataloader :::
+::: {.cell .markdown} 
+Create Dataset as Dataloader 
+:::
 
 ::: {.cell .code}
 ``` python
 # Data Loader (Input Pipeline)
-batch_size = 128
-train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                           batch_size=batch_size,
+batch_size_cifar10_cutout = 128
+train_loader_cifar10_cutout = torch.utils.data.DataLoader(dataset=train_dataset_cifar10_cutout,
+                                           batch_size=batch_size_cifar10_cutout,
                                            shuffle=True,
                                            pin_memory=True,
                                            num_workers=2)
 
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
-                                          batch_size=batch_size,
+test_loader_cifar10_cutout = torch.utils.data.DataLoader(dataset=test_dataset,
+                                          batch_size=batch_size_cifar10_cutout,
                                           shuffle=False,
                                           pin_memory=True,
                                           num_workers=2)
 ```
 :::
 
-::: {.cell .markdown} Define the model :::
+::: {.cell .markdown} 
+Define the model 
+:::
 
-::: {.cell .markdown} This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. :::
+::: {.cell .markdown} 
+This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. 
+:::
 
 ::: {.cell .code}
 ``` python
 #file_name will be the used for the name of the file of weight of the model and also the result
-file_name = "cifar10_resnet18_Cutout"
+file_name_resnet18_cifar10_cutout = "resnet18_cifar10_cutout"
 
 num_classes = 10
 resnet18_cifar10_cutout = ResNet18(num_classes=num_classes)
 
 
 resnet18_cifar10_cutout = resnet18_cifar10_cutout.cuda()
-learning_rate = 0.1
-criterion = nn.CrossEntropyLoss().cuda()
-cnn_optimizer = torch.optim.SGD(resnet18_cifar10_cutout.parameters(), lr=learning_rate,
+learning_rate_resnet18_cifar10_cutout = 0.1
+criterion_resnet18_cifar10_cutout = nn.CrossEntropyLoss().cuda()
+cnn_optimizer_resnet18_cifar10_cutout = torch.optim.SGD(resnet18_cifar10_cutout.parameters(), lr=learning_rate_resnet18_cifar10_cutout,
                                 momentum=0.9, nesterov=True, weight_decay=5e-4)
-scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
+scheduler_resnet18_cifar10_cutout = MultiStepLR(cnn_optimizer_resnet18_cifar10_cutout, milestones=[60, 120, 160], gamma=0.2)
 ```
 :::
 
-::: {.cell .markdown} Training ResNet-18 with Cutout :::
+::: {.cell .markdown}
+Training ResNet-18 with Cutout 
+:::
 
-::: {.cell .markdown} This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved. :::
+::: {.cell .markdown} 
+This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved. 
+:::
 
 ::: {.cell .code}
 ``` python
@@ -498,7 +549,7 @@ for epoch in range(epochs):
     correct = 0.
     total = 0.
 
-    progress_bar = tqdm(train_loader)
+    progress_bar = tqdm(train_loader_cifar10_cutout)
     for i, (images, labels) in enumerate(progress_bar):
         progress_bar.set_description('Epoch ' + str(epoch))
 
@@ -524,13 +575,344 @@ for epoch in range(epochs):
             xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
             acc='%.3f' % accuracy)
 
-    test_acc = test(test_loader,resnet18_cifar10_cutout)
-    tqdm.write('test_acc: %.3f' % (test_acc))
-    scheduler.step()     
-torch.save(resnet18_cifar10_cutout.state_dict(), 'checkpoints/' + file_name + '.pt')
+    test_acc_cifar10 = test(test_loader_cifar10,resnet18_cifar10_cutout)
+    tqdm.write('test_acc: %.3f' % (test_acc_cifar10))
+    scheduler_resnet18_cifar10_cutout.step()     
+torch.save(resnet18_cifar10_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10_cutout + '.pt')
 
 
-final_test_acc_with_cutout = (1 - test(test_loader,resnet18_cifar10_cutout))*100
-print('Result ResNet-18 with Cutout for Test Dataset: %.3f' % (final_test_acc_with_cutout))
+final_test_acc_cifar10_cutout = (1 - test(test_loader,resnet18_cifar10_cutout))*100
+print('Result ResNet-18 with Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_cifar10_cutout))
 ```
 :::
+
+
+::: {.cell .markdown}
+
+4.2.1.2. Training ResNet-18 in CF10 with Data Augmentation without Cutout
+::: 
+
+::: {.cell .markdown}
+Check Cuda GPU availability and set seed number 
+::: 
+
+::: {.cell .code}
+``` python
+cuda = torch.cuda.is_available()
+cudnn.benchmark = True  # Should make training should go faster for large models
+
+seed = 1
+torch.manual_seed(seed)
+```
+:::
+
+::: {.cell .markdown} Image Processing for CIFAR-10 :::
+
+::: {.cell .code}
+``` python
+# Image Preprocessing
+
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+
+train_transform_cifar10_da = transforms.Compose([])
+train_transform_cifar10_da.transforms.append(transforms.RandomCrop(32, padding=4))
+train_transform_cifar10_da.transforms.append(transforms.RandomHorizontalFlip())
+train_transform_cifar10_da.transforms.append(transforms.ToTensor())
+train_transform_cifar10_da.transforms.append(normalize_image_cifar10)
+
+
+test_transform_cifar10 = transforms.Compose([
+    transforms.ToTensor(),
+    normalize_image_cifar10])
+``` 
+:::
+
+::: {.cell .markdown} 
+Import the dataset of CIFAR-10 
+:::
+
+::: {.cell .code}
+``` python
+train_dataset_cifar10_da = datasets.CIFAR10(root='data/',
+                                     train=True,
+                                     transform=train_transform_cifar10_da,
+                                     download=True)
+
+test_dataset_cifar10 = datasets.CIFAR10(root='data/',
+                                    train=False,
+                                    transform=test_transform_cifar10,
+                                    download=True)
+```
+:::
+
+::: {.cell .markdown} 
+Create Dataset as Dataloader 
+:::
+
+::: {.cell .code}
+``` python
+# Data Loader (Input Pipeline)
+batch_size_cifar10_da = 128
+train_loader_cifar10_da = torch.utils.data.DataLoader(dataset=train_dataset_cifar10_da,
+                                           batch_size=batch_size_cifar10_da,
+                                           shuffle=True,
+                                           pin_memory=True,
+                                           num_workers=2)
+
+test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
+                                          batch_size=batch_size_cifar10_da,
+                                          shuffle=False,
+                                          pin_memory=True,
+                                          num_workers=2)
+```
+:::
+
+::: {.cell .markdown} 
+Define the model 
+:::
+
+::: {.cell .markdown} 
+This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. 
+:::
+
+::: {.cell .code}
+``` python
+#file_name will be the used for the name of the file of weight of the model and also the result
+file_name_resnet18_cifar10_da = "resnet18_cifar10_da"
+
+num_classes = 10
+resnet18_cifar10_da = ResNet18(num_classes=num_classes)
+
+
+resnet18_cifar10_da = resnet18_cifar10_da.cuda()
+learning_rate_resnet18_cifar10_da = 0.1
+criterion_resnet18_cifar10_da = nn.CrossEntropyLoss().cuda()
+cnn_optimizer_resnet18_cifar10_da = torch.optim.SGD(resnet18_cifar10_da.parameters(), lr=learning_rate_resnet18_cifar10_da,
+                                momentum=0.9, nesterov=True, weight_decay=5e-4)
+scheduler_resnet18_cifar10_da = MultiStepLR(cnn_optimizer_resnet18_cifar10_da, milestones=[60, 120, 160], gamma=0.2)
+```
+:::
+
+::: {.cell .markdown}
+Training ResNet-18 with Cutout and Data Augmentation
+:::
+
+::: {.cell .markdown} 
+This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved. 
+:::
+
+::: {.cell .code}
+``` python
+epochs = 200
+for epoch in range(epochs):
+
+    xentropy_loss_avg = 0.
+    correct = 0.
+    total = 0.
+
+    progress_bar = tqdm(train_loader_cifar10_da)
+    for i, (images, labels) in enumerate(progress_bar):
+        progress_bar.set_description('Epoch ' + str(epoch))
+
+        images = images.cuda()
+        labels = labels.cuda()
+
+        resnet18_cifar10_da.zero_grad()
+        pred = resnet18_cifar10_da(images)
+
+        xentropy_loss = criterion(pred, labels)
+        xentropy_loss.backward()
+        cnn_optimizer.step()
+
+        xentropy_loss_avg += xentropy_loss.item()
+
+        # Calculate running average of accuracy
+        pred = torch.max(pred.data, 1)[1]
+        total += labels.size(0)
+        correct += (pred == labels.data).sum().item()
+        accuracy = correct / total
+
+        progress_bar.set_postfix(
+            xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
+            acc='%.3f' % accuracy)
+
+    test_acc_cifar10 = test(test_loader_cifar10,resnet18_cifar10_da)
+    tqdm.write('test_acc: %.3f' % (test_acc_cifar10))
+    scheduler_resnet18_cifar10_da.step()     
+torch.save(resnet18_cifar10_da.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10_da + '.pt')
+
+
+final_test_acc_cifar10_da = (1 - test(test_loader_cifar10,resnet18_cifar10_da))*100
+print('Result ResNet-18 with Cutout for Test Dataset: %.3f' % (final_test_acc_cifar10_da))
+```
+:::
+
+
+::: {.cell .markdown}
+
+4.2.1.2. Training ResNet-18 in CF10 with Data Augmentation with Cutout
+::: 
+
+::: {.cell .markdown}
+Check Cuda GPU availability and set seed number 
+::: 
+
+
+::: {.cell .code}
+``` python
+cuda = torch.cuda.is_available()
+cudnn.benchmark = True  # Should make training should go faster for large models
+
+seed = 1
+torch.manual_seed(seed)
+```
+:::
+
+::: {.cell .markdown} 
+Image Processing for CIFAR-10 
+:::
+
+::: {.cell .code}
+``` python
+# Image Preprocessing
+
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+
+train_transform_cifar10_da_co = transforms.Compose([])
+train_transform_cifar10_da_co.transforms.append(transforms.RandomCrop(32, padding=4))
+train_transform_cifar10_da_co.transforms.append(transforms.RandomHorizontalFlip())
+train_transform_cifar10_da_co.transforms.append(transforms.ToTensor())
+train_transform_cifar10_da_co.transforms.append(normalize_image_cifar10)
+
+#Add Cutout to the image transformer piepeline
+n_holes_cifar10_da_co = 1
+length_cifar10_da_co = 16
+train_transform_cifar10_da_co.transforms.append(Cutout(n_holes=n_holes_cifar10_da_co, length=length_cifar10_da_co))
+
+
+test_transform_cifar10 = transforms.Compose([
+    transforms.ToTensor(),
+    normalize_image_cifar10])
+``` 
+:::
+
+::: {.cell .markdown} 
+Import the dataset of CIFAR-10 
+:::
+
+::: {.cell .code}
+``` python
+train_dataset_cifar10_da_co = datasets.CIFAR10(root='data/',
+                                     train=True,
+                                     transform=train_transform_cifar10_da_co,
+                                     download=True)
+
+test_dataset_cifar10 = datasets.CIFAR10(root='data/',
+                                    train=False,
+                                    transform=test_transform_cifar10,
+                                    download=True)
+```
+:::
+
+::: {.cell .markdown} 
+Create Dataset as Dataloader 
+:::
+
+::: {.cell .code}
+``` python
+# Data Loader (Input Pipeline)
+batch_size_cifar10_da_co = 128
+train_loader_cifar10_da_co = torch.utils.data.DataLoader(dataset=train_dataset_cifar10_da_co,
+                                           batch_size=batch_size_cifar10_da_co,
+                                           shuffle=True,
+                                           pin_memory=True,
+                                           num_workers=2)
+
+test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
+                                          batch_size=batch_size_cifar10_da_co,
+                                          shuffle=False,
+                                          pin_memory=True,
+                                          num_workers=2)
+```
+:::
+
+::: {.cell .markdown} 
+Define the model 
+:::
+
+::: {.cell .markdown} 
+This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. 
+:::
+
+::: {.cell .code}
+``` python
+#file_name will be the used for the name of the file of weight of the model and also the result
+file_name_resnet18_cifar10_da_cutout = "resnet18_cifar10_da_cutout"
+
+num_classes = 10
+resnet18_cifar10_da_cutout = ResNet18(num_classes=num_classes)
+
+
+resnet18_cifar10_da_cutout = resnet18_cifar10_da_cutout.cuda()
+learning_rate_cifar10_da_cutout = 0.1
+criterion_cifar10_da_cutout = nn.CrossEntropyLoss().cuda()
+cnn_optimizer_cifar10_da_cutout = torch.optim.SGD(resnet18_cifar10_da_cutout.parameters(), lr=learning_rate_cifar10_da_cutout,
+                                momentum=0.9, nesterov=True, weight_decay=5e-4)
+scheduler_cifar10_da_cutout = MultiStepLR(cnn_optimizer_cifar10_da_cutout, milestones=[60, 120, 160], gamma=0.2)
+```
+:::
+
+::: {.cell .markdown}
+Training ResNet-18 with Cutout 
+:::
+
+::: {.cell .markdown} 
+This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved. 
+:::
+
+::: {.cell .code}
+``` python
+epochs = 200
+for epoch in range(epochs):
+
+    xentropy_loss_avg = 0.
+    correct = 0.
+    total = 0.
+
+    progress_bar = tqdm(train_loader_cifar10_da_co)
+    for i, (images, labels) in enumerate(progress_bar):
+        progress_bar.set_description('Epoch ' + str(epoch))
+
+        images = images.cuda()
+        labels = labels.cuda()
+
+        resnet18_cifar10_da_cutout.zero_grad()
+        pred = resnet18_cifar10_da_cutout(images)
+
+        xentropy_loss = criterion(pred, labels)
+        xentropy_loss.backward()
+        cnn_optimizer.step()
+
+        xentropy_loss_avg += xentropy_loss.item()
+
+        # Calculate running average of accuracy
+        pred = torch.max(pred.data, 1)[1]
+        total += labels.size(0)
+        correct += (pred == labels.data).sum().item()
+        accuracy = correct / total
+
+        progress_bar.set_postfix(
+            xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
+            acc='%.3f' % accuracy)
+
+    test_acc_cifar10_da_cutout = test(test_loader_cifar10,resnet18_cifar10_da_cutout)
+    tqdm.write('test_acc: %.3f' % (test_acc_cifar10_da_cutout))
+    scheduler_cifar10_da_cutout.step()     
+torch.save(resnet18_cifar10_da_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10_da_cutout + '.pt')
+
+
+final_test_acc_resnet_cifar10_da_cutout = (1 - test(test_loader,resnet18_cifar10_da_cutout))*100
+print('Result ResNet-18 with Cutout for CIFAR-10 Test Dataset with Cutout: %.3f' % (final_test_acc_resnet_cifar10_da_cutout))
+```
+:::
+
