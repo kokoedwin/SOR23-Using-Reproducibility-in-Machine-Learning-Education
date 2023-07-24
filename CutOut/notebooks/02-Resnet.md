@@ -48,12 +48,14 @@ These findings emphasize the efficacy of both standard and cutout data augmentat
 ```python
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.autograd import Variable
 import torch.backends.cudnn as cudnn
 from torch.optim.lr_scheduler import MultiStepLR
-
-from torchvision.utils import make_grid
 from torchvision import datasets, transforms
+import numpy as np
+import os
+from tqdm import tqdm
 ```
 :::
 
@@ -252,7 +254,7 @@ train_transform_cifar10.transforms.append(normalize_image_cifar10)
 
 test_transform_cifar10 = transforms.Compose([
     transforms.ToTensor(),
-    normalize_image])
+    normalize_image_cifar10])
 ```
 :::
 
@@ -274,20 +276,22 @@ test_dataset_cifar10 = datasets.CIFAR10(root='data/',
 ```
 :::
 
-::: {.cell .markdown} Create Dataset as Dataloader :::
+::: {.cell .markdown} 
+Create Dataset as Dataloader 
+:::
 
 ::: {.cell .code}
 ``` python
 # Data Loader (Input Pipeline)
-batch_size = 128
+batch_size_cifar10 = 128
 train_loader_cifar10 = torch.utils.data.DataLoader(dataset=train_dataset_cifar10,
-                                           batch_size=batch_size,
+                                           batch_size=batch_size_cifar10,
                                            shuffle=True,
                                            pin_memory=True,
                                            num_workers=2)
 
 test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
-                                          batch_size=batch_size,
+                                          batch_size=batch_size_cifar10,
                                           shuffle=False,
                                           pin_memory=True,
                                           num_workers=2)
@@ -347,9 +351,9 @@ for epoch in range(epochs):
         resnet18_cifar10.zero_grad()
         pred = resnet18_cifar10(images)
 
-        xentropy_loss = criterion(pred, labels)
+        xentropy_loss = criterion_resnet18_cifar10(pred, labels)
         xentropy_loss.backward()
-        cnn_optimizer.step()
+        cnn_optimizer_resnet18_cifar10.step()
 
         xentropy_loss_avg += xentropy_loss.item()
 
@@ -363,8 +367,8 @@ for epoch in range(epochs):
             xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
             acc='%.3f' % accuracy)
 
-    test_accr_cifar10 = test(test_loader_cifar10, resnet18_cifar10)
-    tqdm.write('test_acc: %.3f' % (test_accr_cifar10))
+    test_accr_resnet18_cifar10 = test(test_loader_cifar10, resnet18_cifar10)
+    tqdm.write('test_acc: %.3f' % (test_accr_resnet18_cifar10))
 
     #scheduler.step(epoch)  # Use this line for PyTorch <1.4
     scheduler_resnet18_cifar10.step()     # Use this line for PyTorch >=1.4
@@ -373,8 +377,8 @@ for epoch in range(epochs):
 torch.save(resnet18_cifar10.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10 + '.pt')
 
 
-final_test_acc_cifar10 = (1 - test(test_loader_cifar10, resnet18_cifar10))*100
-print('Result ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_cifar10))
+final_test_acc_resnet18_cifar10 = (1 - test(test_loader_cifar10, resnet18_cifar10))*100
+print('Final Result ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_resnet18_cifar10))
 ``` 
 :::
 
@@ -384,7 +388,7 @@ print('Result ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final
 ::: 
 
 ::: {.cell .markdown}
-Check Cuda GPU availability and set seed number 
+Cutout Code
 ::: 
 
 ::: {.cell .code}
@@ -433,6 +437,10 @@ class Cutout(object):
 ```
 :::
 
+::: {.cell .markdown}
+Check Cuda GPU availability and set seed number 
+::: 
+
 ::: {.cell .code}
 ``` python
 cuda = torch.cuda.is_available()
@@ -464,7 +472,7 @@ train_transform_cifar10_cutout.transforms.append(Cutout(n_holes=n_holes_cifar10,
 
 test_transform_cifar10 = transforms.Compose([
     transforms.ToTensor(),
-    normalize])
+    normalize_image_cifar10])
 ``` 
 :::
 
@@ -479,7 +487,7 @@ train_dataset_cifar10_cutout = datasets.CIFAR10(root='data/',
 
 test_dataset_cifar10 = datasets.CIFAR10(root='data/',
                                     train=False,
-                                    transform=test_transform,
+                                    transform=test_transform_cifar10,
                                     download=True)
 ```
 :::
@@ -498,7 +506,7 @@ train_loader_cifar10_cutout = torch.utils.data.DataLoader(dataset=train_dataset_
                                            pin_memory=True,
                                            num_workers=2)
 
-test_loader_cifar10_cutout = torch.utils.data.DataLoader(dataset=test_dataset,
+test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
                                           batch_size=batch_size_cifar10_cutout,
                                           shuffle=False,
                                           pin_memory=True,
@@ -559,9 +567,9 @@ for epoch in range(epochs):
         resnet18_cifar10_cutout.zero_grad()
         pred = resnet18_cifar10_cutout(images)
 
-        xentropy_loss = criterion(pred, labels)
+        xentropy_loss = criterion_resnet18_cifar10_cutout(pred, labels)
         xentropy_loss.backward()
-        cnn_optimizer.step()
+        cnn_optimizer_resnet18_cifar10_cutout.step()
 
         xentropy_loss_avg += xentropy_loss.item()
 
@@ -581,8 +589,8 @@ for epoch in range(epochs):
 torch.save(resnet18_cifar10_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10_cutout + '.pt')
 
 
-final_test_acc_cifar10_cutout = (1 - test(test_loader,resnet18_cifar10_cutout))*100
-print('Result ResNet-18 with Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_cifar10_cutout))
+final_test_acc_resnet18_cifar10_cutout = (1 - test(test_loader_cifar10_cutout,resnet18_cifar10_cutout))*100
+print('Final Result ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
 ```
 :::
 
@@ -694,7 +702,7 @@ scheduler_resnet18_cifar10_da = MultiStepLR(cnn_optimizer_resnet18_cifar10_da, m
 :::
 
 ::: {.cell .markdown}
-Training ResNet-18 with Cutout and Data Augmentation
+Training ResNet-18 with  Data Augmentation
 :::
 
 ::: {.cell .markdown} 
@@ -720,9 +728,9 @@ for epoch in range(epochs):
         resnet18_cifar10_da.zero_grad()
         pred = resnet18_cifar10_da(images)
 
-        xentropy_loss = criterion(pred, labels)
+        xentropy_loss = criterion_resnet18_cifar10_da(pred, labels)
         xentropy_loss.backward()
-        cnn_optimizer.step()
+        cnn_optimizer_resnet18_cifar10_da.step()
 
         xentropy_loss_avg += xentropy_loss.item()
 
@@ -736,14 +744,14 @@ for epoch in range(epochs):
             xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
             acc='%.3f' % accuracy)
 
-    test_acc_cifar10 = test(test_loader_cifar10,resnet18_cifar10_da)
-    tqdm.write('test_acc: %.3f' % (test_acc_cifar10))
+    test_acc_resnet18_cifar10_da = test(test_loader_cifar10,resnet18_cifar10_da)
+    tqdm.write('test_acc: %.3f' % (test_acc_resnet18_cifar10_da))
     scheduler_resnet18_cifar10_da.step()     
 torch.save(resnet18_cifar10_da.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10_da + '.pt')
 
 
-final_test_acc_cifar10_da = (1 - test(test_loader_cifar10,resnet18_cifar10_da))*100
-print('Result ResNet-18 with Cutout for Test Dataset: %.3f' % (final_test_acc_cifar10_da))
+final_test_acc_resnet18_cifar10_da = (1 - test(test_loader_cifar10,resnet18_cifar10_da))*100
+print('Final Result ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
 ```
 :::
 
@@ -889,9 +897,9 @@ for epoch in range(epochs):
         resnet18_cifar10_da_cutout.zero_grad()
         pred = resnet18_cifar10_da_cutout(images)
 
-        xentropy_loss = criterion(pred, labels)
+        xentropy_loss = criterion_cifar10_da_cutout(pred, labels)
         xentropy_loss.backward()
-        cnn_optimizer.step()
+        cnn_optimizer_cifar10_da_cutout.step()
 
         xentropy_loss_avg += xentropy_loss.item()
 
@@ -911,8 +919,16 @@ for epoch in range(epochs):
 torch.save(resnet18_cifar10_da_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10_da_cutout + '.pt')
 
 
-final_test_acc_resnet_cifar10_da_cutout = (1 - test(test_loader,resnet18_cifar10_da_cutout))*100
-print('Result ResNet-18 with Cutout for CIFAR-10 Test Dataset with Cutout: %.3f' % (final_test_acc_resnet_cifar10_da_cutout))
+final_test_acc_resnet18_cifar10_da_cutout = (1 - test(test_loader_cifar10,resnet18_cifar10_da_cutout))*100
+print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da_cutout))
 ```
 :::
 
+::: {.cell .code}
+``` python
+print('Final Result ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_resnet18_cifar10))
+print('Final Result ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
+print('Final Result ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
+print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet_cifar10_da_cutout))
+```
+:::
