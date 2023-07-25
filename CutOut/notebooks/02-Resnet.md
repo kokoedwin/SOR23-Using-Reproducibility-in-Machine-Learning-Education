@@ -1,6 +1,6 @@
 
 ::: {.cell .markdown}
-### ResNet
+### 02. ResNet
 :::
 
 
@@ -39,7 +39,7 @@ These findings emphasize the efficacy of both standard and cutout data augmentat
 
 ::: {.cell .markdown}
 
-#### Implementation
+### Import Library
 
 :::
 
@@ -59,6 +59,19 @@ from tqdm import tqdm
 ```
 :::
 
+::: {.cell .markdown}
+Check Cuda GPU availability and set seed number
+:::
+::: {.cell .code}
+``` python
+cuda = torch.cuda.is_available()
+cudnn.benchmark = True  # Should make training should go faster for large models
+
+seed = 1
+torch.manual_seed(seed)
+```
+:::
+
 
 ::: {.cell .markdown}
 This code block is used for creating a directory named 'checkpoints'. This directory will be used to store the weights of our models, which are crucial for both preserving our progress during model training and for future use of the trained models.
@@ -75,20 +88,13 @@ if not os.path.exists('./checkpoints'):
 :::
 
 ::: {.cell .markdown}
-### 4.1.1 ResNet Code
+### 2.1.1 ResNet Code
 :::
 
 ::: {.cell .code}
 ``` python
 # ResNet
 # From https://github.com/uoguelph-mlrg/Cutout/blob/master/model/resnet.py
-
-'''ResNet18/34/50/101/152 in Pytorch.'''
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
-from torch.autograd import Variable
 
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
@@ -182,20 +188,12 @@ class ResNet(nn.Module):
 
 def ResNet18(num_classes=10):
     return ResNet(BasicBlock, [2,2,2,2], num_classes)
-
-def test_resnet():
-    net = ResNet18()
-    y = net(Variable(torch.randn(1,3,32,32)))
-    print(y.size())
-
-# test_resnet()
 ```
 :::
 
 
-
 ::: {.cell .markdown}
-### 4.1.3 Model Evaluate Test Code
+### 2.1.2. Model Evaluate Test Code
 This function evaluates the performance of the model on a given data loader (loader). It sets the model to evaluation mode (eval), calculates the accuracy on the dataset, and returns the validation accuracy. It then switches the model back to training mode (train) before returning the validation accuracy.
 :::
 
@@ -223,17 +221,8 @@ def test(loader, cnn):
 :::
 
 ::: {.cell .markdown}
-Check Cuda GPU availability and set seed number
-:::
-::: {.cell .code}
-``` python
-cuda = torch.cuda.is_available()
-cudnn.benchmark = True  # Should make training should go faster for large models
-
-seed = 1
-torch.manual_seed(seed)
-```
-:::
+### 2.2.1. Training ResNet-18 in CF10 without Cutout
+::: 
 
 ::: {.cell .markdown}
 Image Processing for CIFAR-10
@@ -311,8 +300,8 @@ This code block sets up the machine learning model, loss function, optimizer, an
 #file_name will be the used for the name of the file of weight of the model and also the result
 file_name_resnet18_cifar10 = "resnet18_cifar10"
 
-num_classes = 10
-resnet18_cifar10 = ResNet18(num_classes=num_classes)
+num_classes_cifar10 = 10
+resnet18_cifar10 = ResNet18(num_classes=num_classes_cifar10)
 
 
 resnet18_cifar10 = resnet18_cifar10.cuda()
@@ -382,9 +371,9 @@ print('Final Result ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % 
 ``` 
 :::
 
-::: {.cell .markdown}
 
-4.2.1.2. Training ResNet-18 in CF10 with Cutout
+::: {.cell .markdown}
+### 2.2.2. Training ResNet-18 in CF10 with Cutout
 ::: 
 
 ::: {.cell .markdown}
@@ -437,21 +426,10 @@ class Cutout(object):
 ```
 :::
 
-::: {.cell .markdown}
-Check Cuda GPU availability and set seed number 
-::: 
 
-::: {.cell .code}
-``` python
-cuda = torch.cuda.is_available()
-cudnn.benchmark = True  # Should make training should go faster for large models
-
-seed = 1
-torch.manual_seed(seed)
-```
+::: {.cell .markdown} 
+Image Processing for CIFAR-10 
 :::
-
-::: {.cell .markdown} Image Processing for CIFAR-10 :::
 
 ::: {.cell .code}
 ``` python
@@ -476,7 +454,9 @@ test_transform_cifar10 = transforms.Compose([
 ``` 
 :::
 
-::: {.cell .markdown} Import the dataset of CIFAR-10 :::
+::: {.cell .markdown} 
+Import the dataset of CIFAR-10 
+:::
 
 ::: {.cell .code}
 ``` python
@@ -527,8 +507,8 @@ This code block sets up the machine learning model, loss function, optimizer, an
 #file_name will be the used for the name of the file of weight of the model and also the result
 file_name_resnet18_cifar10_cutout = "resnet18_cifar10_cutout"
 
-num_classes = 10
-resnet18_cifar10_cutout = ResNet18(num_classes=num_classes)
+num_classes_cifar10 = 10
+resnet18_cifar10_cutout = ResNet18(num_classes=num_classes_cifar10)
 
 
 resnet18_cifar10_cutout = resnet18_cifar10_cutout.cuda()
@@ -596,25 +576,13 @@ print('Final Result ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (f
 
 
 ::: {.cell .markdown}
-
-4.2.1.2. Training ResNet-18 in CF10 with Data Augmentation without Cutout
+### 2.2.3. Training ResNet-18 in CF10 with Data Augmentation 
 ::: 
 
-::: {.cell .markdown}
-Check Cuda GPU availability and set seed number 
-::: 
 
-::: {.cell .code}
-``` python
-cuda = torch.cuda.is_available()
-cudnn.benchmark = True  # Should make training should go faster for large models
-
-seed = 1
-torch.manual_seed(seed)
-```
+::: {.cell .markdown} 
+Image Processing for CIFAR-10 
 :::
-
-::: {.cell .markdown} Image Processing for CIFAR-10 :::
 
 ::: {.cell .code}
 ``` python
@@ -688,8 +656,8 @@ This code block sets up the machine learning model, loss function, optimizer, an
 #file_name will be the used for the name of the file of weight of the model and also the result
 file_name_resnet18_cifar10_da = "resnet18_cifar10_da"
 
-num_classes = 10
-resnet18_cifar10_da = ResNet18(num_classes=num_classes)
+num_classes_cifar10 = 10
+resnet18_cifar10_da = ResNet18(num_classes=num_classes_cifar10)
 
 
 resnet18_cifar10_da = resnet18_cifar10_da.cuda()
@@ -757,24 +725,8 @@ print('Final Result ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset:
 
 
 ::: {.cell .markdown}
-
-4.2.1.2. Training ResNet-18 in CF10 with Data Augmentation with Cutout
+### 2.2.4. Training ResNet-18 in CF10 with Data Augmentation with Cutout
 ::: 
-
-::: {.cell .markdown}
-Check Cuda GPU availability and set seed number 
-::: 
-
-
-::: {.cell .code}
-``` python
-cuda = torch.cuda.is_available()
-cudnn.benchmark = True  # Should make training should go faster for large models
-
-seed = 1
-torch.manual_seed(seed)
-```
-:::
 
 ::: {.cell .markdown} 
 Image Processing for CIFAR-10 
@@ -857,8 +809,8 @@ This code block sets up the machine learning model, loss function, optimizer, an
 #file_name will be the used for the name of the file of weight of the model and also the result
 file_name_resnet18_cifar10_da_cutout = "resnet18_cifar10_da_cutout"
 
-num_classes = 10
-resnet18_cifar10_da_cutout = ResNet18(num_classes=num_classes)
+num_classes_cifar10 = 10
+resnet18_cifar10_da_cutout = ResNet18(num_classes=num_classes_cifar10)
 
 
 resnet18_cifar10_da_cutout = resnet18_cifar10_da_cutout.cuda()
@@ -930,5 +882,622 @@ print('Final Result ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % 
 print('Final Result ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
 print('Final Result ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
 print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet_cifar10_da_cutout))
+```
+:::
+
+
+::: {.cell .markdown}
+### 2.3.1. Training ResNet-18 in CF100 without Cutout
+::: 
+
+::: {.cell .markdown}
+Image Processing for CIFAR-100
+:::
+
+::: {.cell .code}
+``` python
+# Image Preprocessing
+
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+
+train_transform_cifar100 = transforms.Compose([])
+
+train_transform_cifar100.transforms.append(transforms.ToTensor())
+train_transform_cifar100.transforms.append(normalize_image_cifar100)
+
+
+
+test_transform_cifar100 = transforms.Compose([
+    transforms.ToTensor(),
+    normalize_image_cifar100])
+```
+:::
+
+::: {.cell .markdown} 
+Import the dataset of CIFAR-100 
+:::
+
+::: {.cell .code}
+``` python
+train_dataset_cifar100 = datasets.CIFAR10(root='data/',
+                                     train=True,
+                                     transform=train_transform_cifar100,
+                                     download=True)
+
+test_dataset_cifar100 = datasets.CIFAR10(root='data/',
+                                    train=False,
+                                    transform=test_transform_cifar100,
+                                    download=True)
+```
+:::
+
+::: {.cell .markdown} 
+Create Dataset as Dataloader 
+:::
+
+::: {.cell .code}
+``` python
+# Data Loader (Input Pipeline)
+batch_size_cifar100 = 128
+train_loader_cifar100 = torch.utils.data.DataLoader(dataset=train_dataset_cifar100,
+                                           batch_size=batch_size_cifar100,
+                                           shuffle=True,
+                                           pin_memory=True,
+                                           num_workers=2)
+
+test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100,
+                                          batch_size=batch_size_cifar100,
+                                          shuffle=False,
+                                          pin_memory=True,
+                                          num_workers=2)
+```
+:::
+
+::: {.cell .markdown} 
+Define the model 
+:::
+
+::: {.cell .markdown} 
+This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. 
+:::
+
+::: {.cell .code}
+``` python
+#file_name will be the used for the name of the file of weight of the model and also the result
+file_name_resnet18_cifar100 = "resnet18_cifar100"
+
+num_classes_cifar100 = 100
+resnet18_cifar100 = ResNet18(num_classes=num_classes_cifar100)
+
+
+resnet18_cifar100 = resnet18_cifar100.cuda()
+learning_rate_resnet18_cifar100 = 0.1
+criterion_resnet18_cifar100 = nn.CrossEntropyLoss().cuda()
+cnn_optimizer_resnet18_cifar100 = torch.optim.SGD(resnet18_cifar100.parameters(), lr=learning_rate_resnet18_cifar100,
+                                momentum=0.9, nesterov=True, weight_decay=5e-4)
+scheduler_resnet18_cifar100 = MultiStepLR(cnn_optimizer_resnet18_cifar100, milestones=[60, 120, 160], gamma=0.2)
+```
+:::
+
+::: {.cell .markdown} 
+Training ResNet-18 withuout Cutout 
+:::
+
+::: {.cell .markdown} 
+This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved. 
+:::
+
+::: {.cell .code}
+``` python
+epochs = 200
+for epoch in range(epochs):
+
+    xentropy_loss_avg = 0.
+    correct = 0.
+    total = 0.
+
+    progress_bar = tqdm(train_loader_cifar100)
+    for i, (images, labels) in enumerate(progress_bar):
+        progress_bar.set_description('Epoch ' + str(epoch))
+
+        images = images.cuda()
+        labels = labels.cuda()
+
+        resnet18_cifar100.zero_grad()
+        pred = resnet18_cifar100(images)
+
+        xentropy_loss = criterion_resnet18_cifar100(pred, labels)
+        xentropy_loss.backward()
+        cnn_optimizer_resnet18_cifar100.step()
+
+        xentropy_loss_avg += xentropy_loss.item()
+
+        # Calculate running average of accuracy
+        pred = torch.max(pred.data, 1)[1]
+        total += labels.size(0)
+        correct += (pred == labels.data).sum().item()
+        accuracy = correct / total
+
+        progress_bar.set_postfix(
+            xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
+            acc='%.3f' % accuracy)
+
+    test_accr_resnet18_cifar100 = test(test_loader_cifar100, resnet18_cifar100)
+    tqdm.write('test_acc: %.3f' % (test_accr_resnet18_cifar100))
+
+    #scheduler.step(epoch)  # Use this line for PyTorch <1.4
+    scheduler_resnet18_cifar100.step()     # Use this line for PyTorch >=1.4
+
+    
+torch.save(resnet18_cifar100.state_dict(), 'checkpoints/' + file_name_resnet18_cifar100 + '.pt')
+
+
+final_test_acc_resnet18_cifar100 = (1 - test(test_loader_cifar100, resnet18_cifar100))*100
+print('Final Result ResNet-18 without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_resnet18_cifar100))
+``` 
+:::
+
+
+::: {.cell .markdown}
+### 2.2.2. Training ResNet-18 in CF100 with Cutout
+::: 
+
+
+
+::: {.cell .markdown} 
+Image Processing for CIFAR-100 
+:::
+
+::: {.cell .code}
+``` python
+# Image Preprocessing
+
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+
+train_transform_cifar100_cutout = transforms.Compose([])
+
+train_transform_cifar100_cutout.transforms.append(transforms.ToTensor())
+train_transform_cifar100_cutout.transforms.append(normalize_image_cifar100)
+
+#Add Cutout to the image transformer piepeline
+n_holes_cifar100 = 1
+length_cifar100 = 16
+train_transform_cifar100_cutout.transforms.append(Cutout(n_holes=n_holes_cifar100, length=length_cifar100))
+
+
+test_transform_cifar100 = transforms.Compose([
+    transforms.ToTensor(),
+    normalize_image_cifar100])
+``` 
+:::
+
+::: {.cell .markdown} 
+Import the dataset of CIFAR-0 
+:::
+
+::: {.cell .code}
+``` python
+train_dataset_cifar100_cutout = datasets.CIFAR100(root='data/',
+                                     train=True,
+                                     transform=train_transform_cifar100_cutout,
+                                     download=True)
+
+test_dataset_cifar100 = datasets.CIFAR100(root='data/',
+                                    train=False,
+                                    transform=test_transform_cifar100,
+                                    download=True)
+```
+:::
+
+::: {.cell .markdown} 
+Create Dataset as Dataloader 
+:::
+
+::: {.cell .code}
+``` python
+# Data Loader (Input Pipeline)
+batch_size_cifar100_cutout = 128
+train_loader_cifar100_cutout = torch.utils.data.DataLoader(dataset=train_dataset_cifar100_cutout,
+                                           batch_size=batch_size_cifar100_cutout,
+                                           shuffle=True,
+                                           pin_memory=True,
+                                           num_workers=2)
+
+test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100,
+                                          batch_size=batch_size_cifar100_cutout,
+                                          shuffle=False,
+                                          pin_memory=True,
+                                          num_workers=2)
+```
+:::
+
+::: {.cell .markdown} 
+Define the model 
+:::
+
+::: {.cell .markdown} 
+This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. 
+:::
+
+::: {.cell .code}
+``` python
+#file_name will be the used for the name of the file of weight of the model and also the result
+file_name_resnet18_cifar100_cutout = "resnet18_cifar100_cutout"
+
+num_classes_cifar100 = 100
+resnet18_cifar100_cutout = ResNet18(num_classes=num_classes_cifar100)
+
+
+resnet18_cifar100_cutout = resnet18_cifar100_cutout.cuda()
+learning_rate_resnet18_cifar100_cutout = 0.1
+criterion_resnet18_cifar100_cutout = nn.CrossEntropyLoss().cuda()
+cnn_optimizer_resnet18_cifar100_cutout = torch.optim.SGD(resnet18_cifar100_cutout.parameters(), lr=learning_rate_resnet18_cifar100_cutout,
+                                momentum=0.9, nesterov=True, weight_decay=5e-4)
+scheduler_resnet18_cifar100_cutout = MultiStepLR(cnn_optimizer_resnet18_cifar100_cutout, milestones=[60, 120, 160], gamma=0.2)
+```
+:::
+
+::: {.cell .markdown}
+Training ResNet-18 with Cutout 
+:::
+
+::: {.cell .markdown} 
+This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved. 
+:::
+
+::: {.cell .code}
+``` python
+epochs = 200
+for epoch in range(epochs):
+
+    xentropy_loss_avg = 0.
+    correct = 0.
+    total = 0.
+
+    progress_bar = tqdm(train_loader_cifar100_cutout)
+    for i, (images, labels) in enumerate(progress_bar):
+        progress_bar.set_description('Epoch ' + str(epoch))
+
+        images = images.cuda()
+        labels = labels.cuda()
+
+        resnet18_cifar100_cutout.zero_grad()
+        pred = resnet18_cifar100_cutout(images)
+
+        xentropy_loss = criterion_resnet18_cifar100_cutout(pred, labels)
+        xentropy_loss.backward()
+        cnn_optimizer_resnet18_cifar100_cutout.step()
+
+        xentropy_loss_avg += xentropy_loss.item()
+
+        # Calculate running average of accuracy
+        pred = torch.max(pred.data, 1)[1]
+        total += labels.size(0)
+        correct += (pred == labels.data).sum().item()
+        accuracy = correct / total
+
+        progress_bar.set_postfix(
+            xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
+            acc='%.3f' % accuracy)
+
+    test_acc_cifar100 = test(test_loader_cifar100,resnet18_cifar100_cutout)
+    tqdm.write('test_acc: %.3f' % (test_acc_cifar100))
+    scheduler_resnet18_cifar100_cutout.step()     
+torch.save(resnet18_cifar100_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar100_cutout + '.pt')
+
+
+final_test_acc_resnet18_cifar100_cutout = (1 - test(test_loader_cifar100_cutout,resnet18_cifar100_cutout))*100
+print('Final Result ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
+```
+:::
+
+
+::: {.cell .markdown}
+### 2.2.3. Training ResNet-18 in CF100 with Data Augmentation 
+::: 
+
+
+::: {.cell .markdown} 
+Image Processing for CIFAR-100 
+:::
+
+::: {.cell .code}
+``` python
+# Image Preprocessing
+
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+
+train_transform_cifar100_da = transforms.Compose([])
+train_transform_cifar100_da.transforms.append(transforms.RandomCrop(32, padding=4))
+train_transform_cifar100_da.transforms.append(transforms.RandomHorizontalFlip())
+train_transform_cifar100_da.transforms.append(transforms.ToTensor())
+train_transform_cifar100_da.transforms.append(normalize_image_cifar100)
+
+
+test_transform_cifar100 = transforms.Compose([
+    transforms.ToTensor(),
+    normalize_image_cifar100])
+``` 
+:::
+
+::: {.cell .markdown} 
+Import the dataset of CIFAR-100
+:::
+
+::: {.cell .code}
+``` python
+train_dataset_cifar100_da = datasets.CIFAR100(root='data/',
+                                     train=True,
+                                     transform=train_transform_cifar100_da,
+                                     download=True)
+
+test_dataset_cifar100 = datasets.CIFAR100(root='data/',
+                                    train=False,
+                                    transform=test_transform_cifar100,
+                                    download=True)
+```
+:::
+
+::: {.cell .markdown} 
+Create Dataset as Dataloader 
+:::
+
+::: {.cell .code}
+``` python
+# Data Loader (Input Pipeline)
+batch_size_cifar100_da = 128
+train_loader_cifar100_da = torch.utils.data.DataLoader(dataset=train_dataset_cifar100_da,
+                                           batch_size=batch_size_cifar100_da,
+                                           shuffle=True,
+                                           pin_memory=True,
+                                           num_workers=2)
+
+test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100,
+                                          batch_size=batch_size_cifar100_da,
+                                          shuffle=False,
+                                          pin_memory=True,
+                                          num_workers=2)
+```
+:::
+
+::: {.cell .markdown} 
+Define the model 
+:::
+
+::: {.cell .markdown} 
+This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. 
+:::
+
+::: {.cell .code}
+``` python
+#file_name will be the used for the name of the file of weight of the model and also the result
+file_name_resnet18_cifar100_da = "resnet18_cifar100_da"
+
+num_classes_cifar100 = 100
+resnet18_cifar100_da = ResNet18(num_classes=num_classes_cifar100)
+
+
+resnet18_cifar100_da = resnet18_cifar100_da.cuda()
+learning_rate_resnet18_cifar100_da = 0.1
+criterion_resnet18_cifar100_da = nn.CrossEntropyLoss().cuda()
+cnn_optimizer_resnet18_cifar100_da = torch.optim.SGD(resnet18_cifar100_da.parameters(), lr=learning_rate_resnet18_cifar100_da,
+                                momentum=0.9, nesterov=True, weight_decay=5e-4)
+scheduler_resnet18_cifar100_da = MultiStepLR(cnn_optimizer_resnet18_cifar100_da, milestones=[60, 120, 160], gamma=0.2)
+```
+:::
+
+::: {.cell .markdown}
+Training ResNet-18 with  Data Augmentation
+:::
+
+::: {.cell .markdown} 
+This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved. 
+:::
+
+::: {.cell .code}
+``` python
+epochs = 200
+for epoch in range(epochs):
+
+    xentropy_loss_avg = 0.
+    correct = 0.
+    total = 0.
+
+    progress_bar = tqdm(train_loader_cifar100_da)
+    for i, (images, labels) in enumerate(progress_bar):
+        progress_bar.set_description('Epoch ' + str(epoch))
+
+        images = images.cuda()
+        labels = labels.cuda()
+
+        resnet18_cifar100_da.zero_grad()
+        pred = resnet18_cifar100_da(images)
+
+        xentropy_loss = criterion_resnet18_cifar100_da(pred, labels)
+        xentropy_loss.backward()
+        cnn_optimizer_resnet18_cifar100_da.step()
+
+        xentropy_loss_avg += xentropy_loss.item()
+
+        # Calculate running average of accuracy
+        pred = torch.max(pred.data, 1)[1]
+        total += labels.size(0)
+        correct += (pred == labels.data).sum().item()
+        accuracy = correct / total
+
+        progress_bar.set_postfix(
+            xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
+            acc='%.3f' % accuracy)
+
+    test_acc_resnet18_cifar100_da = test(test_loader_cifar100,resnet18_cifar100_da)
+    tqdm.write('test_acc: %.3f' % (test_acc_resnet18_cifar100_da))
+    scheduler_resnet18_cifar100_da.step()     
+torch.save(resnet18_cifar100_da.state_dict(), 'checkpoints/' + file_name_resnet18_cifar100_da + '.pt')
+
+
+final_test_acc_resnet18_cifar100_da = (1 - test(test_loader_cifar100,resnet18_cifar100_da))*100
+print('Final Result ResNet-18 using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da))
+```
+:::
+
+
+::: {.cell .markdown}
+### 2.2.4. Training ResNet-18 in CF100 with Data Augmentation with Cutout
+::: 
+
+::: {.cell .markdown} 
+Image Processing for CIFAR-100
+:::
+
+::: {.cell .code}
+``` python
+# Image Preprocessing
+
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+
+train_transform_cifar100_da_co = transforms.Compose([])
+train_transform_cifar100_da_co.transforms.append(transforms.RandomCrop(32, padding=4))
+train_transform_cifar100_da_co.transforms.append(transforms.RandomHorizontalFlip())
+train_transform_cifar100_da_co.transforms.append(transforms.ToTensor())
+train_transform_cifar100_da_co.transforms.append(normalize_image_cifar100)
+
+#Add Cutout to the image transformer piepeline
+n_holes_cifar100_da_co = 1
+length_cifar100_da_co = 16
+train_transform_cifar100_da_co.transforms.append(Cutout(n_holes=n_holes_cifar100_da_co, length=length_cifar100_da_co))
+
+
+test_transform_cifar100 = transforms.Compose([
+    transforms.ToTensor(),
+    normalize_image_cifar100])
+``` 
+:::
+
+::: {.cell .markdown} 
+Import the dataset of CIFAR-100
+:::
+
+::: {.cell .code}
+``` python
+train_dataset_cifar100_da_co = datasets.CIFAR100(root='data/',
+                                     train=True,
+                                     transform=train_transform_cifar100_da_co,
+                                     download=True)
+
+test_dataset_cifar100 = datasets.CIFAR100(root='data/',
+                                    train=False,
+                                    transform=test_transform_cifar100,
+                                    download=True)
+```
+:::
+
+::: {.cell .markdown} 
+Create Dataset as Dataloader 
+:::
+
+::: {.cell .code}
+``` python
+# Data Loader (Input Pipeline)
+batch_size_cifar100_da_co = 128
+train_loader_cifar100_da_co = torch.utils.data.DataLoader(dataset=train_dataset_cifar100_da_co,
+                                           batch_size=batch_size_cifar100_da_co,
+                                           shuffle=True,
+                                           pin_memory=True,
+                                           num_workers=2)
+
+test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100,
+                                          batch_size=batch_size_cifar100_da_co,
+                                          shuffle=False,
+                                          pin_memory=True,
+                                          num_workers=2)
+```
+:::
+
+::: {.cell .markdown} 
+Define the model 
+:::
+
+::: {.cell .markdown} 
+This code block sets up the machine learning model, loss function, optimizer, and learning rate scheduler. 
+:::
+
+::: {.cell .code}
+``` python
+#file_name will be the used for the name of the file of weight of the model and also the result
+file_name_resnet18_cifar100_da_cutout = "resnet18_cifar100_da_cutout"
+
+num_classes_cifar100 = 100
+resnet18_cifar100_da_cutout = ResNet18(num_classes=num_classes_cifar100)
+
+
+resnet18_cifar100_da_cutout = resnet18_cifar100_da_cutout.cuda()
+learning_rate_cifar100_da_cutout = 0.1
+criterion_cifar100_da_cutout = nn.CrossEntropyLoss().cuda()
+cnn_optimizer_cifar100_da_cutout = torch.optim.SGD(resnet18_cifar100_da_cutout.parameters(), lr=learning_rate_cifar100_da_cutout,
+                                momentum=0.9, nesterov=True, weight_decay=5e-4)
+scheduler_cifar100_da_cutout = MultiStepLR(cnn_optimizer_cifar100_da_cutout, milestones=[60, 120, 160], gamma=0.2)
+```
+:::
+
+::: {.cell .markdown}
+Training ResNet-18 with Cutout 
+:::
+
+::: {.cell .markdown} 
+This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved. 
+:::
+
+::: {.cell .code}
+``` python
+epochs = 200
+for epoch in range(epochs):
+
+    xentropy_loss_avg = 0.
+    correct = 0.
+    total = 0.
+
+    progress_bar = tqdm(train_loader_cifar100_da_co)
+    for i, (images, labels) in enumerate(progress_bar):
+        progress_bar.set_description('Epoch ' + str(epoch))
+
+        images = images.cuda()
+        labels = labels.cuda()
+
+        resnet18_cifar100_da_cutout.zero_grad()
+        pred = resnet18_cifar100_da_cutout(images)
+
+        xentropy_loss = criterion_cifar100_da_cutout(pred, labels)
+        xentropy_loss.backward()
+        cnn_optimizer_cifar100_da_cutout.step()
+
+        xentropy_loss_avg += xentropy_loss.item()
+
+        # Calculate running average of accuracy
+        pred = torch.max(pred.data, 1)[1]
+        total += labels.size(0)
+        correct += (pred == labels.data).sum().item()
+        accuracy = correct / total
+
+        progress_bar.set_postfix(
+            xentropy='%.3f' % (xentropy_loss_avg / (i + 1)),
+            acc='%.3f' % accuracy)
+
+    test_acc_cifar100_da_cutout = test(test_loader_cifar100,resnet18_cifar100_da_cutout)
+    tqdm.write('test_acc: %.3f' % (test_acc_cifar100_da_cutout))
+    scheduler_cifar100_da_cutout.step()     
+torch.save(resnet18_cifar100_da_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar100_da_cutout + '.pt')
+
+
+final_test_acc_resnet18_cifar100_da_cutout = (1 - test(test_loader_cifar100,resnet18_cifar100_da_cutout))*100
+print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da_cutout))
+```
+:::
+
+::: {.cell .code}
+``` python
+print('Final Result ResNet-18 without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_resnet18_cifar100))
+print('Final Result ResNet-18 using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
+print('Final Result ResNet-18 using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da))
+print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet_cifar100_da_cutout))
 ```
 :::
