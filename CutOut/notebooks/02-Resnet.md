@@ -569,7 +569,7 @@ for epoch in range(epochs):
 torch.save(resnet18_cifar10_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10_cutout + '.pt')
 
 
-final_test_acc_resnet18_cifar10_cutout = (1 - test(test_loader_cifar10_cutout,resnet18_cifar10_cutout))*100
+final_test_acc_resnet18_cifar10_cutout = (1 - test(test_loader_cifar10,resnet18_cifar10_cutout))*100
 print('Final Result ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
 ```
 :::
@@ -881,7 +881,7 @@ print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 T
 print('Final Result ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_resnet18_cifar10))
 print('Final Result ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
 print('Final Result ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
-print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet_cifar10_da_cutout))
+print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da_cutout))
 ```
 :::
 
@@ -919,12 +919,12 @@ Import the dataset of CIFAR-100
 
 ::: {.cell .code}
 ``` python
-train_dataset_cifar100 = datasets.CIFAR10(root='data/',
+train_dataset_cifar100 = datasets.CIFAR100(root='data/',
                                      train=True,
                                      transform=train_transform_cifar100,
                                      download=True)
 
-test_dataset_cifar100 = datasets.CIFAR10(root='data/',
+test_dataset_cifar100 = datasets.CIFAR100(root='data/',
                                     train=False,
                                     transform=test_transform_cifar100,
                                     download=True)
@@ -1186,8 +1186,8 @@ for epoch in range(epochs):
 torch.save(resnet18_cifar100_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar100_cutout + '.pt')
 
 
-final_test_acc_resnet18_cifar100_cutout = (1 - test(test_loader_cifar100_cutout,resnet18_cifar100_cutout))*100
-print('Final Result ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
+final_test_acc_resnet18_cifar100_cutout = (1 - test(test_loader_cifar100,resnet18_cifar100_cutout))*100
+print('Final Result ResNet-18 using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
 ```
 :::
 
@@ -1498,6 +1498,6 @@ print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 
 print('Final Result ResNet-18 without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_resnet18_cifar100))
 print('Final Result ResNet-18 using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
 print('Final Result ResNet-18 using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da))
-print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet_cifar100_da_cutout))
+print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da_cutout))
 ```
 :::
