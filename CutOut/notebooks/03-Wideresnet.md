@@ -1547,9 +1547,9 @@ Import the dataset of SVHN
 ::: {.cell .code}
 ``` python
 train_dataset_svhn = datasets.SVHN(root='data/',
-                                     train=True,
-                                     transform=train_transform_svhn,
-                                     download=True)
+                                    split='train',
+                                    transform=train_transform_svhn,
+                                    download=True)
 
 extra_dataset_svhn = datasets.SVHN(root='data/',
                                     split='extra',
@@ -1557,15 +1557,15 @@ extra_dataset_svhn = datasets.SVHN(root='data/',
                                     download=True)
 
 # Combine both training splits (https://arxiv.org/pdf/1605.07146.pdf)
-data_svhn = np.concatenate([train_dataset_svhnt.data, extra_dataset_svhn.data], axis=0)
+data_svhn = np.concatenate([train_dataset_svhn.data, extra_dataset_svhn.data], axis=0)
 labels_svhn = np.concatenate([train_dataset_svhn.labels, extra_dataset_svhn.labels], axis=0)
 train_dataset_svhn.data = data_svhn
 train_dataset_svhn.labels = labels_svhn
 
 test_dataset_svhn = datasets.SVHN(root='data/',
-                                    train=False,
-                                    transform=test_transform_svhn,
-                                    download=True)
+                                  split='test',
+                                  transform=test_transform_svhn,
+                                  download=True)
 ```
 :::
 
@@ -1713,9 +1713,9 @@ Import the dataset of SVHN
 ::: {.cell .code}
 ``` python
 train_dataset_svhn_cutout = datasets.SVHN(root='data/',
-                                     train=True,
-                                     transform=train_transform_svhn_cutout,
-                                     download=True)
+                                    split='train',
+                                    transform=train_transform_svhn_cutout,
+                                    download=True)
 
 extra_dataset_svhn_cutout = datasets.SVHN(root='data/',
                                     split='extra',
@@ -1729,9 +1729,9 @@ train_dataset_svhn_cutout.data = data_svhn_cutout
 train_dataset_svhn_cutout.labels = labels_svhn_cutout
 
 test_dataset_svhn = datasets.SVHN(root='data/',
-                                    train=False,
-                                    transform=test_transform_svhn,
-                                    download=True)
+                                  split='test',
+                                  transform=test_transform_svhn,
+                                  download=True)
 ```
 :::
 
