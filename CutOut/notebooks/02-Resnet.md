@@ -1,6 +1,6 @@
 
 ::: {.cell .markdown}
-### 02. ResNet
+# 02. ResNet
 :::
 
 
@@ -39,7 +39,7 @@ These findings emphasize the efficacy of both standard and cutout data augmentat
 
 ::: {.cell .markdown}
 
-### Import Library
+## Import Library
 
 :::
 
@@ -85,6 +85,10 @@ Creating such a directory and regularly saving model weights is a good practice 
 if not os.path.exists('./checkpoints'):
     os.makedirs('./checkpoints')
 ```
+:::
+
+::: {.cell .markdown}
+## 2.1 Implementation Code
 :::
 
 ::: {.cell .markdown}
@@ -218,6 +222,10 @@ def test(loader, cnn):
     cnn.train()
     return val_acc
 ```
+:::
+
+::: {.cell .markdown}
+## 2.2 Training ResNet-18 in CIFAR-10 
 :::
 
 ::: {.cell .markdown}
@@ -359,8 +367,7 @@ for epoch in range(epochs):
     test_accr_resnet18_cifar10 = test(test_loader_cifar10, resnet18_cifar10)
     tqdm.write('test_acc: %.3f' % (test_accr_resnet18_cifar10))
 
-    #scheduler.step(epoch)  # Use this line for PyTorch <1.4
-    scheduler_resnet18_cifar10.step()     # Use this line for PyTorch >=1.4
+    scheduler_resnet18_cifar10.step()    
 
     
 torch.save(resnet18_cifar10.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10 + '.pt')
@@ -442,7 +449,7 @@ train_transform_cifar10_cutout = transforms.Compose([])
 train_transform_cifar10_cutout.transforms.append(transforms.ToTensor())
 train_transform_cifar10_cutout.transforms.append(normalize_image_cifar10)
 
-#Add Cutout to the image transformer piepeline
+#Add Cutout to the image transformer pipeline
 n_holes_cifar10 = 1
 length_cifar10 = 16
 train_transform_cifar10_cutout.transforms.append(Cutout(n_holes=n_holes_cifar10, length=length_cifar10))
@@ -744,7 +751,7 @@ train_transform_cifar10_da_co.transforms.append(transforms.RandomHorizontalFlip(
 train_transform_cifar10_da_co.transforms.append(transforms.ToTensor())
 train_transform_cifar10_da_co.transforms.append(normalize_image_cifar10)
 
-#Add Cutout to the image transformer piepeline
+#Add Cutout to the image transformer pipeline
 n_holes_cifar10_da_co = 1
 length_cifar10_da_co = 16
 train_transform_cifar10_da_co.transforms.append(Cutout(n_holes=n_holes_cifar10_da_co, length=length_cifar10_da_co))
@@ -885,6 +892,9 @@ print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 T
 ```
 :::
 
+::: {.cell .markdown}
+## 2.3 Training ResNet-18 in CIFAR-100 
+:::
 
 ::: {.cell .markdown}
 ### 2.3.1. Training ResNet-18 in CF100 without Cutout
@@ -1025,9 +1035,7 @@ for epoch in range(epochs):
     test_accr_resnet18_cifar100 = test(test_loader_cifar100, resnet18_cifar100)
     tqdm.write('test_acc: %.3f' % (test_accr_resnet18_cifar100))
 
-    #scheduler.step(epoch)  # Use this line for PyTorch <1.4
-    scheduler_resnet18_cifar100.step()     # Use this line for PyTorch >=1.4
-
+    scheduler_resnet18_cifar100.step()   
     
 torch.save(resnet18_cifar100.state_dict(), 'checkpoints/' + file_name_resnet18_cifar100 + '.pt')
 
@@ -1059,9 +1067,9 @@ train_transform_cifar100_cutout = transforms.Compose([])
 train_transform_cifar100_cutout.transforms.append(transforms.ToTensor())
 train_transform_cifar100_cutout.transforms.append(normalize_image_cifar100)
 
-#Add Cutout to the image transformer piepeline
+#Add Cutout to the image transformer pipeline
 n_holes_cifar100 = 1
-length_cifar100 = 16
+length_cifar100 = 8
 train_transform_cifar100_cutout.transforms.append(Cutout(n_holes=n_holes_cifar100, length=length_cifar100))
 
 
@@ -1361,9 +1369,9 @@ train_transform_cifar100_da_co.transforms.append(transforms.RandomHorizontalFlip
 train_transform_cifar100_da_co.transforms.append(transforms.ToTensor())
 train_transform_cifar100_da_co.transforms.append(normalize_image_cifar100)
 
-#Add Cutout to the image transformer piepeline
+#Add Cutout to the image transformer pipeline
 n_holes_cifar100_da_co = 1
-length_cifar100_da_co = 16
+length_cifar100_da_co = 8
 train_transform_cifar100_da_co.transforms.append(Cutout(n_holes=n_holes_cifar100_da_co, length=length_cifar100_da_co))
 
 
