@@ -1,7 +1,13 @@
 
 ::: {.cell .markdown}
-##### 4.3.1.3.2. Compare the Qualitative Claims usinng Grad-CAM
+# 04. Grad-CAM
+:::
 
+::: {.cell .markdown}
+Note: for faster training, use Runtime > Change Runtime Type to run this notebook on a GPU.
+:::
+
+::: {.cell .markdown}
 ###### What is Grad-CAM?
 Grad-CAM (Gradient-weighted Class Activation Mapping) is a technique that provides visual explanations for decisions made by Convolutional Neural Network (CNN) models. It uses the gradients of any target concept, flowing into the final convolutional layer to produce a coarse localization map highlighting the important regions in the image for predicting the concept.
 
@@ -10,6 +16,53 @@ Grad-CAM is not limited to a specific architecture, it can be applied to a wide 
 By visualizing the model's focus areas with Grad-CAM, we can assess how effectively Cutout is encouraging the model to use a broader range of features. For example, if a model trained with Cutout still primarily focuses on a single region, that might suggest the Cutout squares are too small, or not numerous enough. Conversely, if the focus areas are well spread across the image, it would confirm that Cutout is indeed pushing the model to generalize better.
 
 If you want to understand more about Grad-CAM? Check this paper (https://arxiv.org/abs/1610.02391)
+:::
+
+
+::: {.cell .markdown}
+
+## Import Library
+
+:::
+
+
+::: {.cell .code}
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.autograd import Variable
+import torch.backends.cudnn as cudnn
+from torch.optim.lr_scheduler import MultiStepLR
+from torchvision import datasets, transforms
+import numpy as np
+import os
+from tqdm import tqdm
+import math
+import cv2
+import matplotlib.pyplot as plt
+from PIL import Image
+```
+:::
+
+
+::: {.cell .markdown}
+Check Cuda GPU availability and set seed number
+:::
+::: {.cell .code}
+``` python
+cuda = torch.cuda.is_available()
+print(cuda)
+cudnn.benchmark = True  # Should make training should go faster for large models
+
+seed = 1
+torch.manual_seed(seed)
+np.random.seed(seed)
+```
+:::
+
+::: {.cell .markdown}
+## 4.2 Implementation Grad-CAM for ResNet Model
 :::
 
 ::: {.cell .code}
@@ -61,17 +114,28 @@ class ResNet(nn.Module):
 ```
 :::
 
+::: {.cell .markdown}
+## 4.2.1 Implementation Grad-CAM for ResNet18 Model for CIFAR-10
+:::
 
 ::: {.cell .code}
 ``` python
 
-model = ResNet18(num_classes=10)
-model.load_state_dict(torch.load("checkpoints/cifar10_resnet18.pt"))
-model.eval()
+resnet18_gradcam_cifar10 = ResNet18(num_classes=10)
+resnet18_gradcam_cifar10.load_state_dict(torch.load("checkpoints/resnet18_cifar10.pt"))
+resnet18_gradcam_cifar10.eval()
 
-model_co = ResNet18(num_classes=10)
-model_co.load_state_dict(torch.load("checkpoints/cifar10_resnet18_Cutout.pt"))
-model_co.eval()
+resnet18_gradcam_cifar10_cutout = ResNet18(num_classes=10)
+resnet18_gradcam_cifar10_cutout.load_state_dict(torch.load("checkpoints/resnet18_cifar10_cutout.pt"))
+resnet18_gradcam_cifar10_cutout.eval()
+
+resnet18_gradcam_cifar10_da = ResNet18(num_classes=10)
+resnet18_gradcam_cifar10_da.load_state_dict(torch.load("checkpoints/resnet18_cifar10_da.pt"))
+resnet18_gradcam_cifar10_da.eval()
+
+resnet18_gradcam_cifar10_da_cutout = ResNet18(num_classes=10)
+resnet18_gradcam_cifar10_da_cutout.load_state_dict(torch.load("checkpoints/resnet18_cifar10_da_cutout.pt"))
+resnet18_gradcam_cifar10_da_cutout.eval()
 ```
 :::
 
@@ -83,21 +147,21 @@ Let's try to see the result from the testloader of CIFAR-10 dataset
 ``` python
 import torchvision
 
-transform_dataset = transforms.Compose([
+transform_cifar10 = transforms.Compose([
     transforms.Resize((32, 32)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
-testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_dataset)
-testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=True, num_workers=2)
+testset_cifar10 = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_cifar10)
+testloader_cifar10 = torch.utils.data.DataLoader(testset_cifar10, batch_size=1, shuffle=True, num_workers=2)
 
 ```
 :::
 
 ::: {.cell .code}
 ``` python
-cifar_classes = [
+cifar10_classes = [
     "Airplane", "Automobile", "Bird", "Cat", "Deer",
     "Dog", "Frog", "Horse", "Ship", "Truck"
 ]
@@ -107,59 +171,99 @@ cifar_classes = [
 ::: {.cell .code}
 ``` python
 # Get a batch from the testloader
-images, labels = next(iter(testloader))
+images, labels = next(iter(testloader_cifar10))
 input_tensor = images  # As your batch_size is 1, you will have a single image here
 
 # Forward pass
-model.zero_grad()
-output = model(input_tensor)
+resnet18_gradcam_cifar10.zero_grad()
+output_resnet18_gradcam_cifar10 = resnet18_gradcam_cifar10(input_tensor)
 
-model_co.zero_grad()
-output_co = model_co(input_tensor)
+resnet18_gradcam_cifar10_cutout.zero_grad()
+output_resnet18_gradcam_cifar10_cutout = resnet18_gradcam_cifar10_cutout(input_tensor)
+
+resnet18_gradcam_cifar10_da.zero_grad()
+output_resnet18_gradcam_cifar10_da = resnet18_gradcam_cifar10_da(input_tensor)
+
+resnet18_gradcam_cifar10_da_cutout.zero_grad()
+output_resnet18_gradcam_cifar10_da_cutout = resnet18_gradcam_cifar10_da_cutout(input_tensor)
 
 # Get the index of the max log-probability
-target = output.argmax(1)
-output.max().backward()
+target_resnet18_gradcam_cifar10 = output_resnet18_gradcam_cifar10.argmax(1)
+output_resnet18_gradcam_cifar10.max().backward()
 
-target_co = output_co.argmax(1)
-output_co.max().backward()
+target_resnet18_gradcam_cifar10_cutout = output_resnet18_gradcam_cifar10_cutout.argmax(1)
+output_resnet18_gradcam_cifar10_cutout.max().backward()
+
+target_resnet18_gradcam_cifar10_da = output_resnet18_gradcam_cifar10_da.argmax(1)
+output_resnet18_gradcam_cifar10_da.max().backward()
+
+target_resnet18_gradcam_cifar10_da_cutout = output_resnet18_gradcam_cifar10_da_cutout.argmax(1)
+output_resnet18_gradcam_cifar10_da_cutout.max().backward()
 
 # Map the predicted class indices to the class labels
-predicted_class = cifar_classes[target.item()]
-predicted_class_co = cifar_classes[target_co.item()]
+predicted_class_resnet18_gradcam_cifar10 = cifar_classes[target_resnet18_gradcam_cifar10.item()]
+predicted_class_resnet18_gradcam_cifar10 = cifar_classes[target_resnet18_gradcam_cifar10_cutout.item()]
+predicted_class_resnet18_gradcam_cifar10_da = cifar_classes[target_resnet18_gradcam_cifar10_da.item()]
+predicted_class_resnet18_gradcam_cifar10_da_cutout = cifar_classes[target_resnet18_gradcam_cifar10_da_cutout.item()]
 
 
 # Get the gradients and activations
-gradients = model.gradients.detach().cpu()
-activations = model.activations.detach().cpu()
+gradients_resnet18_gradcam_cifar10 = resnet18_gradcam_cifar10.gradients.detach().cpu()
+activations_resnet18_gradcam_cifar10 = resnet18_gradcam_cifar10.activations.detach().cpu()
 
-gradients_co = model_co.gradients.detach().cpu()
-activations_co = model_co.activations.detach().cpu()
+gradients_resnet18_gradcam_cifar10_cutout = resnet18_gradcam_cifar10_cutout.gradients.detach().cpu()
+activations_resnet18_gradcam_cifar10_cutout = resnet18_gradcam_cifar10_cutout.activations.detach().cpu()
+
+gradients_resnet18_gradcam_cifar10_da = resnet18_gradcam_cifar10_da.gradients.detach().cpu()
+activations_resnet18_gradcam_cifar10_da = resnet18_gradcam_cifar10_da.activations.detach().cpu()
+
+gradients_resnet18_gradcam_cifar10_da_cutout = resnet18_gradcam_cifar10_da_cutout.gradients.detach().cpu()
+activations_resnet18_gradcam_cifar10_da_cutout = resnet18_gradcam_cifar10_da_cutout.activations.detach().cpu()
 
 
 # Calculate the weights
-weights = gradients.mean(dim=(2, 3), keepdim=True)
+weights_resnet18_gradcam_cifar10 = gradients_resnet18_gradcam_cifar10.mean(dim=(2, 3), keepdim=True)
 
-weights_co = gradients_co.mean(dim=(2, 3), keepdim=True)
+weights_resnet18_gradcam_cifar10_cutout = gradients_resnet18_gradcam_cifar10_cutout.mean(dim=(2, 3), keepdim=True)
+
+weights_resnet18_gradcam_cifar10_da = gradients_resnet18_gradcam_cifar10_da.mean(dim=(2, 3), keepdim=True)
+
+weights_resnet18_gradcam_cifar10_da_cutout = gradients_resnet18_gradcam_cifar10_da_cutout.mean(dim=(2, 3), keepdim=True)
 
 # Calculate the weighted sum of activations (Grad-CAM)
-cam = (weights * activations).sum(dim=1, keepdim=True)
-cam = F.relu(cam)  # apply ReLU to the heatmap
-cam = F.interpolate(cam, size=(32, 32), mode='bilinear', align_corners=False)
-cam = cam.squeeze().numpy()
+cam_resnet18_gradcam_cifar10 = (weights_resnet18_gradcam_cifar10 * activations_resnet18_gradcam_cifar10).sum(dim=1, keepdim=True)
+cam_resnet18_gradcam_cifar10 = F.relu(cam_resnet18_gradcam_cifar10)  # apply ReLU to the heatmap
+cam_resnet18_gradcam_cifar10 = F.interpolate(cam_resnet18_gradcam_cifar10, size=(32, 32), mode='bilinear', align_corners=False)
+cam_resnet18_gradcam_cifar10 = cam_resnet18_gradcam_cifar10.squeeze().numpy()
 
-cam_co = (weights_co * activations_co).sum(dim=1, keepdim=True)
-cam_co = F.relu(cam_co)  # apply ReLU to the heatmap
-cam_co = F.interpolate(cam_co, size=(32, 32), mode='bilinear', align_corners=False)
-cam_co = cam_co.squeeze().numpy()
+cam_resnet18_gradcam_cifar10_cutout = (weights_resnet18_gradcam_cifar10_cutout * activations_resnet18_gradcam_cifar10_cutout).sum(dim=1, keepdim=True)
+cam_resnet18_gradcam_cifar10_cutout = F.relu(cam_resnet18_gradcam_cifar10_cutout)  # apply ReLU to the heatmap
+cam_resnet18_gradcam_cifar10_cutout = F.interpolate(cam_resnet18_gradcam_cifar10_cutout, size=(32, 32), mode='bilinear', align_corners=False)
+cam_resnet18_gradcam_cifar10_cutout = cam_resnet18_gradcam_cifar10_cutout.squeeze().numpy()
+
+cam_resnet18_gradcam_cifar10_da = (weights_resnet18_gradcam_cifar10_da * activations_resnet18_gradcam_cifar10_da).sum(dim=1, keepdim=True)
+cam_resnet18_gradcam_cifar10_da = F.relu(cam_resnet18_gradcam_cifar10_da)  # apply ReLU to the heatmap
+cam_resnet18_gradcam_cifar10_da = F.interpolate(cam_resnet18_gradcam_cifar10_da, size=(32, 32), mode='bilinear', align_corners=False)
+cam_resnet18_gradcam_cifar10_da = cam_resnet18_gradcam_cifar10_da.squeeze().numpy()
+
+cam_resnet18_gradcam_cifar10_da_cutout = (weights_resnet18_gradcam_cifar10_da_cutout * activations_resnet18_gradcam_cifar10_da_cutout).sum(dim=1, keepdim=True)
+cam_resnet18_gradcam_cifar10_da_cutout = F.relu(cam_resnet18_gradcam_cifar10_da_cutout)  # apply ReLU to the heatmap
+cam_resnet18_gradcam_cifar10_da_cutout = F.interpolate(cam_resnet18_gradcam_cifar10_da_cutout, size=(32, 32), mode='bilinear', align_corners=False)
+cam_resnet18_gradcam_cifar10_da_cutout = cam_resnet18_gradcam_cifar10_da_cutout.squeeze().numpy()
 
 
 # Normalize the heatmap
-cam -= cam.min()
-cam /= cam.max()
+cam_resnet18_gradcam_cifar10 -= cam_resnet18_gradcam_cifar10.min()
+cam_resnet18_gradcam_cifar10 /= cam_resnet18_gradcam_cifar10.max()
 
-cam_co -= cam_co.min()
-cam_co /= cam_co.max()
+cam_resnet18_gradcam_cifar10_cutout -= cam_resnet18_gradcam_cifar10_cutout.min()
+cam_resnet18_gradcam_cifar10_cutout /= cam_resnet18_gradcam_cifar10_cutout.max()
+
+cam_resnet18_gradcam_cifar10_da -= cam_resnet18_gradcam_cifar10_da.min()
+cam_resnet18_gradcam_cifar10_da /= cam_resnet18_gradcam_cifar10_da.max()
+
+cam_resnet18_gradcam_cifar10_da_cutout -= cam_resnet18_gradcam_cifar10_da_cutout.min()
+cam_resnet18_gradcam_cifar10_da_cutout /= cam_resnet18_gradcam_cifar10_da_cutout.max()
 
 # Since the images from the dataloader are normalized, you have to denormalize them before plotting
 mean = torch.tensor([0.485, 0.456, 0.406])
@@ -168,29 +272,44 @@ img = images.squeeze().detach().cpu() * std[..., None, None] + mean[..., None, N
 img = img.permute(1, 2, 0).numpy()
 
 # Superimpose the heatmap onto the original image
-heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
-heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
-superimposed_img = heatmap * 0.4 + img * 255
+heatmap_resnet18_gradcam_cifar10 = cv2.applyColorMap(np.uint8(255 * cam_resnet18_gradcam_cifar10), cv2.COLORMAP_JET)
+heatmap_resnet18_gradcam_cifar10 = cv2.cvtColor(heatmap_resnet18_gradcam_cifar10, cv2.COLOR_BGR2RGB)
+superimposed_img_resnet18_gradcam_cifar10 = heatmap_resnet18_gradcam_cifar10 * 0.4 + img * 255
 
-heatmap_co = cv2.applyColorMap(np.uint8(255 * cam_co), cv2.COLORMAP_JET)
-heatmap_co = cv2.cvtColor(heatmap_co, cv2.COLOR_BGR2RGB)
-superimposed_img_co = heatmap_co * 0.4 + img * 255
+heatmap_resnet18_gradcam_cifar10_cutout = cv2.applyColorMap(np.uint8(255 * cam_resnet18_gradcam_cifar10_cutout), cv2.COLORMAP_JET)
+heatmap_resnet18_gradcam_cifar10_cutout = cv2.cvtColor(heatmap_resnet18_gradcam_cifar10_cutout, cv2.COLOR_BGR2RGB)
+superimposed_img_resnet18_gradcam_cifar10_cutout = heatmap_resnet18_gradcam_cifar10_cutout * 0.4 + img * 255
+
+heatmap_resnet18_gradcam_cifar10_da = cv2.applyColorMap(np.uint8(255 * cam_resnet18_gradcam_cifar10_da), cv2.COLORMAP_JET)
+heatmap_resnet18_gradcam_cifar10_da = cv2.cvtColor(heatmap_resnet18_gradcam_cifar10_da, cv2.COLOR_BGR2RGB)
+superimposed_img_resnet18_gradcam_cifar10_da = heatmap_resnet18_gradcam_cifar10_da * 0.4 + img * 255
+
+heatmap_resnet18_gradcam_cifar10_da_cutout = cv2.applyColorMap(np.uint8(255 * cam_resnet18_gradcam_cifar10_da_cutout), cv2.COLORMAP_JET)
+heatmap_resnet18_gradcam_cifar10_da_cutout = cv2.cvtColor(heatmap_resnet18_gradcam_cifar10_da_cutout, cv2.COLOR_BGR2RGB)
+superimposed_img_resnet18_gradcam_cifar10_da_cutout = heatmap_resnet18_gradcam_cifar10_da_cutout * 0.4 + img * 255
 
 class_label = str(labels.item())
 
 # Display the original image and the Grad-CAM
-fig, ax = plt.subplots(nrows=1, ncols=3)
+fig, ax = plt.subplots(nrows=1, ncols=5)
 
 ax[0].imshow(img)
 ax[0].set_title('Original Image (Class: ' + cifar_classes[int(class_label)] + ')')
 ax[0].axis('off')
-ax[1].imshow(superimposed_img / 255)
-ax[1].set_title('Grad-CAM: ' + predicted_class)
+ax[1].imshow(superimposed_img_resnet18_gradcam_cifar10 / 255)
+ax[1].set_title('Grad-CAM: ' + predicted_class_resnet18_gradcam_cifar10)
 ax[1].axis('off')
-ax[2].imshow(superimposed_img_co / 255)
-ax[2].set_title('Grad-CAM with Cutout:'+  predicted_class_co)
+ax[2].imshow(superimposed_img_resnet18_gradcam_cifar10_cutout / 255)
+ax[2].set_title('Grad-CAM with Cutout:'+  predicted_class_resnet18_gradcam_cifar10)
 ax[2].axis('off')
+ax[3].imshow(superimposed_img_resnet18_gradcam_cifar10_da / 255)
+ax[3].set_title('Grad-CAM with Data Augmenntation: ' + predicted_class_resnet18_gradcam_cifar10_da)
+ax[3].axis('off')
+ax[4].imshow(superimposed_img_resnet18_gradcam_cifar10_da_cutout / 255)
+ax[4].set_title('Grad-CAM with DA annd Cutout:'+  predicted_class_resnet18_gradcam_cifar10_da_cutout)
+ax[4].axis('off')
 plt.show()
+
 
 ```
 :::
@@ -293,9 +412,6 @@ Visualize the image and the Grad-CAM heatmap
 
 ::: {.cell .code}
 ``` python
-import matplotlib.pyplot as plt
-import cv2
-
 # Load the original image
 img = cv2.imread(image_path)
 img = cv2.resize(img, (32, 32))

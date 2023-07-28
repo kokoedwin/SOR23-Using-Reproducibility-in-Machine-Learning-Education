@@ -65,10 +65,12 @@ Check Cuda GPU availability and set seed number
 ::: {.cell .code}
 ``` python
 cuda = torch.cuda.is_available()
+print(cuda)
 cudnn.benchmark = True  # Should make training should go faster for large models
 
 seed = 1
 torch.manual_seed(seed)
+np.random.seed(seed)
 ```
 :::
 
