@@ -3,9 +3,7 @@
 # 04. Grad-CAM
 :::
 
-::: {.cell .markdown}
-Note: for faster training, use Runtime > Change Runtime Type to run this notebook on a GPU.
-:::
+ 
 
 ::: {.cell .markdown}
 ###### What is Grad-CAM?
@@ -319,9 +317,12 @@ plt.show()
 
 ```
 :::
+::: {.cell .markdown}
+## 4.3 Implementation Grad-CAM for WideResNet Model
+:::
 
 ::: {.cell .markdown}
-### 3.1.1 WideResNet Code
+### WideResNet Code
 :::
 
 ::: {.cell .code}
@@ -329,17 +330,6 @@ plt.show()
 # WideResNet
 
 # From https://github.com/uoguelph-mlrg/Cutout/blob/master/model/wide_resnet.py
-
-
-# WideResNet
-
-# From https://github.com/xternalz/WideResNet-pytorch
-
-import math
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
 
 class BasicBlockWide(nn.Module):
     def __init__(self, in_planes, out_planes, stride, dropRate=0.0):
@@ -438,21 +428,214 @@ class WideResNet(nn.Module):
 :::
 
 
+SDSDSDS
 ::: {.cell .markdown}
-Now you  can try to load your image, preprocess it and convert it into a PyTorch tensor. 
-Choose an image that is in the CIFAR-10 classes (airplanes, cars, birds, cats, deer, dogs, frogs, horses, ships, and trucks).
-The preprocessing steps should be the same as the ones you used for training your model. 
-Let's say you have an image `image.jpg`:
+## 4.3.1 Implementation Grad-CAM for WideResNet Model for CIFAR-10
 :::
-
 
 ::: {.cell .code}
 ``` python
-from PIL import Image
-from torchvision import transforms
 
+wideresnet_gradcam_cifar10 = WideResNet(depth=28, num_classes=10, widen_factor=10, dropRate=0.3)
+wideresnet_gradcam_cifar10.load_state_dict(torch.load("checkpoints/wideresnet_cifar10.pt"))
+wideresnet_gradcam_cifar10.eval()
+
+wideresnet_gradcam_cifar10_cutout = WideResNet(depth=28, num_classes=10, widen_factor=10, dropRate=0.3)
+wideresnet_gradcam_cifar10_cutout.load_state_dict(torch.load("checkpoints/wideresnet_cifar10_cutout.pt"))
+wideresnet_gradcam_cifar10_cutout.eval()
+
+wideresnet_gradcam_cifar10_da = WideResNet(depth=28, num_classes=10, widen_factor=10, dropRate=0.3)
+wideresnet_gradcam_cifar10_da.load_state_dict(torch.load("checkpoints/wideresnet_cifar10_da.pt"))
+wideresnet_gradcam_cifar10_da.eval()
+
+wideresnet_gradcam_cifar10_da_cutout = WideResNet(depth=28, num_classes=10, widen_factor=10, dropRate=0.3)
+wideresnet_gradcam_cifar10_da_cutout.load_state_dict(torch.load("checkpoints/wideresnet_cifar10_da_cutout.pt"))
+wideresnet_gradcam_cifar10_da_cutout.eval()
+```
+:::
+
+::: {.cell .markdown}
+Let's try to see the result from the testloader of CIFAR-10 dataset
+:::
+
+::: {.cell .code}
+``` python
+import torchvision
+
+transform_cifar10 = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+testset_cifar10 = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_cifar10)
+testloader_cifar10 = torch.utils.data.DataLoader(testset_cifar10, batch_size=1, shuffle=True, num_workers=2)
+
+```
+:::
+
+::: {.cell .code}
+``` python
+cifar10_classes = [
+    "Airplane", "Automobile", "Bird", "Cat", "Deer",
+    "Dog", "Frog", "Horse", "Ship", "Truck"
+]
+```
+:::
+
+::: {.cell .code}
+``` python
+# Get a batch from the testloader
+images, labels = next(iter(testloader_cifar10))
+input_tensor = images  # As your batch_size is 1, you will have a single image here
+
+# Forward pass
+wideresnet_gradcam_cifar10.zero_grad()
+output_wideresnet_gradcam_cifar10 = wideresnet_gradcam_cifar10(input_tensor)
+
+wideresnet_gradcam_cifar10_cutout.zero_grad()
+output_wideresnet_gradcam_cifar10_cutout = wideresnet_gradcam_cifar10_cutout(input_tensor)
+
+wideresnet_gradcam_cifar10_da.zero_grad()
+output_wideresnet_gradcam_cifar10_da = wideresnet_gradcam_cifar10_da(input_tensor)
+
+wideresnet_gradcam_cifar10_da_cutout.zero_grad()
+output_wideresnet_gradcam_cifar10_da_cutout = wideresnet_gradcam_cifar10_da_cutout(input_tensor)
+
+# Get the index of the max log-probability
+target_wideresnet_gradcam_cifar10 = output_wideresnet_gradcam_cifar10.argmax(1)
+output_wideresnet_gradcam_cifar10.max().backward()
+
+target_wideresnet_gradcam_cifar10_cutout = output_wideresnet_gradcam_cifar10_cutout.argmax(1)
+output_wideresnet_gradcam_cifar10_cutout.max().backward()
+
+target_wideresnet_gradcam_cifar10_da = output_wideresnet_gradcam_cifar10_da.argmax(1)
+output_wideresnet_gradcam_cifar10_da.max().backward()
+
+target_wideresnet_gradcam_cifar10_da_cutout = output_wideresnet_gradcam_cifar10_da_cutout.argmax(1)
+output_wideresnet_gradcam_cifar10_da_cutout.max().backward()
+
+# Map the predicted class indices to the class labels
+predicted_class_wideresnet_gradcam_cifar10 = cifar_classes[target_wideresnet_gradcam_cifar10.item()]
+predicted_class_wideresnet_gradcam_cifar10 = cifar_classes[target_wideresnet_gradcam_cifar10_cutout.item()]
+predicted_class_wideresnet_gradcam_cifar10_da = cifar_classes[target_wideresnet_gradcam_cifar10_da.item()]
+predicted_class_wideresnet_gradcam_cifar10_da_cutout = cifar_classes[target_wideresnet_gradcam_cifar10_da_cutout.item()]
+
+
+# Get the gradients and activations
+gradients_wideresnet_gradcam_cifar10 = wideresnet_gradcam_cifar10.gradients.detach().cpu()
+activations_wideresnet_gradcam_cifar10 = wideresnet_gradcam_cifar10.activations.detach().cpu()
+
+gradients_wideresnet_gradcam_cifar10_cutout = wideresnet_gradcam_cifar10_cutout.gradients.detach().cpu()
+activations_wideresnet_gradcam_cifar10_cutout = wideresnet_gradcam_cifar10_cutout.activations.detach().cpu()
+
+gradients_wideresnet_gradcam_cifar10_da = wideresnet_gradcam_cifar10_da.gradients.detach().cpu()
+activations_wideresnet_gradcam_cifar10_da = wideresnet_gradcam_cifar10_da.activations.detach().cpu()
+
+gradients_wideresnet_gradcam_cifar10_da_cutout = wideresnet_gradcam_cifar10_da_cutout.gradients.detach().cpu()
+activations_wideresnet_gradcam_cifar10_da_cutout = wideresnet_gradcam_cifar10_da_cutout.activations.detach().cpu()
+
+
+# Calculate the weights
+weights_wideresnet_gradcam_cifar10 = gradients_wideresnet_gradcam_cifar10.mean(dim=(2, 3), keepdim=True)
+
+weights_wideresnet_gradcam_cifar10_cutout = gradients_wideresnet_gradcam_cifar10_cutout.mean(dim=(2, 3), keepdim=True)
+
+weights_wideresnet_gradcam_cifar10_da = gradients_wideresnet_gradcam_cifar10_da.mean(dim=(2, 3), keepdim=True)
+
+weights_wideresnet_gradcam_cifar10_da_cutout = gradients_wideresnet_gradcam_cifar10_da_cutout.mean(dim=(2, 3), keepdim=True)
+
+# Calculate the weighted sum of activations (Grad-CAM)
+cam_wideresnet_gradcam_cifar10 = (weights_wideresnet_gradcam_cifar10 * activations_wideresnet_gradcam_cifar10).sum(dim=1, keepdim=True)
+cam_wideresnet_gradcam_cifar10 = F.relu(cam_wideresnet_gradcam_cifar10)  # apply ReLU to the heatmap
+cam_wideresnet_gradcam_cifar10 = F.interpolate(cam_wideresnet_gradcam_cifar10, size=(32, 32), mode='bilinear', align_corners=False)
+cam_wideresnet_gradcam_cifar10 = cam_wideresnet_gradcam_cifar10.squeeze().numpy()
+
+cam_wideresnet_gradcam_cifar10_cutout = (weights_wideresnet_gradcam_cifar10_cutout * activations_wideresnet_gradcam_cifar10_cutout).sum(dim=1, keepdim=True)
+cam_wideresnet_gradcam_cifar10_cutout = F.relu(cam_wideresnet_gradcam_cifar10_cutout)  # apply ReLU to the heatmap
+cam_wideresnet_gradcam_cifar10_cutout = F.interpolate(cam_wideresnet_gradcam_cifar10_cutout, size=(32, 32), mode='bilinear', align_corners=False)
+cam_wideresnet_gradcam_cifar10_cutout = cam_wideresnet_gradcam_cifar10_cutout.squeeze().numpy()
+
+cam_wideresnet_gradcam_cifar10_da = (weights_wideresnet_gradcam_cifar10_da * activations_wideresnet_gradcam_cifar10_da).sum(dim=1, keepdim=True)
+cam_wideresnet_gradcam_cifar10_da = F.relu(cam_wideresnet_gradcam_cifar10_da)  # apply ReLU to the heatmap
+cam_wideresnet_gradcam_cifar10_da = F.interpolate(cam_wideresnet_gradcam_cifar10_da, size=(32, 32), mode='bilinear', align_corners=False)
+cam_wideresnet_gradcam_cifar10_da = cam_wideresnet_gradcam_cifar10_da.squeeze().numpy()
+
+cam_wideresnet_gradcam_cifar10_da_cutout = (weights_wideresnet_gradcam_cifar10_da_cutout * activations_wideresnet_gradcam_cifar10_da_cutout).sum(dim=1, keepdim=True)
+cam_wideresnet_gradcam_cifar10_da_cutout = F.relu(cam_wideresnet_gradcam_cifar10_da_cutout)  # apply ReLU to the heatmap
+cam_wideresnet_gradcam_cifar10_da_cutout = F.interpolate(cam_wideresnet_gradcam_cifar10_da_cutout, size=(32, 32), mode='bilinear', align_corners=False)
+cam_wideresnet_gradcam_cifar10_da_cutout = cam_wideresnet_gradcam_cifar10_da_cutout.squeeze().numpy()
+
+
+# Normalize the heatmap
+cam_wideresnet_gradcam_cifar10 -= cam_wideresnet_gradcam_cifar10.min()
+cam_wideresnet_gradcam_cifar10 /= cam_wideresnet_gradcam_cifar10.max()
+
+cam_wideresnet_gradcam_cifar10_cutout -= cam_wideresnet_gradcam_cifar10_cutout.min()
+cam_wideresnet_gradcam_cifar10_cutout /= cam_wideresnet_gradcam_cifar10_cutout.max()
+
+cam_wideresnet_gradcam_cifar10_da -= cam_wideresnet_gradcam_cifar10_da.min()
+cam_wideresnet_gradcam_cifar10_da /= cam_wideresnet_gradcam_cifar10_da.max()
+
+cam_wideresnet_gradcam_cifar10_da_cutout -= cam_wideresnet_gradcam_cifar10_da_cutout.min()
+cam_wideresnet_gradcam_cifar10_da_cutout /= cam_wideresnet_gradcam_cifar10_da_cutout.max()
+
+# Since the images from the dataloader are normalized, you have to denormalize them before plotting
+mean = torch.tensor([0.485, 0.456, 0.406])
+std = torch.tensor([0.229, 0.224, 0.225])
+img = images.squeeze().detach().cpu() * std[..., None, None] + mean[..., None, None]
+img = img.permute(1, 2, 0).numpy()
+
+# Superimpose the heatmap onto the original image
+heatmap_wideresnet_gradcam_cifar10 = cv2.applyColorMap(np.uint8(255 * cam_wideresnet_gradcam_cifar10), cv2.COLORMAP_JET)
+heatmap_wideresnet_gradcam_cifar10 = cv2.cvtColor(heatmap_wideresnet_gradcam_cifar10, cv2.COLOR_BGR2RGB)
+superimposed_img_wideresnet_gradcam_cifar10 = heatmap_wideresnet_gradcam_cifar10 * 0.4 + img * 255
+
+heatmap_wideresnet_gradcam_cifar10_cutout = cv2.applyColorMap(np.uint8(255 * cam_wideresnet_gradcam_cifar10_cutout), cv2.COLORMAP_JET)
+heatmap_wideresnet_gradcam_cifar10_cutout = cv2.cvtColor(heatmap_wideresnet_gradcam_cifar10_cutout, cv2.COLOR_BGR2RGB)
+superimposed_img_wideresnet_gradcam_cifar10_cutout = heatmap_wideresnet_gradcam_cifar10_cutout * 0.4 + img * 255
+
+heatmap_wideresnet_gradcam_cifar10_da = cv2.applyColorMap(np.uint8(255 * cam_wideresnet_gradcam_cifar10_da), cv2.COLORMAP_JET)
+heatmap_wideresnet_gradcam_cifar10_da = cv2.cvtColor(heatmap_wideresnet_gradcam_cifar10_da, cv2.COLOR_BGR2RGB)
+superimposed_img_wideresnet_gradcam_cifar10_da = heatmap_wideresnet_gradcam_cifar10_da * 0.4 + img * 255
+
+heatmap_wideresnet_gradcam_cifar10_da_cutout = cv2.applyColorMap(np.uint8(255 * cam_wideresnet_gradcam_cifar10_da_cutout), cv2.COLORMAP_JET)
+heatmap_wideresnet_gradcam_cifar10_da_cutout = cv2.cvtColor(heatmap_wideresnet_gradcam_cifar10_da_cutout, cv2.COLOR_BGR2RGB)
+superimposed_img_wideresnet_gradcam_cifar10_da_cutout = heatmap_wideresnet_gradcam_cifar10_da_cutout * 0.4 + img * 255
+
+class_label = str(labels.item())
+
+# Display the original image and the Grad-CAM
+fig, ax = plt.subplots(nrows=1, ncols=5)
+
+ax[0].imshow(img)
+ax[0].set_title('Original Image (Class: ' + cifar_classes[int(class_label)] + ')')
+ax[0].axis('off')
+ax[1].imshow(superimposed_img_wideresnet_gradcam_cifar10 / 255)
+ax[1].set_title('Grad-CAM: ' + predicted_class_wideresnet_gradcam_cifar10)
+ax[1].axis('off')
+ax[2].imshow(superimposed_img_wideresnet_gradcam_cifar10_cutout / 255)
+ax[2].set_title('Grad-CAM with Cutout:'+  predicted_class_wideresnet_gradcam_cifar10)
+ax[2].axis('off')
+ax[3].imshow(superimposed_img_wideresnet_gradcam_cifar10_da / 255)
+ax[3].set_title('Grad-CAM with Data Augmenntation: ' + predicted_class_wideresnet_gradcam_cifar10_da)
+ax[3].axis('off')
+ax[4].imshow(superimposed_img_wideresnet_gradcam_cifar10_da_cutout / 255)
+ax[4].set_title('Grad-CAM with DA annd Cutout:'+  predicted_class_wideresnet_gradcam_cifar10_da_cutout)
+ax[4].axis('off')
+plt.show()
+```
+:::
+
+
+::: {.cell .markdown}
+Now you can try to load your image, preprocess it and convert it into a PyTorch tensor. Choose an image that is in the CIFAR-10 classes (airplanes, cars, birds, cats, deer, dogs, frogs, horses, ships, and trucks). The preprocessing steps should be the same as the ones you used for training your model. Let’s say you have an image `image.jpg`:
+:::
+
+::: {.cell .code}
+```python
 # Load the image
-image_path = "image.jpg"
+image_path = "dog.jpeg"
 image = Image.open(image_path)
 
 # Define the transformations: resize, to tensor, normalize (replace the mean and std with values you used for training)
@@ -465,16 +648,16 @@ preprocess = transforms.Compose([
 # Preprocess the image
 input_tensor = preprocess(image)
 input_tensor = input_tensor.unsqueeze(0)  # add batch dimension.  C,H,W => B,C,H,W
-
 ```
 :::
+
 
 ::: {.cell .markdown}
 Apply Grad-CAM
 :::
 
 ::: {.cell .code}
-``` python
+```python
 # Forward pass
 model.zero_grad()
 output = model(input_tensor)
@@ -518,27 +701,27 @@ cam /= cam.max()
 
 cam_co -= cam_co.min()
 cam_co /= cam_co.max()
-
 ```
 :::
+
 ::: {.cell .markdown}
 Visualize the image and the Grad-CAM heatmap
 :::
 
-
 ::: {.cell .code}
-``` python
+```python
 # Load the original image
 img = cv2.imread(image_path)
 img = cv2.resize(img, (32, 32))
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
 
 # Superimpose the heatmap onto the original image
 heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
 heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
 superimposed_img = heatmap * 0.4 + img
 
-# Superimpose the heatmap onto the original image with cutout
+
 heatmap_co = cv2.applyColorMap(np.uint8(255 * cam_co), cv2.COLORMAP_JET)
 heatmap_co = cv2.cvtColor(heatmap_co, cv2.COLOR_BGR2RGB)
 superimposed_img_co = heatmap_co * 0.4 + img
@@ -555,6 +738,5 @@ ax[2].imshow(superimposed_img_co / 255)
 ax[2].set_title('Grad-CAM with Cutout')
 ax[2].axis("off")
 plt.show()
-
 ```
 :::
