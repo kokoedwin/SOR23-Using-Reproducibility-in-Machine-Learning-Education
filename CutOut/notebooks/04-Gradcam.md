@@ -199,10 +199,10 @@ target_resnet18_gradcam_cifar10_da_cutout = output_resnet18_gradcam_cifar10_da_c
 output_resnet18_gradcam_cifar10_da_cutout.max().backward()
 
 # Map the predicted class indices to the class labels
-predicted_class_resnet18_gradcam_cifar10 = cifar_classes[target_resnet18_gradcam_cifar10.item()]
-predicted_class_resnet18_gradcam_cifar10 = cifar_classes[target_resnet18_gradcam_cifar10_cutout.item()]
-predicted_class_resnet18_gradcam_cifar10_da = cifar_classes[target_resnet18_gradcam_cifar10_da.item()]
-predicted_class_resnet18_gradcam_cifar10_da_cutout = cifar_classes[target_resnet18_gradcam_cifar10_da_cutout.item()]
+predicted_class_resnet18_gradcam_cifar10 = cifar10_classes[target_resnet18_gradcam_cifar10.item()]
+predicted_class_resnet18_gradcam_cifar10 = cifar10_classes[target_resnet18_gradcam_cifar10_cutout.item()]
+predicted_class_resnet18_gradcam_cifar10_da = cifar10_classes[target_resnet18_gradcam_cifar10_da.item()]
+predicted_class_resnet18_gradcam_cifar10_da_cutout = cifar10_classes[target_resnet18_gradcam_cifar10_da_cutout.item()]
 
 
 # Get the gradients and activations
@@ -292,20 +292,22 @@ class_label = str(labels.item())
 fig, ax = plt.subplots(nrows=1, ncols=5)
 
 ax[0].imshow(img)
-ax[0].set_title('Original Image (Class: ' + cifar_classes[int(class_label)] + ')')
+ax[0].set_title('(Class: ' + cifar10_classes[int(class_label)] + ')')
 ax[0].axis('off')
 ax[1].imshow(superimposed_img_resnet18_gradcam_cifar10 / 255)
-ax[1].set_title('Grad-CAM: ' + predicted_class_resnet18_gradcam_cifar10)
+ax[1].set_title(predicted_class_resnet18_gradcam_cifar10)
 ax[1].axis('off')
 ax[2].imshow(superimposed_img_resnet18_gradcam_cifar10_cutout / 255)
-ax[2].set_title('Grad-CAM with Cutout:'+  predicted_class_resnet18_gradcam_cifar10)
+ax[2].set_title(predicted_class_resnet18_gradcam_cifar10)
 ax[2].axis('off')
 ax[3].imshow(superimposed_img_resnet18_gradcam_cifar10_da / 255)
-ax[3].set_title('Grad-CAM with Data Augmenntation: ' + predicted_class_resnet18_gradcam_cifar10_da)
+ax[3].set_title(predicted_class_resnet18_gradcam_cifar10_da)
 ax[3].axis('off')
 ax[4].imshow(superimposed_img_resnet18_gradcam_cifar10_da_cutout / 255)
-ax[4].set_title('Grad-CAM with DA annd Cutout:'+  predicted_class_resnet18_gradcam_cifar10_da_cutout)
+ax[4].set_title(predicted_class_resnet18_gradcam_cifar10_da_cutout)
 ax[4].axis('off')
+
+fig.suptitle("Original Image - Grad-CAM -  GC with CO - GC with DA - GC with CO&Da")
 plt.show()
 
 
@@ -516,10 +518,10 @@ target_wideresnet_gradcam_cifar10_da_cutout = output_wideresnet_gradcam_cifar10_
 output_wideresnet_gradcam_cifar10_da_cutout.max().backward()
 
 # Map the predicted class indices to the class labels
-predicted_class_wideresnet_gradcam_cifar10 = cifar_classes[target_wideresnet_gradcam_cifar10.item()]
-predicted_class_wideresnet_gradcam_cifar10 = cifar_classes[target_wideresnet_gradcam_cifar10_cutout.item()]
-predicted_class_wideresnet_gradcam_cifar10_da = cifar_classes[target_wideresnet_gradcam_cifar10_da.item()]
-predicted_class_wideresnet_gradcam_cifar10_da_cutout = cifar_classes[target_wideresnet_gradcam_cifar10_da_cutout.item()]
+predicted_class_wideresnet_gradcam_cifar10 = cifar10_classes[target_wideresnet_gradcam_cifar10.item()]
+predicted_class_wideresnet_gradcam_cifar10 = cifar10_classes[target_wideresnet_gradcam_cifar10_cutout.item()]
+predicted_class_wideresnet_gradcam_cifar10_da = cifar10_classes[target_wideresnet_gradcam_cifar10_da.item()]
+predicted_class_wideresnet_gradcam_cifar10_da_cutout = cifar10_classes[target_wideresnet_gradcam_cifar10_da_cutout.item()]
 
 
 # Get the gradients and activations
@@ -606,23 +608,25 @@ superimposed_img_wideresnet_gradcam_cifar10_da_cutout = heatmap_wideresnet_gradc
 class_label = str(labels.item())
 
 # Display the original image and the Grad-CAM
-fig, ax = plt.subplots(nrows=1, ncols=5)
+fig, ax = plt.subplots(nrows=1, ncols=5, constrained_layout=True)
 
 ax[0].imshow(img)
-ax[0].set_title('Original Image (Class: ' + cifar_classes[int(class_label)] + ')')
+ax[0].set_title('(Class: ' + cifar10_classes[int(class_label)] + ')')
 ax[0].axis('off')
 ax[1].imshow(superimposed_img_wideresnet_gradcam_cifar10 / 255)
-ax[1].set_title('Grad-CAM: ' + predicted_class_wideresnet_gradcam_cifar10)
+ax[1].set_title('Pred: ' + predicted_class_wideresnet_gradcam_cifar10)
 ax[1].axis('off')
 ax[2].imshow(superimposed_img_wideresnet_gradcam_cifar10_cutout / 255)
-ax[2].set_title('Grad-CAM with Cutout:'+  predicted_class_wideresnet_gradcam_cifar10)
+ax[2].set_title(predicted_class_wideresnet_gradcam_cifar10)
 ax[2].axis('off')
 ax[3].imshow(superimposed_img_wideresnet_gradcam_cifar10_da / 255)
-ax[3].set_title('Grad-CAM with Data Augmenntation: ' + predicted_class_wideresnet_gradcam_cifar10_da)
+ax[3].set_title(predicted_class_wideresnet_gradcam_cifar10_da)
 ax[3].axis('off')
 ax[4].imshow(superimposed_img_wideresnet_gradcam_cifar10_da_cutout / 255)
-ax[4].set_title('Grad-CAM with DA annd Cutout:'+  predicted_class_wideresnet_gradcam_cifar10_da_cutout)
+ax[4].set_title(predicted_class_wideresnet_gradcam_cifar10_da_cutout)
 ax[4].axis('off')
+
+fig.suptitle("Original Image - Grad-CAM -  GC with CO - GC with DA - GC with CO&Da")
 plt.show()
 ```
 :::
