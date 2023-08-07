@@ -60,7 +60,15 @@ np.random.seed(seed)
 :::
 
 ::: {.cell .markdown}
-Check Cuda GPU availability and set seed number
+If you are using Google Colab, here's a step-by-step how to connect with your google drive:
+
+1. On the left sidebar of the Colab notebook interface, you will see a folder icon with the Google Drive logo. Click on this folder icon to open the file explorer.
+
+2. If you haven't connected your Google Drive to Colab yet, it will prompt you to do so. Click the "Mount Drive" button to connect your Google Drive to Colab.
+
+3. Once your Google Drive is mounted, you can use the file explorer to navigate to the file you want to open. Click on the folders to explore the contents of your Google Drive.
+
+4. When you find the file you want to open, click the three dots next to the name of the file in the file explorer. From the options that appear, choose "Copy path." This action will copy the full path of the file to your clipboard. Paste the copy path into the 'current_path' below.
 :::
 
 ::: {.cell .code}
