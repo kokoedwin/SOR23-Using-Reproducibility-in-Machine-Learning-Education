@@ -60,11 +60,82 @@ np.random.seed(seed)
 :::
 
 ::: {.cell .markdown}
+Check Cuda GPU availability and set seed number
+:::
+
+::: {.cell .code}
+``` python
+current_path ="./"
+```
+:::
+
+::: {.cell .markdown}
 ## 4.2 Implementation Grad-CAM for ResNet Model
 :::
 
 ::: {.cell .code}
 ``` python
+
+# ResNet
+# From https://github.com/uoguelph-mlrg/Cutout/blob/master/model/resnet.py
+
+def conv3x3(in_planes, out_planes, stride=1):
+    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
+
+
+class BasicBlock(nn.Module):
+    expansion = 1
+
+    def __init__(self, in_planes, planes, stride=1):
+        super(BasicBlock, self).__init__()
+        self.conv1 = conv3x3(in_planes, planes, stride)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = conv3x3(planes, planes)
+        self.bn2 = nn.BatchNorm2d(planes)
+
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_planes != self.expansion*planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(self.expansion*planes)
+            )
+
+    def forward(self, x):
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.bn2(self.conv2(out))
+        out += self.shortcut(x)
+        out = F.relu(out)
+        return out
+
+
+class Bottleneck(nn.Module):
+    expansion = 4
+
+    def __init__(self, in_planes, planes, stride=1):
+        super(Bottleneck, self).__init__()
+        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(planes)
+        self.conv3 = nn.Conv2d(planes, self.expansion*planes, kernel_size=1, bias=False)
+        self.bn3 = nn.BatchNorm2d(self.expansion*planes)
+
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_planes != self.expansion*planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(self.expansion*planes)
+            )
+
+    def forward(self, x):
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = F.relu(self.bn2(self.conv2(out)))
+        out = self.bn3(self.conv3(out))
+        out += self.shortcut(x)
+        out = F.relu(out)
+        return out
+
+
 class ResNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10):
         super(ResNet, self).__init__()
@@ -109,6 +180,8 @@ class ResNet(nn.Module):
         out = self.linear(out)
         return out
 
+def ResNet18(num_classes=10):
+    return ResNet(BasicBlock, [2,2,2,2], num_classes)
 ```
 :::
 
@@ -120,19 +193,19 @@ class ResNet(nn.Module):
 ``` python
 
 resnet18_gradcam_cifar10 = ResNet18(num_classes=10)
-resnet18_gradcam_cifar10.load_state_dict(torch.load("checkpoints/resnet18_cifar10.pt"))
+resnet18_gradcam_cifar10.load_state_dict(torch.load(current_path + "checkpoints/resnet18_cifar10.pt"))
 resnet18_gradcam_cifar10.eval()
 
 resnet18_gradcam_cifar10_cutout = ResNet18(num_classes=10)
-resnet18_gradcam_cifar10_cutout.load_state_dict(torch.load("checkpoints/resnet18_cifar10_cutout.pt"))
+resnet18_gradcam_cifar10_cutout.load_state_dict(torch.load(current_path + "checkpoints/resnet18_cifar10_cutout.pt"))
 resnet18_gradcam_cifar10_cutout.eval()
 
 resnet18_gradcam_cifar10_da = ResNet18(num_classes=10)
-resnet18_gradcam_cifar10_da.load_state_dict(torch.load("checkpoints/resnet18_cifar10_da.pt"))
+resnet18_gradcam_cifar10_da.load_state_dict(torch.load(current_path + "checkpoints/resnet18_cifar10_da.pt"))
 resnet18_gradcam_cifar10_da.eval()
 
 resnet18_gradcam_cifar10_da_cutout = ResNet18(num_classes=10)
-resnet18_gradcam_cifar10_da_cutout.load_state_dict(torch.load("checkpoints/resnet18_cifar10_da_cutout.pt"))
+resnet18_gradcam_cifar10_da_cutout.load_state_dict(torch.load(current_path + "checkpoints/resnet18_cifar10_da_cutout.pt"))
 resnet18_gradcam_cifar10_da_cutout.eval()
 ```
 :::
@@ -430,7 +503,6 @@ class WideResNet(nn.Module):
 :::
 
 
-SDSDSDS
 ::: {.cell .markdown}
 ## 4.3.1 Implementation Grad-CAM for WideResNet Model for CIFAR-10
 :::
@@ -439,19 +511,19 @@ SDSDSDS
 ``` python
 
 wideresnet_gradcam_cifar10 = WideResNet(depth=28, num_classes=10, widen_factor=10, dropRate=0.3)
-wideresnet_gradcam_cifar10.load_state_dict(torch.load("checkpoints/wideresnet_cifar10.pt"))
+wideresnet_gradcam_cifar10.load_state_dict(torch.load(current_path + "checkpoints/wideresnet_cifar10.pt"))
 wideresnet_gradcam_cifar10.eval()
 
 wideresnet_gradcam_cifar10_cutout = WideResNet(depth=28, num_classes=10, widen_factor=10, dropRate=0.3)
-wideresnet_gradcam_cifar10_cutout.load_state_dict(torch.load("checkpoints/wideresnet_cifar10_cutout.pt"))
+wideresnet_gradcam_cifar10_cutout.load_state_dict(torch.load(current_path + "checkpoints/wideresnet_cifar10_cutout.pt"))
 wideresnet_gradcam_cifar10_cutout.eval()
 
 wideresnet_gradcam_cifar10_da = WideResNet(depth=28, num_classes=10, widen_factor=10, dropRate=0.3)
-wideresnet_gradcam_cifar10_da.load_state_dict(torch.load("checkpoints/wideresnet_cifar10_da.pt"))
+wideresnet_gradcam_cifar10_da.load_state_dict(torch.load(current_path + "checkpoints/wideresnet_cifar10_da.pt"))
 wideresnet_gradcam_cifar10_da.eval()
 
 wideresnet_gradcam_cifar10_da_cutout = WideResNet(depth=28, num_classes=10, widen_factor=10, dropRate=0.3)
-wideresnet_gradcam_cifar10_da_cutout.load_state_dict(torch.load("checkpoints/wideresnet_cifar10_da_cutout.pt"))
+wideresnet_gradcam_cifar10_da_cutout.load_state_dict(torch.load(current_path + "checkpoints/wideresnet_cifar10_da_cutout.pt"))
 wideresnet_gradcam_cifar10_da_cutout.eval()
 ```
 :::

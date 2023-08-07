@@ -74,6 +74,24 @@ np.random.seed(seed)
 ```
 :::
 
+::: {.cell .markdown}
+If you are using Google Colab, here's a step-by-step how to connect with your google drive:
+
+1. On the left sidebar of the Colab notebook interface, you will see a folder icon with the Google Drive logo. Click on this folder icon to open the file explorer.
+
+2. If you haven't connected your Google Drive to Colab yet, it will prompt you to do so. Click the "Mount Drive" button to connect your Google Drive to Colab.
+
+3. Once your Google Drive is mounted, you can use the file explorer to navigate to the file you want to open. Click on the folders to explore the contents of your Google Drive.
+
+4. When you find the file you want to open, click the three dots next to the name of the file in the file explorer. From the options that appear, choose "Copy path." This action will copy the full path of the file to your clipboard. Paste the copy path into the 'current_path' below.
+:::
+
+::: {.cell .code}
+``` python
+current_path ="./"
+```
+:::
+
 
 ::: {.cell .markdown}
 This code block is used for creating a directory named 'checkpoints'. This directory will be used to store the weights of our models, which are crucial for both preserving our progress during model training and for future use of the trained models.
@@ -84,8 +102,8 @@ Creating such a directory and regularly saving model weights is a good practice 
 ::: {.cell .code}
 ``` python
 # Create file names 'checkpoints' to save the weight of the models
-if not os.path.exists('./checkpoints'):
-    os.makedirs('./checkpoints')
+if not os.path.exists(current_path + 'checkpoints'):
+    os.makedirs(current_path + 'checkpoints')
 ```
 :::
 
@@ -263,12 +281,12 @@ Import the dataset of CIFAR-10
 
 ::: {.cell .code}
 ``` python
-train_dataset_cifar10 = datasets.CIFAR10(root='data/',
+train_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
                                      train=True,
                                      transform=train_transform_cifar10,
                                      download=True)
 
-test_dataset_cifar10 = datasets.CIFAR10(root='data/',
+test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
                                     train=False,
                                     transform=test_transform_cifar10,
                                     download=True)
@@ -372,7 +390,7 @@ for epoch in range(epochs):
     scheduler_resnet18_cifar10.step()    
 
     
-torch.save(resnet18_cifar10.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10 + '.pt')
+torch.save(resnet18_cifar10.state_dict(), current_path + 'checkpoints/' + file_name_resnet18_cifar10 + '.pt')
 
 
 final_test_acc_resnet18_cifar10 = (1 - test(test_loader_cifar10, resnet18_cifar10))*100
@@ -469,12 +487,12 @@ Import the dataset of CIFAR-10
 
 ::: {.cell .code}
 ``` python
-train_dataset_cifar10_cutout = datasets.CIFAR10(root='data/',
+train_dataset_cifar10_cutout = datasets.CIFAR10(root=current_path + 'data/',
                                      train=True,
                                      transform=train_transform_cifar10_cutout,
                                      download=True)
 
-test_dataset_cifar10 = datasets.CIFAR10(root='data/',
+test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
                                     train=False,
                                     transform=test_transform_cifar10,
                                     download=True)
@@ -575,7 +593,7 @@ for epoch in range(epochs):
     test_acc_cifar10 = test(test_loader_cifar10,resnet18_cifar10_cutout)
     tqdm.write('test_acc: %.3f' % (test_acc_cifar10))
     scheduler_resnet18_cifar10_cutout.step()     
-torch.save(resnet18_cifar10_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10_cutout + '.pt')
+torch.save(resnet18_cifar10_cutout.state_dict(), current_path + 'checkpoints/' + file_name_resnet18_cifar10_cutout + '.pt')
 
 
 final_test_acc_resnet18_cifar10_cutout = (1 - test(test_loader_cifar10,resnet18_cifar10_cutout))*100
@@ -618,12 +636,12 @@ Import the dataset of CIFAR-10
 
 ::: {.cell .code}
 ``` python
-train_dataset_cifar10_da = datasets.CIFAR10(root='data/',
+train_dataset_cifar10_da = datasets.CIFAR10(root=current_path + 'data/',
                                      train=True,
                                      transform=train_transform_cifar10_da,
                                      download=True)
 
-test_dataset_cifar10 = datasets.CIFAR10(root='data/',
+test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
                                     train=False,
                                     transform=test_transform_cifar10,
                                     download=True)
@@ -724,7 +742,7 @@ for epoch in range(epochs):
     test_acc_resnet18_cifar10_da = test(test_loader_cifar10,resnet18_cifar10_da)
     tqdm.write('test_acc: %.3f' % (test_acc_resnet18_cifar10_da))
     scheduler_resnet18_cifar10_da.step()     
-torch.save(resnet18_cifar10_da.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10_da + '.pt')
+torch.save(resnet18_cifar10_da.state_dict(), current_path + 'checkpoints/' + file_name_resnet18_cifar10_da + '.pt')
 
 
 final_test_acc_resnet18_cifar10_da = (1 - test(test_loader_cifar10,resnet18_cifar10_da))*100
@@ -771,12 +789,12 @@ Import the dataset of CIFAR-10
 
 ::: {.cell .code}
 ``` python
-train_dataset_cifar10_da_co = datasets.CIFAR10(root='data/',
+train_dataset_cifar10_da_co = datasets.CIFAR10(root=current_path + 'data/',
                                      train=True,
                                      transform=train_transform_cifar10_da_co,
                                      download=True)
 
-test_dataset_cifar10 = datasets.CIFAR10(root='data/',
+test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
                                     train=False,
                                     transform=test_transform_cifar10,
                                     download=True)
@@ -877,7 +895,7 @@ for epoch in range(epochs):
     test_acc_cifar10_da_cutout = test(test_loader_cifar10,resnet18_cifar10_da_cutout)
     tqdm.write('test_acc: %.3f' % (test_acc_cifar10_da_cutout))
     scheduler_cifar10_da_cutout.step()     
-torch.save(resnet18_cifar10_da_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar10_da_cutout + '.pt')
+torch.save(resnet18_cifar10_da_cutout.state_dict(), current_path + 'checkpoints/' + file_name_resnet18_cifar10_da_cutout + '.pt')
 
 
 final_test_acc_resnet18_cifar10_da_cutout = (1 - test(test_loader_cifar10,resnet18_cifar10_da_cutout))*100
@@ -931,12 +949,12 @@ Import the dataset of CIFAR-100
 
 ::: {.cell .code}
 ``` python
-train_dataset_cifar100 = datasets.CIFAR100(root='data/',
+train_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
                                      train=True,
                                      transform=train_transform_cifar100,
                                      download=True)
 
-test_dataset_cifar100 = datasets.CIFAR100(root='data/',
+test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
                                     train=False,
                                     transform=test_transform_cifar100,
                                     download=True)
@@ -1039,7 +1057,7 @@ for epoch in range(epochs):
 
     scheduler_resnet18_cifar100.step()   
     
-torch.save(resnet18_cifar100.state_dict(), 'checkpoints/' + file_name_resnet18_cifar100 + '.pt')
+torch.save(resnet18_cifar100.state_dict(), current_path + 'checkpoints/' + file_name_resnet18_cifar100 + '.pt')
 
 
 final_test_acc_resnet18_cifar100 = (1 - test(test_loader_cifar100, resnet18_cifar100))*100
@@ -1087,12 +1105,12 @@ Import the dataset of CIFAR-0
 
 ::: {.cell .code}
 ``` python
-train_dataset_cifar100_cutout = datasets.CIFAR100(root='data/',
+train_dataset_cifar100_cutout = datasets.CIFAR100(root=current_path + 'data/',
                                      train=True,
                                      transform=train_transform_cifar100_cutout,
                                      download=True)
 
-test_dataset_cifar100 = datasets.CIFAR100(root='data/',
+test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
                                     train=False,
                                     transform=test_transform_cifar100,
                                     download=True)
@@ -1193,7 +1211,7 @@ for epoch in range(epochs):
     test_acc_cifar100 = test(test_loader_cifar100,resnet18_cifar100_cutout)
     tqdm.write('test_acc: %.3f' % (test_acc_cifar100))
     scheduler_resnet18_cifar100_cutout.step()     
-torch.save(resnet18_cifar100_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar100_cutout + '.pt')
+torch.save(resnet18_cifar100_cutout.state_dict(), current_path + 'checkpoints/' + file_name_resnet18_cifar100_cutout + '.pt')
 
 
 final_test_acc_resnet18_cifar100_cutout = (1 - test(test_loader_cifar100,resnet18_cifar100_cutout))*100
@@ -1236,12 +1254,12 @@ Import the dataset of CIFAR-100
 
 ::: {.cell .code}
 ``` python
-train_dataset_cifar100_da = datasets.CIFAR100(root='data/',
+train_dataset_cifar100_da = datasets.CIFAR100(root=current_path + 'data/',
                                      train=True,
                                      transform=train_transform_cifar100_da,
                                      download=True)
 
-test_dataset_cifar100 = datasets.CIFAR100(root='data/',
+test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
                                     train=False,
                                     transform=test_transform_cifar100,
                                     download=True)
@@ -1342,7 +1360,7 @@ for epoch in range(epochs):
     test_acc_resnet18_cifar100_da = test(test_loader_cifar100,resnet18_cifar100_da)
     tqdm.write('test_acc: %.3f' % (test_acc_resnet18_cifar100_da))
     scheduler_resnet18_cifar100_da.step()     
-torch.save(resnet18_cifar100_da.state_dict(), 'checkpoints/' + file_name_resnet18_cifar100_da + '.pt')
+torch.save(resnet18_cifar100_da.state_dict(), current_path + 'checkpoints/' + file_name_resnet18_cifar100_da + '.pt')
 
 
 final_test_acc_resnet18_cifar100_da = (1 - test(test_loader_cifar100,resnet18_cifar100_da))*100
@@ -1389,12 +1407,12 @@ Import the dataset of CIFAR-100
 
 ::: {.cell .code}
 ``` python
-train_dataset_cifar100_da_co = datasets.CIFAR100(root='data/',
+train_dataset_cifar100_da_co = datasets.CIFAR100(root=current_path + 'data/',
                                      train=True,
                                      transform=train_transform_cifar100_da_co,
                                      download=True)
 
-test_dataset_cifar100 = datasets.CIFAR100(root='data/',
+test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
                                     train=False,
                                     transform=test_transform_cifar100,
                                     download=True)
@@ -1495,7 +1513,7 @@ for epoch in range(epochs):
     test_acc_cifar100_da_cutout = test(test_loader_cifar100,resnet18_cifar100_da_cutout)
     tqdm.write('test_acc: %.3f' % (test_acc_cifar100_da_cutout))
     scheduler_cifar100_da_cutout.step()     
-torch.save(resnet18_cifar100_da_cutout.state_dict(), 'checkpoints/' + file_name_resnet18_cifar100_da_cutout + '.pt')
+torch.save(resnet18_cifar100_da_cutout.state_dict(),current_path +  'checkpoints/' + file_name_resnet18_cifar100_da_cutout + '.pt')
 
 
 final_test_acc_resnet18_cifar100_da_cutout = (1 - test(test_loader_cifar100,resnet18_cifar100_da_cutout))*100
