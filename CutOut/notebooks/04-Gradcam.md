@@ -1014,7 +1014,7 @@ cam_wideresnet_gradcam_cifar10_da_cutout -= cam_wideresnet_gradcam_cifar10_da_cu
 cam_wideresnet_gradcam_cifar10_da_cutout /= cam_wideresnet_gradcam_cifar10_da_cutout.max()
 
 # Load the original image
-img = cv2.imread(curret_path + image_path)
+img = cv2.imread(current_path + image_path)
 img = cv2.resize(img, (32, 32))
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
