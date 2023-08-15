@@ -368,25 +368,30 @@ superimposed_img_resnet18_gradcam_cifar10_da_cutout = heatmap_resnet18_gradcam_c
 class_label = str(labels.item())
 
 # Display the original image and the Grad-CAM
-fig, ax = plt.subplots(nrows=1, ncols=5)
+fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(20, 4))
 
 ax[0].imshow(img)
 ax[0].set_title('(Class: ' + cifar10_classes[int(class_label)] + ')')
 ax[0].axis('off')
 ax[1].imshow(superimposed_img_resnet18_gradcam_cifar10 / 255)
-ax[1].set_title(predicted_class_resnet18_gradcam_cifar10)
+ax[1].set_title('Pred: ' +predicted_class_resnet18_gradcam_cifar10)
 ax[1].axis('off')
 ax[2].imshow(superimposed_img_resnet18_gradcam_cifar10_cutout / 255)
-ax[2].set_title(predicted_class_resnet18_gradcam_cifar10)
+ax[2].set_title('Pred: ' +predicted_class_resnet18_gradcam_cifar10)
 ax[2].axis('off')
 ax[3].imshow(superimposed_img_resnet18_gradcam_cifar10_da / 255)
-ax[3].set_title(predicted_class_resnet18_gradcam_cifar10_da)
+ax[3].set_title'Pred: ' + (predicted_class_resnet18_gradcam_cifar10_da)
 ax[3].axis('off')
 ax[4].imshow(superimposed_img_resnet18_gradcam_cifar10_da_cutout / 255)
-ax[4].set_title(predicted_class_resnet18_gradcam_cifar10_da_cutout)
+ax[4].set_title('Pred: ' + predicted_class_resnet18_gradcam_cifar10_da_cutout)
 ax[4].axis('off')
 
-fig.suptitle("Original Image - Grad-CAM -  GC with CO - GC with DA - GC with CO&Da")
+# Adjust the vertical position of the suptitle to bring it closer to the subplots.
+fig.suptitle("Original Image - Grad-CAM -  Grad-CAM with Cutout - Grad-CAM with Data Augmentation - Grad-CAM with Cutout & Data Augmentation", y=1.1) 
+
+# Automatically adjust subplot params for better layout.
+plt.tight_layout()
+
 plt.show()
 
 
@@ -548,7 +553,7 @@ Visualize the image and the Grad-CAM heatmap
 ::: {.cell .code}
 ```python
 # Display the original image and the Grad-CAM
-fig, ax = plt.subplots(nrows=1, ncols=5)
+fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(20, 4))
 
 ax[0].imshow(img)
 ax[0].set_title('(Class: ' + cifar10_classes[int(class_label)] + ')')
@@ -566,7 +571,11 @@ ax[4].imshow(superimposed_img_resnet18_gradcam_cifar10_da_cutout / 255)
 ax[4].set_title(predicted_class_resnet18_gradcam_cifar10_da_cutout)
 ax[4].axis('off')
 
-fig.suptitle("Original Image - Grad-CAM -  GC with CO - GC with DA - GC with CO&Da")
+# Adjust the vertical position of the suptitle to bring it closer to the subplots.
+fig.suptitle("Original Image - Grad-CAM -  Grad-CAM with Cutout - Grad-CAM with Data Augmentation - Grad-CAM with Cutout & Data Augmentation", y=1.1) 
+
+# Automatically adjust subplot params for better layout.
+plt.tight_layout()
 
 plt.show()
 ```
@@ -761,25 +770,30 @@ superimposed_img_resnet18_gradcam_cifar100_da_cutout = heatmap_resnet18_gradcam_
 class_label = str(labels.item())
 
 # Display the original image and the Grad-CAM
-fig, ax = plt.subplots(nrows=1, ncols=5)
+fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(20, 4))
 
 ax[0].imshow(img)
 ax[0].set_title('(Class: ' + cifar100_classes[int(class_label)] + ')')
 ax[0].axis('off')
 ax[1].imshow(superimposed_img_resnet18_gradcam_cifar100 / 255)
-ax[1].set_title(predicted_class_resnet18_gradcam_cifar100)
+ax[1].set_title('Pred: ' +predicted_class_resnet18_gradcam_cifar100)
 ax[1].axis('off')
 ax[2].imshow(superimposed_img_resnet18_gradcam_cifar100_cutout / 255)
-ax[2].set_title(predicted_class_resnet18_gradcam_cifar100)
+ax[2].set_title('Pred: ' +predicted_class_resnet18_gradcam_cifar100)
 ax[2].axis('off')
 ax[3].imshow(superimposed_img_resnet18_gradcam_cifar100_da / 255)
-ax[3].set_title(predicted_class_resnet18_gradcam_cifar100_da)
+ax[3].set_title('Pred: ' +predicted_class_resnet18_gradcam_cifar100_da)
 ax[3].axis('off')
 ax[4].imshow(superimposed_img_resnet18_gradcam_cifar100_da_cutout / 255)
-ax[4].set_title(predicted_class_resnet18_gradcam_cifar100_da_cutout)
+ax[4].set_title('Pred: ' +predicted_class_resnet18_gradcam_cifar100_da_cutout)
 ax[4].axis('off')
 
-fig.suptitle("Original Image - Grad-CAM -  GC with CO - GC with DA - GC with CO&Da")
+# Adjust the vertical position of the suptitle to bring it closer to the subplots.
+fig.suptitle("Original Image - Grad-CAM -  Grad-CAM with Cutout - Grad-CAM with Data Augmentation - Grad-CAM with Cutout & Data Augmentation", y=1.1) 
+
+# Automatically adjust subplot params for better layout.
+plt.tight_layout()
+
 plt.show()
 
 
@@ -941,26 +955,29 @@ Visualize the image and the Grad-CAM heatmap
 ::: {.cell .code}
 ```python
 # Display the original image and the Grad-CAM
-fig, ax = plt.subplots(nrows=1, ncols=5)
+fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(20, 4))
 
 ax[0].imshow(img)
 ax[0].set_title('(Class: ' + cifar100_classes[int(class_label)] + ')')
 ax[0].axis('off')
 ax[1].imshow(superimposed_img_resnet18_gradcam_cifar100 / 255)
-ax[1].set_title(predicted_class_resnet18_gradcam_cifar100)
+ax[1].set_title('Pred: ' +predicted_class_resnet18_gradcam_cifar100)
 ax[1].axis('off')
 ax[2].imshow(superimposed_img_resnet18_gradcam_cifar100_cutout / 255)
-ax[2].set_title(predicted_class_resnet18_gradcam_cifar100)
+ax[2].set_title('Pred: ' +predicted_class_resnet18_gradcam_cifar100)
 ax[2].axis('off')
 ax[3].imshow(superimposed_img_resnet18_gradcam_cifar100_da / 255)
-ax[3].set_title(predicted_class_resnet18_gradcam_cifar100_da)
+ax[3].set_title('Pred: ' +predicted_class_resnet18_gradcam_cifar100_da)
 ax[3].axis('off')
 ax[4].imshow(superimposed_img_resnet18_gradcam_cifar100_da_cutout / 255)
-ax[4].set_title(predicted_class_resnet18_gradcam_cifar100_da_cutout)
+ax[4].set_title('Pred: ' +predicted_class_resnet18_gradcam_cifar100_da_cutout)
 ax[4].axis('off')
 
-fig.suptitle("Original Image - Grad-CAM -  GC with CO - GC with DA - GC with CO&Da")
+# Adjust the vertical position of the suptitle to bring it closer to the subplots.
+fig.suptitle("Original Image - Grad-CAM -  Grad-CAM with Cutout - Grad-CAM with Data Augmentation - Grad-CAM with Cutout & Data Augmentation", y=1.1) 
 
+# Automatically adjust subplot params for better layout.
+plt.tight_layout()
 plt.show()
 ```
 :::
@@ -1257,7 +1274,7 @@ superimposed_img_wideresnet_gradcam_cifar10_da_cutout = heatmap_wideresnet_gradc
 class_label = str(labels.item())
 
 # Display the original image and the Grad-CAM
-fig, ax = plt.subplots(nrows=1, ncols=5, constrained_layout=True)
+fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(20, 4))
 
 ax[0].imshow(img)
 ax[0].set_title('(Class: ' + cifar10_classes[int(class_label)] + ')')
@@ -1266,16 +1283,20 @@ ax[1].imshow(superimposed_img_wideresnet_gradcam_cifar10 / 255)
 ax[1].set_title('Pred: ' + predicted_class_wideresnet_gradcam_cifar10)
 ax[1].axis('off')
 ax[2].imshow(superimposed_img_wideresnet_gradcam_cifar10_cutout / 255)
-ax[2].set_title(predicted_class_wideresnet_gradcam_cifar10)
+ax[2].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar10)
 ax[2].axis('off')
 ax[3].imshow(superimposed_img_wideresnet_gradcam_cifar10_da / 255)
-ax[3].set_title(predicted_class_wideresnet_gradcam_cifar10_da)
+ax[3].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar10_da)
 ax[3].axis('off')
 ax[4].imshow(superimposed_img_wideresnet_gradcam_cifar10_da_cutout / 255)
-ax[4].set_title(predicted_class_wideresnet_gradcam_cifar10_da_cutout)
+ax[4].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar10_da_cutout)
 ax[4].axis('off')
 
-fig.suptitle("Original Image - Grad-CAM -  GC with CO - GC with DA - GC with CO&Da")
+# Adjust the vertical position of the suptitle to bring it closer to the subplots.
+fig.suptitle("Original Image - Grad-CAM -  Grad-CAM with Cutout - Grad-CAM with Data Augmentation - Grad-CAM with Cutout & Data Augmentation", y=1.1) 
+
+# Automatically adjust subplot params for better layout.
+plt.tight_layout()
 plt.show()
 ```
 :::
@@ -1427,7 +1448,7 @@ superimposed_img_wideresnet_gradcam_cifar10_da_cutout = heatmap_wideresnet_gradc
 class_label = str(labels.item())
 
 # Display the original image and the Grad-CAM
-fig, ax = plt.subplots(nrows=1, ncols=5, constrained_layout=True)
+fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(20, 4))
 
 ax[0].imshow(img)
 ax[0].set_title('(Class: ' + cifar10_classes[int(class_label)] + ')')
@@ -1436,16 +1457,21 @@ ax[1].imshow(superimposed_img_wideresnet_gradcam_cifar10 / 255)
 ax[1].set_title('Pred: ' + predicted_class_wideresnet_gradcam_cifar10)
 ax[1].axis('off')
 ax[2].imshow(superimposed_img_wideresnet_gradcam_cifar10_cutout / 255)
-ax[2].set_title(predicted_class_wideresnet_gradcam_cifar10)
+ax[2].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar10)
 ax[2].axis('off')
 ax[3].imshow(superimposed_img_wideresnet_gradcam_cifar10_da / 255)
-ax[3].set_title(predicted_class_wideresnet_gradcam_cifar10_da)
+ax[3].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar10_da)
 ax[3].axis('off')
 ax[4].imshow(superimposed_img_wideresnet_gradcam_cifar10_da_cutout / 255)
-ax[4].set_title(predicted_class_wideresnet_gradcam_cifar10_da_cutout)
+ax[4].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar10_da_cutout)
 ax[4].axis('off')
 
-fig.suptitle("Original Image - Grad-CAM -  GC with CO - GC with DA - GC with CO&Da")
+# Adjust the vertical position of the suptitle to bring it closer to the subplots.
+fig.suptitle("Original Image - Grad-CAM -  Grad-CAM with Cutout - Grad-CAM with Data Augmentation - Grad-CAM with Cutout & Data Augmentation", y=1.1) 
+
+# Automatically adjust subplot params for better layout.
+plt.tight_layout()
+
 plt.show()
 ```
 :::
@@ -1638,25 +1664,30 @@ superimposed_img_wideresnet_gradcam_cifar100_da_cutout = heatmap_wideresnet_grad
 class_label = str(labels.item())
 
 # Display the original image and the Grad-CAM
-fig, ax = plt.subplots(nrows=1, ncols=5)
+fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(20, 4))
 
 ax[0].imshow(img)
 ax[0].set_title('(Class: ' + cifar100_classes[int(class_label)] + ')')
 ax[0].axis('off')
 ax[1].imshow(superimposed_img_wideresnet_gradcam_cifar100 / 255)
-ax[1].set_title(predicted_class_wideresnet_gradcam_cifar100)
+ax[1].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar100)
 ax[1].axis('off')
 ax[2].imshow(superimposed_img_wideresnet_gradcam_cifar100_cutout / 255)
-ax[2].set_title(predicted_class_wideresnet_gradcam_cifar100)
+ax[2].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar100)
 ax[2].axis('off')
 ax[3].imshow(superimposed_img_wideresnet_gradcam_cifar100_da / 255)
-ax[3].set_title(predicted_class_wideresnet_gradcam_cifar100_da)
+ax[3].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar100_da)
 ax[3].axis('off')
 ax[4].imshow(superimposed_img_wideresnet_gradcam_cifar100_da_cutout / 255)
-ax[4].set_title(predicted_class_wideresnet_gradcam_cifar100_da_cutout)
+ax[4].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar100_da_cutout)
 ax[4].axis('off')
 
-fig.suptitle("Original Image - Grad-CAM -  GC with CO - GC with DA - GC with CO&Da")
+# Adjust the vertical position of the suptitle to bring it closer to the subplots.
+fig.suptitle("Original Image - Grad-CAM -  Grad-CAM with Cutout - Grad-CAM with Data Augmentation - Grad-CAM with Cutout & Data Augmentation", y=1.1) 
+
+# Automatically adjust subplot params for better layout.
+plt.tight_layout()
+
 plt.show()
 
 
@@ -1824,19 +1855,23 @@ ax[0].imshow(img)
 ax[0].set_title('(Class: ' + cifar100_classes[int(class_label)] + ')')
 ax[0].axis('off')
 ax[1].imshow(superimposed_img_wideresnet_gradcam_cifar100 / 255)
-ax[1].set_title(predicted_class_wideresnet_gradcam_cifar100)
+ax[1].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar100)
 ax[1].axis('off')
 ax[2].imshow(superimposed_img_wideresnet_gradcam_cifar100_cutout / 255)
 ax[2].set_title(predicted_class_wideresnet_gradcam_cifar100)
 ax[2].axis('off')
 ax[3].imshow(superimposed_img_wideresnet_gradcam_cifar100_da / 255)
-ax[3].set_title(predicted_class_wideresnet_gradcam_cifar100_da)
+ax[3].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar100_da)
 ax[3].axis('off')
 ax[4].imshow(superimposed_img_wideresnet_gradcam_cifar100_da_cutout / 255)
-ax[4].set_title(predicted_class_wideresnet_gradcam_cifar100_da_cutout)
+ax[4].set_title('Pred: ' +predicted_class_wideresnet_gradcam_cifar100_da_cutout)
 ax[4].axis('off')
 
-fig.suptitle("Original Image - Grad-CAM -  GC with CO - GC with DA - GC with CO&Da")
+# Adjust the vertical position of the suptitle to bring it closer to the subplots.
+fig.suptitle("Original Image - Grad-CAM -  Grad-CAM with Cutout - Grad-CAM with Data Augmentation - Grad-CAM with Cutout & Data Augmentation", y=1.1) 
+
+# Automatically adjust subplot params for better layout.
+plt.tight_layout()
 
 plt.show()
 ```
