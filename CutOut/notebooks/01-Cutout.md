@@ -90,7 +90,6 @@ The Cutout code we are using comes from this specific file in the original GitHu
 
 ::: {.cell .code}
 ``` python
-# to do: link to the file in the original repo that this comes from
 # Source Code from https://github.com/uoguelph-mlrg/Cutout/blob/master/util/cutout.py
 class Cutout(object):
     """Randomly mask out one or more patches from an image.

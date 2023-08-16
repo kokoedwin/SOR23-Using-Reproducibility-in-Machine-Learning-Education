@@ -338,7 +338,7 @@ scheduler_wideresnet_cifar10 = MultiStepLR(cnn_optimizer_wideresnet_cifar10, mil
 :::
 
 ::: {.cell .markdown} 
-Training WideResNet withuout Cutout 
+Training WideResNet without Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -1006,7 +1006,7 @@ scheduler_wideresnet_cifar100 = MultiStepLR(cnn_optimizer_wideresnet_cifar100, m
 :::
 
 ::: {.cell .markdown} 
-Training WideResNet withuout Cutout 
+Training WideResNet without Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -1638,7 +1638,7 @@ scheduler_wideresnet_svhn = MultiStepLR(cnn_optimizer_wideresnet_svhn, milestone
 :::
 
 ::: {.cell .markdown} 
-Training WideResNet withuout Cutout 
+Training WideResNet without Cutout 
 :::
 
 ::: {.cell .markdown} 

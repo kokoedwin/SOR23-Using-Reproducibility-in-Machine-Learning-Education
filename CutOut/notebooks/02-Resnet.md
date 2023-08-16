@@ -342,7 +342,7 @@ scheduler_resnet18_cifar10 = MultiStepLR(cnn_optimizer_resnet18_cifar10, milesto
 :::
 
 ::: {.cell .markdown} 
-Training ResNet-18 withuout Cutout 
+Training ResNet-18 without Cutout 
 :::
 
 ::: {.cell .markdown} 
