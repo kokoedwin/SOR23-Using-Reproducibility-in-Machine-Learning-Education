@@ -138,7 +138,7 @@ class Cutout(object):
 
 To see how it works, in the following cell, you will upload an image of your choice to this workspace. To prevent any distortion due to resizing, it is advised to use an image that is approximately square in shape, as we will be resizing the image to a square format (100x100 pixels) later on:
 
-<!-- to do - add instructions for uploading image on Colab, or on Chameleon -->
+
 To see how Cutout works, let's upload an image and apply Cutout to it. Follow these steps to upload an image in this Google Colab notebook:
 
 1. Click on the folder icon in the left sidebar to open the 'Files' tab.
@@ -148,7 +148,7 @@ To see how Cutout works, let's upload an image and apply Cutout to it. Follow th
 After the image is uploaded, we can use Python code to load it into our notebook and apply the Cutout augmentation
 
 If you are using Chameleon, here are the steps:
-<!-- to do - add instructions for uploading image on Chameleon -->
+
 
 1. Click on the upload icon in the left sidebar.
 2. Select the image file from your local machine that you want to upload.
@@ -256,7 +256,6 @@ Cutout was introduced as an alternative to two closely related techniques:
 
 * Dropout in Convolutional Neural Networks: Dropout is a regularization technique for reducing overfitting in neural networks. During training, some number of layer outputs are randomly ignored or "dropped out". This has the effect of making the layer look-like and be treated-like a layer with a different number of nodes and connectivity to the prior layer. In effect, dropout simulates ensembling a large number of neural networks with different architectures, which makes the model more robust.
 
-<!-- to do - expand on these -->
 
 :::
 
@@ -266,7 +265,6 @@ In the following code snippet, we demonstrate some "standard" data augmentation 
 :::
 ::: {.cell .code}
 ```python
-# to do - show the same image with "standard" data augmentation techniques
 # discussed in the related work section of the paper
 
 # Define standard data augmentation techniques

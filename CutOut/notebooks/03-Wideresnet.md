@@ -405,7 +405,6 @@ Cutout Code
 
 ::: {.cell .code}
 ``` python
-# to do: link to the file in the original repo that this comes from
 # Source Code from https://github.com/uoguelph-mlrg/Cutout/blob/master/util/cutout.py
 class Cutout(object):
     """Randomly mask out one or more patches from an image.
