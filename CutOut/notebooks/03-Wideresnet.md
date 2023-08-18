@@ -11,7 +11,7 @@ Note: for faster training, use Runtime > Change Runtime Type to run this noteboo
 :::
 
 
-:
+
 ::: {.cell .markdown}
 
 In the Cutout paper, the authors claim that:
@@ -123,10 +123,7 @@ if not os.path.exists(current_path + 'checkpoints'):
 
 ::: {.cell .code}
 ``` python
-# WideResNet
-
 # From https://github.com/uoguelph-mlrg/Cutout/blob/master/model/wide_resnet.py
-
 
 class BasicBlockWide(nn.Module):
     def __init__(self, in_planes, out_planes, stride, dropRate=0.0):
@@ -290,7 +287,7 @@ test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset CIFAR-10 as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -495,7 +492,7 @@ test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset CIFAR-10 with Cutout as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -644,7 +641,7 @@ test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset CIFAR-10 with Data Augmentation as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -797,7 +794,7 @@ test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset CIFAR-10 with Cutout and Data Augmentation as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -957,7 +954,7 @@ test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset CIFAR-100 as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -1063,7 +1060,7 @@ print('Final Result WideResNet without Cutout for Test CIFAR-100 Dataset: %.3f' 
 
 
 ::: {.cell .markdown}
-### 3.2.2. Training WideResNet in CF100 with Cutout
+### 3.3.2. Training WideResNet in CF100 with Cutout
 ::: 
 
 
@@ -1114,7 +1111,7 @@ test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset CIFAR-100 with Cutout as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -1217,7 +1214,7 @@ print('Final Result WideResNet using Cutout for CIFAR-100 Test Dataset: %.3f' % 
 
 
 ::: {.cell .markdown}
-### 3.2.3. Training WideResNet in CF100 with Data Augmentation 
+### 3.3.3. Training WideResNet in CF100 with Data Augmentation 
 ::: 
 
 
@@ -1263,7 +1260,7 @@ test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset CIFAR-100 with Data Augmentation as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -1367,7 +1364,7 @@ print('Final Result WideResNet using Data Augmentation for CIFAR-100 Test Datase
 
 
 ::: {.cell .markdown}
-### 3.2.4. Training WideResNet in CF100 with Data Augmentation with Cutout
+### 3.3.4. Training WideResNet in CF100 with Data Augmentation with Cutout
 ::: 
 
 ::: {.cell .markdown} 
@@ -1417,7 +1414,7 @@ test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset CIFAR-100 with Cutout and Data Augmentation as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -1589,7 +1586,7 @@ test_dataset_svhn = datasets.SVHN(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset SVHN as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -1755,7 +1752,7 @@ test_dataset_svhn = datasets.SVHN(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset SVHN with Cutout as Dataloader 
 :::
 
 ::: {.cell .code}
