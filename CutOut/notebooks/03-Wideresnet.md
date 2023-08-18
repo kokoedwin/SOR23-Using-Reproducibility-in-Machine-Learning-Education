@@ -386,7 +386,7 @@ torch.save(wideresnet_cifar10.state_dict(), current_path + 'checkpoints/' + file
 
 
 final_test_acc_wideresnet_cifar10 = (1 - test(test_loader_cifar10, wideresnet_cifar10))*100
-print('Final Result WideResNet without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_wideresnet_cifar10))
+print('Test error rates (%) on  WideResNet without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_wideresnet_cifar10))
 ``` 
 :::
 
@@ -588,7 +588,7 @@ torch.save(wideresnet_cifar10_cutout.state_dict(), current_path + 'checkpoints/'
 
 
 final_test_acc_wideresnet_cifar10_cutout = (1 - test(test_loader_cifar10,wideresnet_cifar10_cutout))*100
-print('Final Result WideResNet using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_cutout))
+print('Test error rates (%) on  WideResNet using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_cutout))
 ```
 :::
 
@@ -737,7 +737,7 @@ torch.save(wideresnet_cifar10_da.state_dict(), current_path + 'checkpoints/' + f
 
 
 final_test_acc_wideresnet_cifar10_da = (1 - test(test_loader_cifar10,wideresnet_cifar10_da))*100
-print('Final Result WideResNet using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_da))
+print('Test error rates (%) on  WideResNet using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_da))
 ```
 :::
 
@@ -890,16 +890,16 @@ torch.save(wideresnet_cifar10_da_cutout.state_dict(), current_path + 'checkpoint
 
 
 final_test_acc_wideresnet_cifar10_da_cutout = (1 - test(test_loader_cifar10,wideresnet_cifar10_da_cutout))*100
-print('Final Result WideResNet using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_da_cutout))
+print('Test error rates (%) on  WideResNet using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_da_cutout))
 ```
 :::
 
 ::: {.cell .code}
 ``` python
-print('Final Result WideResNet without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_wideresnet_cifar10))
-print('Final Result WideResNet using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_cutout))
-print('Final Result WideResNet using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_da))
-print('Final Result WideResNet using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_da_cutout))
+print('Test error rates (%) on  WideResNet without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_wideresnet_cifar10))
+print('Test error rates (%) on  WideResNet using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_cutout))
+print('Test error rates (%) on  WideResNet using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_da))
+print('Test error rates (%) on  WideResNet using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar10_da_cutout))
 ```
 :::
 
@@ -1053,7 +1053,7 @@ torch.save(wideresnet_cifar100.state_dict(), current_path + 'checkpoints/' + fil
 
 
 final_test_acc_wideresnet_cifar100 = (1 - test(test_loader_cifar100, wideresnet_cifar100))*100
-print('Final Result WideResNet without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_wideresnet_cifar100))
+print('Test error rates (%) on  WideResNet without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_wideresnet_cifar100))
 ``` 
 :::
 
@@ -1207,7 +1207,7 @@ torch.save(wideresnet_cifar100_cutout.state_dict(), current_path + 'checkpoints/
 
 
 final_test_acc_wideresnet_cifar100_cutout = (1 - test(test_loader_cifar100,wideresnet_cifar100_cutout))*100
-print('Final Result WideResNet using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_cutout))
+print('Test error rates (%) on  WideResNet using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_cutout))
 ```
 :::
 
@@ -1357,7 +1357,7 @@ torch.save(wideresnet_cifar100_da.state_dict(), current_path + 'checkpoints/' + 
 
 
 final_test_acc_wideresnet_cifar100_da = (1 - test(test_loader_cifar100,wideresnet_cifar100_da))*100
-print('Final Result WideResNet using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_da))
+print('Test error rates (%) on  WideResNet using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_da))
 ```
 :::
 
@@ -1510,16 +1510,16 @@ torch.save(wideresnet_cifar100_da_cutout.state_dict(), current_path + 'checkpoin
 
 
 final_test_acc_wideresnet_cifar100_da_cutout = (1 - test(test_loader_cifar100,wideresnet_cifar100_da_cutout))*100
-print('Final Result WideResNet using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_da_cutout))
+print('Test error rates (%) on  WideResNet using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_da_cutout))
 ```
 :::
 
 ::: {.cell .code}
 ``` python
-print('Final Result WideResNet without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_wideresnet_cifar100))
-print('Final Result WideResNet using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_cutout))
-print('Final Result WideResNet using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_da))
-print('Final Result WideResNet using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_da_cutout))
+print('Test error rates (%) on  WideResNet without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_wideresnet_cifar100))
+print('Test error rates (%) on  WideResNet using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_cutout))
+print('Test error rates (%) on  WideResNet using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_da))
+print('Test error rates (%) on  WideResNet using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_wideresnet_cifar100_da_cutout))
 ```
 :::
 
@@ -1685,7 +1685,7 @@ torch.save(wideresnet_svhn.state_dict(), current_path + 'checkpoints/' + file_na
 
 
 final_test_acc_wideresnet_svhn = (1 - test(test_loader_svhn, wideresnet_svhn))*100
-print('Final Result WideResNet without Cutout for Test SVHN Dataset: %.3f' % (final_test_acc_wideresnet_svhn))
+print('Test error rates (%) on  WideResNet without Cutout for Test SVHN Dataset: %.3f' % (final_test_acc_wideresnet_svhn))
 ``` 
 :::
 
@@ -1848,13 +1848,13 @@ torch.save(wideresnet_svhn_cutout.state_dict(), current_path + 'checkpoints/' + 
 
 
 final_test_acc_wideresnet_svhn_cutout = (1 - test(test_loader_svhn,wideresnet_svhn_cutout))*100
-print('Final Result WideResNet using Cutout for SVHN Test Dataset: %.3f' % (final_test_acc_wideresnet_svhn_cutout))
+print('Test error rates (%) on  WideResNet using Cutout for SVHN Test Dataset: %.3f' % (final_test_acc_wideresnet_svhn_cutout))
 ```
 :::
 
 ::: {.cell .code}
 ``` python
-print('Final Result WideResNet without Cutout for Test SVHN Dataset: %.3f' % (final_test_acc_wideresnet_svhn))
-print('Final Result WideResNet using Cutout for SVHN Test Dataset: %.3f' % (final_test_acc_wideresnet_svhn_cutout))
+print('Test error rates (%) on  WideResNet without Cutout for Test SVHN Dataset: %.3f' % (final_test_acc_wideresnet_svhn))
+print('Test error rates (%) on  WideResNet using Cutout for SVHN Test Dataset: %.3f' % (final_test_acc_wideresnet_svhn_cutout))
 ```
 :::
