@@ -394,7 +394,7 @@ torch.save(resnet18_cifar10.state_dict(), current_path + 'checkpoints/' + file_n
 
 
 final_test_acc_resnet18_cifar10 = (1 - test(test_loader_cifar10, resnet18_cifar10))*100
-print('Final Result ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_resnet18_cifar10))
+print('Test error rates (%) on ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_resnet18_cifar10))
 ``` 
 :::
 
@@ -596,7 +596,7 @@ torch.save(resnet18_cifar10_cutout.state_dict(), current_path + 'checkpoints/' +
 
 
 final_test_acc_resnet18_cifar10_cutout = (1 - test(test_loader_cifar10,resnet18_cifar10_cutout))*100
-print('Final Result ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
+print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
 ```
 :::
 
@@ -745,7 +745,7 @@ torch.save(resnet18_cifar10_da.state_dict(), current_path + 'checkpoints/' + fil
 
 
 final_test_acc_resnet18_cifar10_da = (1 - test(test_loader_cifar10,resnet18_cifar10_da))*100
-print('Final Result ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
+print('Test error rates (%) on ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
 ```
 :::
 
@@ -898,16 +898,16 @@ torch.save(resnet18_cifar10_da_cutout.state_dict(), current_path + 'checkpoints/
 
 
 final_test_acc_resnet18_cifar10_da_cutout = (1 - test(test_loader_cifar10,resnet18_cifar10_da_cutout))*100
-print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da_cutout))
+print('Test error rates (%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da_cutout))
 ```
 :::
 
 ::: {.cell .code}
 ``` python
-print('Final Result ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_resnet18_cifar10))
-print('Final Result ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
-print('Final Result ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
-print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da_cutout))
+print('Test error rates (%) on ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_resnet18_cifar10))
+print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
+print('Test error rates (%) on ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
+print('Test error rates (%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da_cutout))
 ```
 :::
 
@@ -1060,7 +1060,7 @@ torch.save(resnet18_cifar100.state_dict(), current_path + 'checkpoints/' + file_
 
 
 final_test_acc_resnet18_cifar100 = (1 - test(test_loader_cifar100, resnet18_cifar100))*100
-print('Final Result ResNet-18 without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_resnet18_cifar100))
+print('Test error rates (%) on ResNet-18 without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_resnet18_cifar100))
 ``` 
 :::
 
@@ -1214,7 +1214,7 @@ torch.save(resnet18_cifar100_cutout.state_dict(), current_path + 'checkpoints/' 
 
 
 final_test_acc_resnet18_cifar100_cutout = (1 - test(test_loader_cifar100,resnet18_cifar100_cutout))*100
-print('Final Result ResNet-18 using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
+print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
 ```
 :::
 
@@ -1363,7 +1363,7 @@ torch.save(resnet18_cifar100_da.state_dict(), current_path + 'checkpoints/' + fi
 
 
 final_test_acc_resnet18_cifar100_da = (1 - test(test_loader_cifar100,resnet18_cifar100_da))*100
-print('Final Result ResNet-18 using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da))
+print('Test error rates (%) on ResNet-18 using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da))
 ```
 :::
 
@@ -1516,15 +1516,15 @@ torch.save(resnet18_cifar100_da_cutout.state_dict(),current_path +  'checkpoints
 
 
 final_test_acc_resnet18_cifar100_da_cutout = (1 - test(test_loader_cifar100,resnet18_cifar100_da_cutout))*100
-print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da_cutout))
+print('Test error rates (%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da_cutout))
 ```
 :::
 
 ::: {.cell .code}
 ``` python
-print('Final Result ResNet-18 without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_resnet18_cifar100))
-print('Final Result ResNet-18 using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
-print('Final Result ResNet-18 using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da))
-print('Final Result ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da_cutout))
+print('Test error rates (%) on ResNet-18 without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_resnet18_cifar100))
+print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
+print('Test error rates (%) on ResNet-18 using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da))
+print('Test error rates (%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da_cutout))
 ```
 :::
