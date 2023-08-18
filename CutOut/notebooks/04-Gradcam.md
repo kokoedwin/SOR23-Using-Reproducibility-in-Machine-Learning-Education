@@ -81,6 +81,10 @@ current_path ="./"
 ## 4.2 Implementation Grad-CAM for ResNet Model
 :::
 
+::: {.cell .markdown}
+This is the code of the ResNet18 Architecture and it is the similar to the code we introduced earlier in the section about ResNet18, but we added hook layers. Hook layers are inserted at specific layers of the model to capture the intermediate feature maps. These feature maps represent the learned activations of the model as it processes the input image. GRAD-CAM uses these activations to understand which parts of the image are contributing the most to the final prediction.
+:::
+
 ::: {.cell .code}
 ``` python
 
@@ -990,6 +994,11 @@ plt.show()
 :::
 ::: {.cell .markdown}
 ## 4.3 Implementation Grad-CAM for WideResNet Model
+:::
+
+
+::: {.cell .markdown}
+This is the code of the WideResNet Architecture and it is the similar to the code we introduced earlier in the section about WideResNet, but we added hook layers. Hook layers are inserted at specific layers of the model to capture the intermediate feature maps. These feature maps represent the learned activations of the model as it processes the input image. GRAD-CAM uses these activations to understand which parts of the image are contributing the most to the final prediction.
 :::
 
 ::: {.cell .markdown}

@@ -407,6 +407,10 @@ print('Test error rates (%) on ResNet-18 without Cutout for Test CIFAR-10 Datase
 Cutout Code
 ::: 
 
+::: {.cell .markdown}
+This is the code to do Cutout and it is the same code we introduced earlier in the section about Cutout
+::: 
+
 ::: {.cell .code}
 ``` python
 # Source Code from https://github.com/uoguelph-mlrg/Cutout/blob/master/util/cutout.py

@@ -399,6 +399,10 @@ print('Test error rates (%) on  WideResNet without Cutout for Test CIFAR-10 Data
 Cutout Code
 ::: 
 
+::: {.cell .markdown}
+This is the code to do Cutout and it is the same code we introduced earlier in the section about Cutout
+::: 
+
 ::: {.cell .code}
 ``` python
 # Source Code from https://github.com/uoguelph-mlrg/Cutout/blob/master/util/cutout.py
