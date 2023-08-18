@@ -11,7 +11,6 @@ Note: for faster training, use Runtime > Change Runtime Type to run this noteboo
 :::
 
 
-
 ::: {.cell .markdown}
 
 In the Cutout paper, the authors claim that:
@@ -1774,7 +1773,7 @@ test_loader_svhn = torch.utils.data.DataLoader(dataset=test_dataset_svhn,
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of WideResNet
 :::
 
 ::: {.cell .markdown} 
