@@ -25,8 +25,8 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 
 
 | **Network** | **CIFAR-10** | **CIFAR-10+** | **CIFAR-100** | **CIFAR-100+** | **SVHN**
 | ----------- | ------------ | ------------- | ------------ | ------------- |------------
-| WideResNet    | 6.97         | 3.87      | 26.06         | 18.8      | 1.60
-| WideResNet + cutout | 5.54   | 3.08         | 23.94        | 18.41       |  1.30
+| WideResNet    | 6.97  ±   0.22    | 3.87 ±  0.08   | 26.06  ±  0.22     | 18.8 ±  0.08   | 1.60 ± 0.05
+| WideResNet + cutout | 5.54 ±  0.08 | 3.08 ±   0.16     | 23.94 ±  0.15     | 18.41 ±   0.27   |  1.30 ± 0.03
 
 
 In this table, the effectiveness of standard and cutout data augmentation techniques is evaluated using the WideResNet architecture on the CIFAR-10, CIFAR-100, and SVHN datasets. The "+", as before, indicates the use of standard data augmentation (mirror and crop).
@@ -308,7 +308,7 @@ test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of WideResNet for CIFAR-10 
 :::
 
 ::: {.cell .markdown} 
@@ -334,8 +334,7 @@ scheduler_wideresnet_cifar10 = MultiStepLR(cnn_optimizer_wideresnet_cifar10, mil
 :::
 
 ::: {.cell .markdown} 
-Training WideResNet without Cutout 
-:::
+Training WideResNet for CIFAR-10
 
 ::: {.cell .markdown} 
 This code runs the training loop for the chosen machine learning model over a specified number of epochs. Each epoch involves a forward pass, loss computation, backpropagation, and parameter updates. It also calculates and displays the training accuracy and cross-entropy loss. At the end of each epoch, the model's performance is evaluated on the test set, and the results are logged and saved. 
@@ -450,7 +449,7 @@ class Cutout(object):
 
 
 ::: {.cell .markdown} 
-Image Processing for CIFAR-10 
+Image Processing for CIFAR-10 with Cutout
 :::
 
 ::: {.cell .code}
@@ -477,7 +476,7 @@ test_transform_cifar10 = transforms.Compose([
 :::
 
 ::: {.cell .markdown} 
-Import the dataset of CIFAR-10 
+Import the dataset of CIFAR-10 with Cutout
 :::
 
 ::: {.cell .code}
@@ -517,7 +516,7 @@ test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of WideResNet for CIFAR-10 with Cutout
 :::
 
 ::: {.cell .markdown} 
@@ -543,7 +542,7 @@ scheduler_wideresnet_cifar10_cutout = MultiStepLR(cnn_optimizer_wideresnet_cifar
 :::
 
 ::: {.cell .markdown}
-Training WideResNet with Cutout 
+Training WideResNet for CIFAR-10 with Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -603,7 +602,7 @@ print('Test error rates (%) on  WideResNet using Cutout for CIFAR-10 Test Datase
 
 
 ::: {.cell .markdown} 
-Image Processing for CIFAR-10 
+Image Processing for CIFAR-10 with Data Augmentation 
 :::
 
 ::: {.cell .code}
@@ -626,7 +625,7 @@ test_transform_cifar10 = transforms.Compose([
 :::
 
 ::: {.cell .markdown} 
-Import the dataset of CIFAR-10 
+Import the dataset of CIFAR-10 with Data Augmentation 
 :::
 
 ::: {.cell .code}
@@ -666,7 +665,7 @@ test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of WideResNet for CIFAR-10 with Data Augmentation 
 :::
 
 ::: {.cell .markdown} 
@@ -692,7 +691,7 @@ scheduler_wideresnet_cifar10_da = MultiStepLR(cnn_optimizer_wideresnet_cifar10_d
 :::
 
 ::: {.cell .markdown}
-Training WideResNet with  Data Augmentation
+Training WideResNet for CIFAR-10 with Data Augmentation
 :::
 
 ::: {.cell .markdown} 
@@ -747,11 +746,11 @@ print('Test error rates (%) on  WideResNet using Data Augmentation for CIFAR-10 
 
 
 ::: {.cell .markdown}
-### 3.2.4. Training WideResNet in CF10 with Data Augmentation with Cutout
+### 3.2.4. Training WideResNet in CF10 with Data Augmentation and Cutout
 ::: 
 
 ::: {.cell .markdown} 
-Image Processing for CIFAR-10 
+Image Processing for CIFAR-10 with Data Augmentation and Cutout
 :::
 
 ::: {.cell .code}
@@ -779,7 +778,7 @@ test_transform_cifar10 = transforms.Compose([
 :::
 
 ::: {.cell .markdown} 
-Import the dataset of CIFAR-10 
+Import the dataset of CIFAR-10 with Data Augmentation and Cutout
 :::
 
 ::: {.cell .code}
@@ -797,7 +796,7 @@ test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset CIFAR-10 with Cutout and Data Augmentation as Dataloader 
+Create Dataset CIFAR-10 with Data Augmentation and Cutout as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -819,7 +818,7 @@ test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of WideResNet for CIFAR-10 with Data Augmentation and Cutout as Dataloader 
 :::
 
 ::: {.cell .markdown} 
@@ -845,7 +844,7 @@ scheduler_cifar10_da_cutout = MultiStepLR(cnn_optimizer_cifar10_da_cutout, miles
 :::
 
 ::: {.cell .markdown}
-Training WideResNet with Cutout 
+Training WideResNet for CIFAR-10 with Data Augmentation and Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -979,7 +978,7 @@ test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of WideResNet for CIFAR-100 
 :::
 
 ::: {.cell .markdown} 
@@ -1005,7 +1004,7 @@ scheduler_wideresnet_cifar100 = MultiStepLR(cnn_optimizer_wideresnet_cifar100, m
 :::
 
 ::: {.cell .markdown} 
-Training WideResNet without Cutout 
+Training WideResNet for CIFAR-100 
 :::
 
 ::: {.cell .markdown} 
@@ -1136,7 +1135,7 @@ test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of WideResNet for CIFAR-100 with Cutout
 :::
 
 ::: {.cell .markdown} 
@@ -1162,7 +1161,7 @@ scheduler_wideresnet_cifar100_cutout = MultiStepLR(cnn_optimizer_wideresnet_cifa
 :::
 
 ::: {.cell .markdown}
-Training WideResNet with Cutout 
+Training WideResNet for CIFAR-100 with Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -1285,7 +1284,7 @@ test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of WideResNet for CIFAR-100 with Data Augmentation
 :::
 
 ::: {.cell .markdown} 
@@ -1312,7 +1311,7 @@ scheduler_wideresnet_cifar100_da = MultiStepLR(cnn_optimizer_wideresnet_cifar100
 :::
 
 ::: {.cell .markdown}
-Training WideResNet with  Data Augmentation
+Training WideResNet for CIFAR-100 with Data Augmentation 
 :::
 
 ::: {.cell .markdown} 
@@ -1439,7 +1438,7 @@ test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of WideResNet for CIFAR-100 with Data Augmentation and Cutout
 :::
 
 ::: {.cell .markdown} 
@@ -1465,7 +1464,7 @@ scheduler_cifar100_da_cutout = MultiStepLR(cnn_optimizer_cifar100_da_cutout, mil
 :::
 
 ::: {.cell .markdown}
-Training WideResNet with Cutout 
+Training WideResNet for CIFAR-100 with Data Augmentation and Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -1611,7 +1610,7 @@ test_loader_svhn = torch.utils.data.DataLoader(dataset=test_dataset_svhn,
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of WideResNet for SVHN 
 :::
 
 ::: {.cell .markdown} 
@@ -1637,7 +1636,7 @@ scheduler_wideresnet_svhn = MultiStepLR(cnn_optimizer_wideresnet_svhn, milestone
 :::
 
 ::: {.cell .markdown} 
-Training WideResNet without Cutout 
+Training WideResNet for SVHN without Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -1777,7 +1776,7 @@ test_loader_svhn = torch.utils.data.DataLoader(dataset=test_dataset_svhn,
 :::
 
 ::: {.cell .markdown} 
-Define the model of WideResNet
+Define the model WideResNet for SVHN with Cutout
 :::
 
 ::: {.cell .markdown} 
@@ -1803,7 +1802,7 @@ scheduler_wideresnet_svhn_cutout = MultiStepLR(cnn_optimizer_wideresnet_svhn_cut
 :::
 
 ::: {.cell .markdown}
-Training WideResNet with Cutout 
+Training WideResNet for SVHN with Cutout 
 :::
 
 ::: {.cell .markdown} 

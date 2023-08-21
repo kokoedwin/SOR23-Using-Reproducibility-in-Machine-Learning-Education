@@ -23,8 +23,8 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 
 
 | **Network** | **CIFAR-10** | **CIFAR-10+** | **CIFAR-100** | **CIFAR-100+** |
 | ----------- | ------------ | ------------- | ------------ | ------------- |
-| ResNet18    | 10.63         | 4.72        | 36.68         | 22.46         |
-| ResNet18 + cutout | 9.31   | 3.99         | 34.98         | 21.96        |  
+| ResNet18    | 10.63 ±        | 4.72 ±       | 36.68  ±       | 22.46  ±       |
+| ResNet18 + cutout | 9.31 ±  | 3.99 ±        | 34.98 ±        | 21.96  ±      |  
 
 
 The provided table displays the results of experiments conducted on the CIFAR-10 and CIFAR-100 datasets using the ResNet18 architecture, revealing the impact of standard and cutout data augmentation techniques. The "CIFAR-10+" and "CIFAR-100+" labels indicate the use of standard data augmentation, which involves mirror and crop techniques.
@@ -253,7 +253,7 @@ def test(loader, cnn):
 ::: 
 
 ::: {.cell .markdown}
-Image Processing for CIFAR-10
+Image Processing for CIFAR-10 without Cutout
 :::
 
 ::: {.cell .code}
@@ -276,7 +276,7 @@ test_transform_cifar10 = transforms.Compose([
 :::
 
 ::: {.cell .markdown} 
-Import the dataset of CIFAR-10 
+Import the dataset of CIFAR-10 without Cutout
 :::
 
 ::: {.cell .code}
@@ -294,7 +294,7 @@ test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset of CIFAR-10 without Cutout as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -316,7 +316,7 @@ test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of ResNet for CIFAR-10 without Cutout
 :::
 
 ::: {.cell .markdown} 
@@ -342,7 +342,7 @@ scheduler_resnet18_cifar10 = MultiStepLR(cnn_optimizer_resnet18_cifar10, milesto
 :::
 
 ::: {.cell .markdown} 
-Training ResNet-18 without Cutout 
+Training ResNet-18 for CIFAR-10 without Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -458,7 +458,7 @@ class Cutout(object):
 
 
 ::: {.cell .markdown} 
-Image Processing for CIFAR-10 
+Image Processing for CIFAR-10 with Cutout
 :::
 
 ::: {.cell .code}
@@ -485,7 +485,7 @@ test_transform_cifar10 = transforms.Compose([
 :::
 
 ::: {.cell .markdown} 
-Import the dataset of CIFAR-10 
+Import the dataset of CIFAR-10 with Cutout
 :::
 
 ::: {.cell .code}
@@ -503,7 +503,7 @@ test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset of CIFAR-10 with Cutout as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -525,7 +525,7 @@ test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of ResNet for CIFAR-10 with Cutout
 :::
 
 ::: {.cell .markdown} 
@@ -551,7 +551,7 @@ scheduler_resnet18_cifar10_cutout = MultiStepLR(cnn_optimizer_resnet18_cifar10_c
 :::
 
 ::: {.cell .markdown}
-Training ResNet-18 with Cutout 
+Training ResNet-18 for CIFAR-10 with Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -611,7 +611,7 @@ print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-10 Test Dataset:
 
 
 ::: {.cell .markdown} 
-Image Processing for CIFAR-10 
+Image Processing for CIFAR-10 with Data Augmentation 
 :::
 
 ::: {.cell .code}
@@ -634,7 +634,7 @@ test_transform_cifar10 = transforms.Compose([
 :::
 
 ::: {.cell .markdown} 
-Import the dataset of CIFAR-10 
+Import the dataset of CIFAR-10 with Data Augmentation
 :::
 
 ::: {.cell .code}
@@ -652,7 +652,7 @@ test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset of CIFAR-10 with Data Augmentation as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -674,7 +674,7 @@ test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of ResNet for CIFAR-10 with Data Augmentation
 :::
 
 ::: {.cell .markdown} 
@@ -700,7 +700,7 @@ scheduler_resnet18_cifar10_da = MultiStepLR(cnn_optimizer_resnet18_cifar10_da, m
 :::
 
 ::: {.cell .markdown}
-Training ResNet-18 with  Data Augmentation
+Training ResNet-18 for CIFAR-10 with Data Augmentation 
 :::
 
 ::: {.cell .markdown} 
@@ -755,11 +755,11 @@ print('Test error rates (%) on ResNet-18 using Data Augmentation for CIFAR-10 Te
 
 
 ::: {.cell .markdown}
-### 2.2.4. Training ResNet-18 in CF10 with Data Augmentation with Cutout
+### 2.2.4. Training ResNet-18 in CF10 with Data Augmentation and Cutout
 ::: 
 
 ::: {.cell .markdown} 
-Image Processing for CIFAR-10 
+Image Processing for CIFAR-10 with Data Augmentation and Cutout
 :::
 
 ::: {.cell .code}
@@ -787,7 +787,7 @@ test_transform_cifar10 = transforms.Compose([
 :::
 
 ::: {.cell .markdown} 
-Import the dataset of CIFAR-10 
+Import the dataset of CIFAR-10 with Data Augmentation and Cutout
 :::
 
 ::: {.cell .code}
@@ -805,7 +805,7 @@ test_dataset_cifar10 = datasets.CIFAR10(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset of CIFAR-10 with Data Augmentation and Cutout as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -827,7 +827,7 @@ test_loader_cifar10 = torch.utils.data.DataLoader(dataset=test_dataset_cifar10,
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of ResNet for CIFAR-10 with Data Augmentation and Cutout
 :::
 
 ::: {.cell .markdown} 
@@ -853,7 +853,7 @@ scheduler_cifar10_da_cutout = MultiStepLR(cnn_optimizer_cifar10_da_cutout, miles
 :::
 
 ::: {.cell .markdown}
-Training ResNet-18 with Cutout 
+Training ResNet-18 for CIFAR-10 with Data Augmentation and Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -924,7 +924,7 @@ print('Test error rates (%) on ResNet-18 using Data Augmentation and  Cutout for
 ::: 
 
 ::: {.cell .markdown}
-Image Processing for CIFAR-100
+Image Processing for CIFAR-100 without Cutout
 :::
 
 ::: {.cell .code}
@@ -947,7 +947,7 @@ test_transform_cifar100 = transforms.Compose([
 :::
 
 ::: {.cell .markdown} 
-Import the dataset of CIFAR-100 
+Import the dataset of CIFAR-100 without Cutout
 :::
 
 ::: {.cell .code}
@@ -965,7 +965,7 @@ test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset of CIFAR-100 without Cutout as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -987,7 +987,7 @@ test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of ResNet for CIFAR-100 
 :::
 
 ::: {.cell .markdown} 
@@ -1013,7 +1013,7 @@ scheduler_resnet18_cifar100 = MultiStepLR(cnn_optimizer_resnet18_cifar100, miles
 :::
 
 ::: {.cell .markdown} 
-Training ResNet-18 without Cutout 
+Training ResNet-18 for CIFAR-100 without Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -1076,7 +1076,7 @@ print('Test error rates (%) on ResNet-18 without Cutout for Test CIFAR-100 Datas
 
 
 ::: {.cell .markdown} 
-Image Processing for CIFAR-100 
+Image Processing for CIFAR-100 with Cutout
 :::
 
 ::: {.cell .code}
@@ -1103,7 +1103,7 @@ test_transform_cifar100 = transforms.Compose([
 :::
 
 ::: {.cell .markdown} 
-Import the dataset of CIFAR-0 
+Import the dataset of CIFAR-100 with Cutout 
 :::
 
 ::: {.cell .code}
@@ -1121,7 +1121,7 @@ test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset of CIFAR-100 with Cutout as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -1143,7 +1143,7 @@ test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of ResNet for CIFAR-100 with Cutout
 :::
 
 ::: {.cell .markdown} 
@@ -1169,7 +1169,7 @@ scheduler_resnet18_cifar100_cutout = MultiStepLR(cnn_optimizer_resnet18_cifar100
 :::
 
 ::: {.cell .markdown}
-Training ResNet-18 with Cutout 
+Training ResNet-18 for CIFAR-100 with Cutout 
 :::
 
 ::: {.cell .markdown} 
@@ -1229,7 +1229,7 @@ print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-100 Test Dataset
 
 
 ::: {.cell .markdown} 
-Image Processing for CIFAR-100 
+Image Processing for CIFAR-100 with Data Augmentation 
 :::
 
 ::: {.cell .code}
@@ -1252,7 +1252,7 @@ test_transform_cifar100 = transforms.Compose([
 :::
 
 ::: {.cell .markdown} 
-Import the dataset of CIFAR-100
+Import the dataset of CIFAR-100 with Data Augmentation 
 :::
 
 ::: {.cell .code}
@@ -1270,7 +1270,7 @@ test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset of CIFAR-100 with Data Augmentation as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -1292,7 +1292,7 @@ test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of ResNet for CIFAR-100 with Data Augmentation
 :::
 
 ::: {.cell .markdown} 
@@ -1318,7 +1318,7 @@ scheduler_resnet18_cifar100_da = MultiStepLR(cnn_optimizer_resnet18_cifar100_da,
 :::
 
 ::: {.cell .markdown}
-Training ResNet-18 with  Data Augmentation
+Training ResNet-18 for CIFAR-100 with Data Augmentation  
 :::
 
 ::: {.cell .markdown} 
@@ -1373,11 +1373,11 @@ print('Test error rates (%) on ResNet-18 using Data Augmentation for CIFAR-100 T
 
 
 ::: {.cell .markdown}
-### 2.2.4. Training ResNet-18 in CF100 with Data Augmentation with Cutout
+### 2.2.4. Training ResNet-18 in CF100 with Data Augmentation and Cutout
 ::: 
 
 ::: {.cell .markdown} 
-Image Processing for CIFAR-100
+Image Processing for CIFAR-100 with Data Augmentation and Cutout
 :::
 
 ::: {.cell .code}
@@ -1405,7 +1405,7 @@ test_transform_cifar100 = transforms.Compose([
 :::
 
 ::: {.cell .markdown} 
-Import the dataset of CIFAR-100
+Import the dataset of CIFAR-100 with Data Augmentation and Cutout
 :::
 
 ::: {.cell .code}
@@ -1423,7 +1423,7 @@ test_dataset_cifar100 = datasets.CIFAR100(root=current_path + 'data/',
 :::
 
 ::: {.cell .markdown} 
-Create Dataset as Dataloader 
+Create Dataset of CIFAR-100 with Data Augmentation and Cutout as Dataloader 
 :::
 
 ::: {.cell .code}
@@ -1445,7 +1445,7 @@ test_loader_cifar100 = torch.utils.data.DataLoader(dataset=test_dataset_cifar100
 :::
 
 ::: {.cell .markdown} 
-Define the model 
+Define the model of ResNet for CIFAR-100 with Data Augmentation and Cutout
 :::
 
 ::: {.cell .markdown} 
@@ -1471,7 +1471,7 @@ scheduler_cifar100_da_cutout = MultiStepLR(cnn_optimizer_cifar100_da_cutout, mil
 :::
 
 ::: {.cell .markdown}
-Training ResNet-18 with Cutout 
+Training ResNet-18 for CIFAR-100 with Data Augmentation and Cutout 
 :::
 
 ::: {.cell .markdown} 
