@@ -265,8 +265,6 @@ In the following code snippet, we demonstrate some "standard" data augmentation 
 :::
 ::: {.cell .code}
 ```python
-# discussed in the related work section of the paper
-
 # Define standard data augmentation techniques
 transforms_data_augmentation = transforms.Compose([
     RandomHorizontalFlip(),
@@ -284,7 +282,6 @@ ax[0].set_title('Original Image')
 ax[1].imshow(augmented_img)
 ax[1].set_title('Augmented Image')
 plt.show()
-
 ```
 :::
 

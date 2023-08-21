@@ -23,8 +23,8 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 
 
 | **Network** | **CIFAR-10** | **CIFAR-10+** | **CIFAR-100** | **CIFAR-100+** |
 | ----------- | ------------ | ------------- | ------------ | ------------- |
-| ResNet18    | 10.63 ±        | 4.72 ±       | 36.68  ±       | 22.46  ±       |
-| ResNet18 + cutout | 9.31 ±  | 3.99 ±        | 34.98 ±        | 21.96  ±      |  
+| ResNet18    | 10.63 ±  0.26      | 4.72 ±   0.21    | 36.68  ± 0.57      | 22.46  ±    0.31   |
+| ResNet18 + cutout | 9.31 ± 0.18  | 3.99 ±  0.13      | 34.98 ±    0.29    | 21.96  ±   0.24   |  
 
 
 The provided table displays the results of experiments conducted on the CIFAR-10 and CIFAR-100 datasets using the ResNet18 architecture, revealing the impact of standard and cutout data augmentation techniques. The "CIFAR-10+" and "CIFAR-100+" labels indicate the use of standard data augmentation, which involves mirror and crop techniques.
@@ -260,7 +260,8 @@ Image Processing for CIFAR-10 without Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10 = transforms.Compose([])
 
@@ -465,7 +466,8 @@ Image Processing for CIFAR-10 with Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10_cutout = transforms.Compose([])
 
@@ -544,8 +546,8 @@ resnet18_cifar10_cutout = ResNet18(num_classes=num_classes_cifar10)
 resnet18_cifar10_cutout = resnet18_cifar10_cutout.cuda()
 learning_rate_resnet18_cifar10_cutout = 0.1
 criterion_resnet18_cifar10_cutout = nn.CrossEntropyLoss().cuda()
-cnn_optimizer_resnet18_cifar10_cutout = torch.optim.SGD(resnet18_cifar10_cutout.parameters(), lr=learning_rate_resnet18_cifar10_cutout,
-                                momentum=0.9, nesterov=True, weight_decay=5e-4)
+cnn_optimizer_resnet18_cifar10_cutout = torch.optim.SGD(resnet18_cifar10_cutout.parameters(),
+            lr=learning_rate_resnet18_cifar10_cutout, momentum=0.9,nesterov=True, weight_decay=5e-4)
 scheduler_resnet18_cifar10_cutout = MultiStepLR(cnn_optimizer_resnet18_cifar10_cutout, milestones=[60, 120, 160], gamma=0.2)
 ```
 :::
@@ -618,7 +620,8 @@ Image Processing for CIFAR-10 with Data Augmentation
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10_da = transforms.Compose([])
 train_transform_cifar10_da.transforms.append(transforms.RandomCrop(32, padding=4))
@@ -766,7 +769,8 @@ Image Processing for CIFAR-10 with Data Augmentation and Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10_da_co = transforms.Compose([])
 train_transform_cifar10_da_co.transforms.append(transforms.RandomCrop(32, padding=4))
@@ -931,7 +935,8 @@ Image Processing for CIFAR-100 without Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100 = transforms.Compose([])
 
@@ -1083,7 +1088,8 @@ Image Processing for CIFAR-100 with Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100_cutout = transforms.Compose([])
 
@@ -1236,7 +1242,8 @@ Image Processing for CIFAR-100 with Data Augmentation
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100_da = transforms.Compose([])
 train_transform_cifar100_da.transforms.append(transforms.RandomCrop(32, padding=4))
@@ -1384,7 +1391,8 @@ Image Processing for CIFAR-100 with Data Augmentation and Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100_da_co = transforms.Compose([])
 train_transform_cifar100_da_co.transforms.append(transforms.RandomCrop(32, padding=4))

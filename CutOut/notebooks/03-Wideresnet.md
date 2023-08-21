@@ -252,7 +252,8 @@ Image Processing for CIFAR-10
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10 = transforms.Compose([])
 
@@ -456,7 +457,8 @@ Image Processing for CIFAR-10 with Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10_cutout = transforms.Compose([])
 
@@ -609,7 +611,8 @@ Image Processing for CIFAR-10 with Data Augmentation
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10_da = transforms.Compose([])
 train_transform_cifar10_da.transforms.append(transforms.RandomCrop(32, padding=4))
@@ -757,7 +760,8 @@ Image Processing for CIFAR-10 with Data Augmentation and Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10_da_co = transforms.Compose([])
 train_transform_cifar10_da_co.transforms.append(transforms.RandomCrop(32, padding=4))
@@ -922,7 +926,8 @@ Image Processing for CIFAR-100
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100 = transforms.Compose([])
 
@@ -1075,7 +1080,8 @@ Image Processing for CIFAR-100
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100_cutout = transforms.Compose([])
 
@@ -1228,7 +1234,8 @@ Image Processing for CIFAR-100
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100_da = transforms.Compose([])
 train_transform_cifar100_da.transforms.append(transforms.RandomCrop(32, padding=4))
@@ -1377,7 +1384,8 @@ Image Processing for CIFAR-100
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100_da_co = transforms.Compose([])
 train_transform_cifar100_da_co.transforms.append(transforms.RandomCrop(32, padding=4))
@@ -1543,7 +1551,8 @@ Image Processing for SVHN
 ``` python
 # Image Preprocessing
 
-normalize_image_svhn = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]],std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
+normalize_image_svhn = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]],
+std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
 
 train_transform_svhn = transforms.Compose([])
 
@@ -1705,7 +1714,8 @@ Image Processing for SVHN
 ``` python
 # Image Preprocessing
 
-normalize_image_svhn = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]], std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
+normalize_image_svhn = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]], 
+std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
 
 train_transform_svhn_cutout = transforms.Compose([])
 
