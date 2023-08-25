@@ -62,6 +62,22 @@ After working through this notebook, you should be able to:
 :::
 
 ::: {.cell .markdown}
+# If you're using Google Colab, make sure to set up the runtime environment properly.
+# Follow these steps to ensure a smooth experience:
+
+- Step 1: Click on the "Runtime" menu at the top of the Colab interface.
+
+- Step 2: Select "Change runtime type" from the dropdown menu.
+
+- Step 3: In the "Runtime type" section, choose the desired hardware accelerator.
+    -       In these experiments, we are going to use "GPU" as it speeds up computations.
+
+Step 4: Click "Save" to apply the changes.
+
+Once you've set up the runtime, you're ready to run the code cells in the notebook!
+:::
+
+::: {.cell .markdown}
 ### For everyone using Google Colab to run these experiments
 If you are using Google Colab, here's a step-by-step how to connect with your google drive:
 
@@ -74,10 +90,33 @@ If you are using Google Colab, here's a step-by-step how to connect with your go
 4. When you find the file you want to open, click the three dots next to the name of the file in the file explorer. From the options that appear, choose "Copy path." This action will copy the full path of the file to your clipboard. Paste the copy path into the 'current_path' below.
 :::
 
+
 ::: {.cell .code}
 ``` python
 current_path ="./"
 ```
+:::
+
+::: {.cell .markdown}
+
+To see how it works, in the following cell, you will upload an image of your choice to this workspace. To prevent any distortion due to resizing, it is advised to use an image that is approximately square in shape, as we will be resizing the image to a square format (100x100 pixels) later on:
+
+
+To see how Cutout works, let's upload an image and apply Cutout to it. Follow these steps to upload an image in this Google Colab notebook:
+
+1. Click on the folder icon in the left sidebar to open the 'Files' tab.
+2. Click the 'Upload to session storage' button (the icon looks like a file with an up arrow).
+3. Select the image file from your local machine that you want to upload.
+4. Wait for the upload to finish. The uploaded file should now appear in the 'Files' tab.
+After the image is uploaded, we can use Python code to load it into our notebook and apply the Cutout augmentation
+
+If you are using Chameleon, here are the steps:
+
+
+1. Click on the upload icon in the left sidebar.
+2. Select the image file from your local machine that you want to upload.
+3. Wait for the upload to finish. The uploaded file should now appear in the 'Files' tab.
+After the image is uploaded, we can use Python code to load it into our notebook and apply the Cutout augmentation to the image.
 :::
 
 
