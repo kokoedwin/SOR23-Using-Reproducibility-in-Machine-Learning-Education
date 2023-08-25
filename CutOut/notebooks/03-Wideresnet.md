@@ -31,6 +31,8 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 
 
 In this table, the effectiveness of standard and cutout data augmentation techniques is evaluated using the WideResNet architecture on the CIFAR-10, CIFAR-100, and SVHN datasets. The "+", as before, indicates the use of standard data augmentation (mirror and crop).
 
+In the results table provided in the original paper, we have included confidence intervals to provide a comprehensive view of the outcomes. It's important to note that in our case, due to computational constraints, we have trained and evaluated the model only once, whereas the original authors conducted multiple runs. Consequently, while our numerical outcomes may not precisely match their averaged values, we are interested in assessing whether our results fall within the specified confidence intervals. This approach allows us to gauge the consistency and reliability of our findings with respect to the reported results.
+
 For CIFAR-10, utilizing the WideResNet model with standard augmentation significantly reduces the test error from 6.97% to 3.87%. When cutout augmentation is added, the error drops even further to 3.08%.
 
 A comparable trend is seen with the CIFAR-100 dataset. Standard augmentation reduces the WideResNet model's test error from 26.06% to 18.8%. With the application of cutout augmentation, the error rate decreases slightly more to 18.41%.

@@ -29,6 +29,9 @@ Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 
 
 The provided table displays the results of experiments conducted on the CIFAR-10 and CIFAR-100 datasets using the ResNet18 architecture, revealing the impact of standard and cutout data augmentation techniques. The "CIFAR-10+" and "CIFAR-100+" labels indicate the use of standard data augmentation, which involves mirror and crop techniques.
 
+
+In the results table provided in the original paper, we have included confidence intervals to provide a comprehensive view of the outcomes. It's important to note that in our case, due to computational constraints, we have trained and evaluated the model only once, whereas the original authors conducted multiple runs. Consequently, while our numerical outcomes may not precisely match their averaged values, we are interested in assessing whether our results fall within the specified confidence intervals. This approach allows us to gauge the consistency and reliability of our findings with respect to the reported results.
+
 With the use of standard data augmentation on CIFAR-10, the ResNet18 model's test error is significantly reduced from 14.04% to 5.72%. Further enhancement is achieved when cutout augmentation is applied, bringing down the error to 4.86%. A similar pattern is observed in the case of the CIFAR-100 dataset, where standard augmentation reduces the ResNet18 model's test error from 40.13% to 24.36%. Upon applying cutout augmentation, a slight further reduction in error to 23.9% is noted.
 
 These findings emphasize the efficacy of both standard and cutout data augmentation techniques in enhancing the model's performance, evidenced by the reduction in test error rates on both CIFAR-10 and CIFAR-100 datasets. The results also highlight that the impact of data augmentation can vary based on the complexity of the dataset, illustrated by the differing rates of error reduction between CIFAR-10 and CIFAR-100.
