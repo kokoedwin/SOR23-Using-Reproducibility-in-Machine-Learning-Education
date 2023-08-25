@@ -38,9 +38,7 @@ These findings emphasize the efficacy of both standard and cutout data augmentat
 
 
 ::: {.cell .markdown}
-
 ## Import Library
-
 :::
 
 
@@ -119,9 +117,12 @@ if not os.path.exists(current_path + 'checkpoints'):
 ``` python
 # ResNet
 # From https://github.com/uoguelph-mlrg/Cutout/blob/master/model/resnet.py
+# ResNet
+# From https://github.com/uoguelph-mlrg/Cutout/blob/master/model/resnet.py
 
 def conv3x3(in_planes, out_planes, stride=1):
-    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
+    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, 
+                     padding=1, bias=False)
 
 
 class BasicBlock(nn.Module):
@@ -137,7 +138,8 @@ class BasicBlock(nn.Module):
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != self.expansion*planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),
+                nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, 
+                          stride=stride, bias=False),
                 nn.BatchNorm2d(self.expansion*planes)
             )
 
@@ -156,15 +158,18 @@ class Bottleneck(nn.Module):
         super(Bottleneck, self).__init__()
         self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, 
+                               padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
-        self.conv3 = nn.Conv2d(planes, self.expansion*planes, kernel_size=1, bias=False)
+        self.conv3 = nn.Conv2d(planes, self.expansion*planes, kernel_size=1, 
+                               bias=False)
         self.bn3 = nn.BatchNorm2d(self.expansion*planes)
 
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != self.expansion*planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, stride=stride, bias=False),
+                nn.Conv2d(in_planes, self.expansion*planes, kernel_size=1, 
+                          stride=stride, bias=False),
                 nn.BatchNorm2d(self.expansion*planes)
             )
 
@@ -212,6 +217,8 @@ class ResNet(nn.Module):
 
 def ResNet18(num_classes=10):
     return ResNet(BasicBlock, [2,2,2,2], num_classes)
+
+
 ```
 :::
 
@@ -259,8 +266,8 @@ Image Processing for CIFAR-10 without Cutout
 ::: {.cell .code}
 ``` python
 # Image Preprocessing
-
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in 
+ [125.3, 123.0, 113.9]], 
 std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10 = transforms.Compose([])
@@ -466,7 +473,8 @@ Image Processing for CIFAR-10 with Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+normalize_image_cifar10 =transforms.Normalize(mean=[x / 255.0 for x in 
+ [125.3, 123.0, 113.9]], 
 std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10_cutout = transforms.Compose([])
@@ -547,7 +555,8 @@ resnet18_cifar10_cutout = resnet18_cifar10_cutout.cuda()
 learning_rate_resnet18_cifar10_cutout = 0.1
 criterion_resnet18_cifar10_cutout = nn.CrossEntropyLoss().cuda()
 cnn_optimizer_resnet18_cifar10_cutout = torch.optim.SGD(resnet18_cifar10_cutout.parameters(),
-            lr=learning_rate_resnet18_cifar10_cutout, momentum=0.9,nesterov=True, weight_decay=5e-4)
+            lr=learning_rate_resnet18_cifar10_cutout, 
+            momentum=0.9,nesterov=True, weight_decay=5e-4)
 scheduler_resnet18_cifar10_cutout = MultiStepLR(cnn_optimizer_resnet18_cifar10_cutout, milestones=[60, 120, 160], gamma=0.2)
 ```
 :::
@@ -620,7 +629,8 @@ Image Processing for CIFAR-10 with Data Augmentation
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in 
+ [125.3, 123.0, 113.9]], 
 std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10_da = transforms.Compose([])
@@ -769,7 +779,8 @@ Image Processing for CIFAR-10 with Data Augmentation and Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+normalize_image_cifar10 = transforms.Normalize(mean=[x / 255.0 for x in 
+ [125.3, 123.0, 113.9]], 
 std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar10_da_co = transforms.Compose([])
@@ -935,7 +946,8 @@ Image Processing for CIFAR-100 without Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in 
+ [125.3, 123.0, 113.9]], 
 std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100 = transforms.Compose([])
@@ -1088,7 +1100,8 @@ Image Processing for CIFAR-100 with Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in 
+ [125.3, 123.0, 113.9]], 
 std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100_cutout = transforms.Compose([])
@@ -1242,7 +1255,8 @@ Image Processing for CIFAR-100 with Data Augmentation
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in 
+ [125.3, 123.0, 113.9]], 
 std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100_da = transforms.Compose([])
@@ -1391,7 +1405,8 @@ Image Processing for CIFAR-100 with Data Augmentation and Cutout
 ``` python
 # Image Preprocessing
 
-normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]], 
+normalize_image_cifar100 = transforms.Normalize(mean=[x / 255.0 for x in 
+ [125.3, 123.0, 113.9]], 
 std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform_cifar100_da_co = transforms.Compose([])

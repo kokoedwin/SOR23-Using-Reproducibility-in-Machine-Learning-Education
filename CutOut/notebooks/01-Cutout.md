@@ -90,7 +90,8 @@ The Cutout code we are using comes from this specific file in the original GitHu
 
 ::: {.cell .code}
 ``` python
-# Source Code from https://github.com/uoguelph-mlrg/Cutout/blob/master/util/cutout.py
+# Source Code from 
+# https://github.com/uoguelph-mlrg/Cutout/blob/master/util/cutout.py
 class Cutout(object):
     """Randomly mask out one or more patches from an image.
 
@@ -162,7 +163,7 @@ After the image is uploaded, we can use Python code to load it into our notebook
 ```python
 # TODO: Replace 'sample.png' with the filename of your own image. 
 # If your image is inside a directory, include the directory's name in the path.
-img = Image.open('./sample.png')
+img = Image.open(current_path + 'sample.png')
 
 # Resize the image to 100x100
 img = img.resize((100, 100))
@@ -268,7 +269,7 @@ In the following code snippet, we demonstrate some "standard" data augmentation 
 # Define standard data augmentation techniques
 transforms_data_augmentation = transforms.Compose([
     RandomHorizontalFlip(),
-    RandomCrop(size=(100, 100), padding=4),  # assuming input image is size 100x100
+    RandomCrop(size=(100, 100), padding=4),
     ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
 ])
 
