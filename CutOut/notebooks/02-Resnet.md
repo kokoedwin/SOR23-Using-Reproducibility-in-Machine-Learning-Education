@@ -263,6 +263,24 @@ def test(loader, cnn):
 ::: 
 
 ::: {.cell .markdown}
+
+In this experiments section, we will evaluate these claims using a ResNet model in CIFAR-10 without cutout and also with cutout.
+
+1. Cutout improves the robustness and overall performance of convolutional neural networks.
+2. Cutout can be used in conjunction with existing forms of data augmentation and other regularizers to further improve model performance.
+
+The specific quantitative claims are given in the following table:
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) and “+” indicates standard data augmentation (mirror
++ crop)
+
+| **Network** | **CIFAR-10** | 
+| ----------- | ------------ | 
+| ResNet18    | 10.63 ±  0.26      | 
+| ResNet18 + cutout | 9.31 ± 0.18  | 
+:::
+
+::: {.cell .markdown}
 Image Processing for CIFAR-10 without Cutout
 :::
 
@@ -405,7 +423,7 @@ torch.save(resnet18_cifar10.state_dict(), current_path + 'checkpoints/' + file_n
 
 
 final_test_acc_resnet18_cifar10 = (1 - test(test_loader_cifar10, resnet18_cifar10))*100
-print('Test error rates (%) on ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_resnet18_cifar10))
+print('Test error rates (%%) on ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_resnet18_cifar10))
 ``` 
 :::
 
@@ -614,7 +632,7 @@ torch.save(resnet18_cifar10_cutout.state_dict(), current_path + 'checkpoints/' +
 
 
 final_test_acc_resnet18_cifar10_cutout = (1 - test(test_loader_cifar10,resnet18_cifar10_cutout))*100
-print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
+print('Test error rates (%%) on ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
 ```
 :::
 
@@ -623,6 +641,23 @@ print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-10 Test Dataset:
 ### 2.2.3. Training ResNet-18 in CF10 with Data Augmentation 
 ::: 
 
+::: {.cell .markdown}
+
+In this experiments section, we will evaluate these claims using a ResNet model in CIFAR-10 with data augmentation and also without cutout and also with cutout.
+
+1. Cutout improves the robustness and overall performance of convolutional neural networks.
+2. Cutout can be used in conjunction with existing forms of data augmentation and other regularizers to further improve model performance.
+
+The specific quantitative claims are given in the following table:
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) and “+” indicates standard data augmentation (mirror
++ crop)
+
+| **Network** | **CIFAR-10+** | 
+| ----------- | ------------ | 
+| ResNet18    | 4.72 ±   0.21     | 
+| ResNet18 + cutout | 3.99 ±  0.13  | 
+:::
 
 ::: {.cell .markdown} 
 Image Processing for CIFAR-10 with Data Augmentation 
@@ -765,7 +800,7 @@ torch.save(resnet18_cifar10_da.state_dict(), current_path + 'checkpoints/' + fil
 
 
 final_test_acc_resnet18_cifar10_da = (1 - test(test_loader_cifar10,resnet18_cifar10_da))*100
-print('Test error rates (%) on ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
+print('Test error rates (%%) on ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
 ```
 :::
 
@@ -920,16 +955,16 @@ torch.save(resnet18_cifar10_da_cutout.state_dict(), current_path + 'checkpoints/
 
 
 final_test_acc_resnet18_cifar10_da_cutout = (1 - test(test_loader_cifar10,resnet18_cifar10_da_cutout))*100
-print('Test error rates (%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da_cutout))
+print('Test error rates (%%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da_cutout))
 ```
 :::
 
 ::: {.cell .code}
 ``` python
-print('Test error rates (%) on ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_resnet18_cifar10))
-print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
-print('Test error rates (%) on ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
-print('Test error rates (%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da_cutout))
+print('Test error rates (%%) on ResNet-18 without Cutout for Test CIFAR-10 Dataset: %.3f' % (final_test_acc_resnet18_cifar10))
+print('Test error rates (%%) on ResNet-18 using Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_cutout))
+print('Test error rates (%%) on ResNet-18 using Data Augmentation for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da))
+print('Test error rates (%%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-10 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar10_da_cutout))
 ```
 :::
 
@@ -938,8 +973,26 @@ print('Test error rates (%) on ResNet-18 using Data Augmentation and  Cutout for
 :::
 
 ::: {.cell .markdown}
+
+In this experiments section, we will evaluate these claims using a ResNet model in CIFAR-100 without cutout and also with cutout.
+
+1. Cutout improves the robustness and overall performance of convolutional neural networks.
+2. Cutout can be used in conjunction with existing forms of data augmentation and other regularizers to further improve model performance.
+
+The specific quantitative claims are given in the following table:
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) 
+
+| **Network** | **CIFAR-100** | 
+| ----------- | ------------ | 
+| ResNet18    | 36.68  ± 0.57     | 
+| ResNet18 + cutout |34.98 ±    0.29 | 
+:::
+
+::: {.cell .markdown}
 ### 2.3.1. Training ResNet-18 in CF100 without Cutout
 ::: 
+
 
 ::: {.cell .markdown}
 Image Processing for CIFAR-100 without Cutout
@@ -1084,7 +1137,7 @@ torch.save(resnet18_cifar100.state_dict(), current_path + 'checkpoints/' + file_
 
 
 final_test_acc_resnet18_cifar100 = (1 - test(test_loader_cifar100, resnet18_cifar100))*100
-print('Test error rates (%) on ResNet-18 without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_resnet18_cifar100))
+print('Test error rates (%%) on ResNet-18 without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_resnet18_cifar100))
 ``` 
 :::
 
@@ -1092,7 +1145,6 @@ print('Test error rates (%) on ResNet-18 without Cutout for Test CIFAR-100 Datas
 ::: {.cell .markdown}
 ### 2.2.2. Training ResNet-18 in CF100 with Cutout
 ::: 
-
 
 
 ::: {.cell .markdown} 
@@ -1240,7 +1292,7 @@ torch.save(resnet18_cifar100_cutout.state_dict(), current_path + 'checkpoints/' 
 
 
 final_test_acc_resnet18_cifar100_cutout = (1 - test(test_loader_cifar100,resnet18_cifar100_cutout))*100
-print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
+print('Test error rates (%%) on ResNet-18 using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
 ```
 :::
 
@@ -1249,6 +1301,22 @@ print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-100 Test Dataset
 ### 2.2.3. Training ResNet-18 in CF100 with Data Augmentation 
 ::: 
 
+:: {.cell .markdown}
+
+In this experiments section, we will evaluate these claims using a ResNet model in CIFAR-100 with Data Augmentation and also without or with cutout.
+
+1. Cutout improves the robustness and overall performance of convolutional neural networks.
+2. Cutout can be used in conjunction with existing forms of data augmentation and other regularizers to further improve model performance.
+
+The specific quantitative claims are given in the following table:
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) 
+
+| **Network** | **CIFAR-100+** | 
+| ----------- | ------------ | 
+| ResNet18    | 22.46  ±    0.31     | 
+| ResNet18 + cutout |21.96  ±   0.24  | 
+:::
 
 ::: {.cell .markdown} 
 Image Processing for CIFAR-100 with Data Augmentation 
@@ -1391,7 +1459,7 @@ torch.save(resnet18_cifar100_da.state_dict(), current_path + 'checkpoints/' + fi
 
 
 final_test_acc_resnet18_cifar100_da = (1 - test(test_loader_cifar100,resnet18_cifar100_da))*100
-print('Test error rates (%) on ResNet-18 using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da))
+print('Test error rates (%%) on ResNet-18 using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da))
 ```
 :::
 
@@ -1546,15 +1614,15 @@ torch.save(resnet18_cifar100_da_cutout.state_dict(),current_path +  'checkpoints
 
 
 final_test_acc_resnet18_cifar100_da_cutout = (1 - test(test_loader_cifar100,resnet18_cifar100_da_cutout))*100
-print('Test error rates (%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da_cutout))
+print('Test error rates (%%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da_cutout))
 ```
 :::
 
 ::: {.cell .code}
 ``` python
-print('Test error rates (%) on ResNet-18 without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_resnet18_cifar100))
-print('Test error rates (%) on ResNet-18 using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
-print('Test error rates (%) on ResNet-18 using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da))
-print('Test error rates (%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da_cutout))
+print('Test error rates (%%) on ResNet-18 without Cutout for Test CIFAR-100 Dataset: %.3f' % (final_test_acc_resnet18_cifar100))
+print('Test error rates (%%) on ResNet-18 using Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_cutout))
+print('Test error rates (%%) on ResNet-18 using Data Augmentation for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da))
+print('Test error rates (%%) on ResNet-18 using Data Augmentation and  Cutout for CIFAR-100 Test Dataset: %.3f' % (final_test_acc_resnet18_cifar100_da_cutout))
 ```
 :::
