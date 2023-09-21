@@ -247,6 +247,22 @@ def test(loader, cnn):
 ::: 
 
 ::: {.cell .markdown}
+In this experiments section, we will evaluate these claims using a WideResNet model in CIFAR-10 without or with cutout.
+
+1. Cutout improves the robustness and overall performance of convolutional neural networks.
+2. Cutout can be used in conjunction with existing forms of data augmentation and other regularizers to further improve model performance.
+
+The specific quantitative claims are given in the following table:
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) 
+
+| **Network** | **CIFAR-10** | 
+| ----------- | ------------ | 
+| WideResNet    | 6.97  ±   0.22     | 
+| WideResNet + cutout |5.54 ±  0.08  | 
+:::
+
+::: {.cell .markdown}
 Image Processing for CIFAR-10
 :::
 
@@ -604,6 +620,22 @@ print('Test error rates (%%) on  WideResNet using Cutout for CIFAR-10 Test Datas
 ### 3.2.3. Training WideResNet in CF10 with Data Augmentation 
 ::: 
 
+::: {.cell .markdown}
+In this experiments section, we will evaluate these claims using a WideResNet model in CIFAR-10 with Data Augmentation and also without or with cutout.
+
+1. Cutout improves the robustness and overall performance of convolutional neural networks.
+2. Cutout can be used in conjunction with existing forms of data augmentation and other regularizers to further improve model performance.
+
+The specific quantitative claims are given in the following table:
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) and “+” indicates standard data augmentation (mirror+ crop)
+
+| **Network** | **CIFAR-10+** | 
+| ----------- | ------------ | 
+| WideResNet    | 3.87 ±  0.08    | 
+| WideResNet + cutout |3.08 ±   0.16 | 
+:::
+
 
 ::: {.cell .markdown} 
 Image Processing for CIFAR-10 with Data Augmentation 
@@ -921,6 +953,23 @@ print('Test error rates (%%) on  WideResNet using Data Augmentation and  Cutout 
 ::: 
 
 ::: {.cell .markdown}
+In this experiments section, we will evaluate these claims using a WideResNet model in CIFAR-100 without or with cutout.
+
+1. Cutout improves the robustness and overall performance of convolutional neural networks.
+2. Cutout can be used in conjunction with existing forms of data augmentation and other regularizers to further improve model performance.
+
+The specific quantitative claims are given in the following table:
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) 
+
+| **Network** | **CIFAR-100** | 
+| ----------- | ------------ | 
+| WideResNet    | 26.06  ±  0.22    | 
+| WideResNet + cutout |23.94 ±  0.15 | 
+:::
+
+
+::: {.cell .markdown}
 Image Processing for CIFAR-100
 :::
 
@@ -1227,6 +1276,21 @@ print('Test error rates (%%) on  WideResNet using Cutout for CIFAR-100 Test Data
 ### 3.3.3. Training WideResNet in CF100 with Data Augmentation 
 ::: 
 
+::: {.cell .markdown}
+In this experiments section, we will evaluate these claims using a WideResNet model in CIFAR-100 with Data Augmentation and also without or with cutout.
+
+1. Cutout improves the robustness and overall performance of convolutional neural networks.
+2. Cutout can be used in conjunction with existing forms of data augmentation and other regularizers to further improve model performance.
+
+The specific quantitative claims are given in the following table:
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs) and “+” indicates standard data augmentation (mirror+ crop)
+
+| **Network** | **CIFAR-100+** | 
+| ----------- | ------------ | 
+| WideResNet    | 18.8 ±  0.08    | 
+| WideResNet + cutout |18.41 ±   0.27 | 
+:::
 
 ::: {.cell .markdown} 
 Image Processing for CIFAR-100 
@@ -1539,6 +1603,22 @@ print('Test error rates (%%) on  WideResNet using Data Augmentation and  Cutout 
 
 ::: {.cell .markdown}
 ## 3.4 Training WideResNet in SVHN
+:::
+
+::: {.cell .markdown}
+In this experiments section, we will evaluate these claims using a WideResNet model in SVHN with Data Augmentation and also without or with cutout.
+
+1. Cutout improves the robustness and overall performance of convolutional neural networks.
+2. Cutout can be used in conjunction with existing forms of data augmentation and other regularizers to further improve model performance.
+
+The specific quantitative claims are given in the following table:
+
+Test error (%, flip/translation augmentation, mean/std normalization, mean of 5 runs)
+
+| **Network** | **SVHN** | 
+| ----------- | ------------ | 
+| WideResNet    | 1.60 ± 0.05  | 
+| WideResNet + cutout |1.30 ± 0.03| 
 :::
 
 ::: {.cell .markdown}

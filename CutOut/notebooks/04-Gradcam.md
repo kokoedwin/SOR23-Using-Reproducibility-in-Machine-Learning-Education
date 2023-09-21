@@ -78,6 +78,10 @@ current_path ="./"
 :::
 
 ::: {.cell .markdown}
+Note: This section of the notebook requires specific model checkpoints to be available in the "checkpoints" directory. These checkpoints are files where the trained models were saved during previous sections. You don't necessarily need to run every part of this notebook to use GradCam for a specific model. If you intend to use GradCam for a particular model (e.g., ResNet18 or WideResNet), please make sure that you have previously run and saved the model checkpoints for that architecture. These checkpoints should be named appropriately (e.g., "resnet18_cifar100_cutout.pt" or "wideresnet_cifar10.pt") and be located in the "checkpoints" directory.
+:::
+
+::: {.cell .markdown}
 ## 4.2 Implementation Grad-CAM for ResNet Model
 :::
 
